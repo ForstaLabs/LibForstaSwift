@@ -1,0 +1,7 @@
+github "Alamofire/Alamofire" "4.8.2"
+github "ForstaLabs/libsignal-protocol-swift" "30246d4fddb224eb22311ca188d9bb0bb0bc9720"
+github "SwiftyJSON/SwiftyJSON" "5.0.0"
+github "apple/swift-protobuf" "1.6.0"
+github "auth0/JWTDecode.swift" "2.3.0"
+github "daltoniam/Starscream" "3.1.0"
+github "mxcl/PromiseKit" "6.10.0"

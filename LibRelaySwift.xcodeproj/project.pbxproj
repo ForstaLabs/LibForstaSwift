@@ -1,0 +1,693 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 51;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DB2B009F22E12CC000B9931A /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009822E12CC000B9931A /* SwiftyJSON.framework */; };
+		DB2B00A022E12CC000B9931A /* Starscream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009922E12CC000B9931A /* Starscream.framework */; };
+		DB2B00A122E12CC000B9931A /* PromiseKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009A22E12CC000B9931A /* PromiseKit.framework */; };
+		DB2B00A222E12CC000B9931A /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009B22E12CC000B9931A /* Alamofire.framework */; };
+		DB2B00A322E12CC000B9931A /* SwiftProtobuf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009C22E12CC000B9931A /* SwiftProtobuf.framework */; };
+		DB2B00A422E12CC000B9931A /* SignalProtocol.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009D22E12CC000B9931A /* SignalProtocol.framework */; };
+		DB2B00A522E12CC000B9931A /* JWTDecode.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009E22E12CC000B9931A /* JWTDecode.framework */; };
+		DB2B00A822E12D4600B9931A /* AtlasClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00A722E12D4600B9931A /* AtlasClient.swift */; };
+		DB2B00B122E12D6100B9931A /* the-Makefile in Resources */ = {isa = PBXBuildFile; fileRef = DB2B00AA22E12D6100B9931A /* the-Makefile */; };
+		DB2B00B222E12D6100B9931A /* DeviceMessages.proto in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00AB22E12D6100B9931A /* DeviceMessages.proto */; };
+		DB2B00B322E12D6100B9931A /* IncomingPushMessageSignal.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00AC22E12D6100B9931A /* IncomingPushMessageSignal.pb.swift */; };
+		DB2B00B422E12D6100B9931A /* SubProtocol.proto in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00AD22E12D6100B9931A /* SubProtocol.proto */; };
+		DB2B00B522E12D6100B9931A /* DeviceMessages.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00AE22E12D6100B9931A /* DeviceMessages.pb.swift */; };
+		DB2B00B622E12D6100B9931A /* SubProtocol.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00AF22E12D6100B9931A /* SubProtocol.pb.swift */; };
+		DB2B00B722E12D6100B9931A /* IncomingPushMessageSignal.proto in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00B022E12D6100B9931A /* IncomingPushMessageSignal.proto */; };
+		DB2B00BB22E12D6A00B9931A /* WebSocketResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00B922E12D6A00B9931A /* WebSocketResource.swift */; };
+		DB2B00BC22E12D6A00B9931A /* SignalClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00BA22E12D6A00B9931A /* SignalClient.swift */; };
+		DB2B00C022E12D7100B9931A /* RelayStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00BE22E12D7100B9931A /* RelayStore.swift */; };
+		DB2B00C122E12D7100B9931A /* KVStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00BF22E12D7100B9931A /* KVStorageProtocol.swift */; };
+		DB2B00C722E12D7800B9931A /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00C322E12D7800B9931A /* Utilities.swift */; };
+		DB2B00C822E12D7800B9931A /* SignalCommonCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00C422E12D7800B9931A /* SignalCommonCrypto.swift */; };
+		DB2B00C922E12D7800B9931A /* RelayError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00C522E12D7800B9931A /* RelayError.swift */; };
+		DB2B00CA22E12D7800B9931A /* SignalCryptoProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00C622E12D7800B9931A /* SignalCryptoProvider.swift */; };
+		DB2B00CE22E12DB200B9931A /* KVStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00CB22E12DB200B9931A /* KVStoreTests.swift */; };
+		DB2B00CF22E12DB200B9931A /* AtlasClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00CC22E12DB200B9931A /* AtlasClientTests.swift */; };
+		DB2B00D022E12DB200B9931A /* SignalClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00CD22E12DB200B9931A /* SignalClientTests.swift */; };
+		DB2B00D222E12EA000B9931A /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009B22E12CC000B9931A /* Alamofire.framework */; };
+		DB2B00D322E12EA400B9931A /* JWTDecode.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009E22E12CC000B9931A /* JWTDecode.framework */; };
+		DB2B00D422E12EA700B9931A /* PromiseKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009A22E12CC000B9931A /* PromiseKit.framework */; };
+		DB2B00D522E12EAA00B9931A /* SignalProtocol.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009D22E12CC000B9931A /* SignalProtocol.framework */; };
+		DB2B00D622E12EAD00B9931A /* Starscream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009922E12CC000B9931A /* Starscream.framework */; };
+		DB2B00D722E12EB000B9931A /* SwiftProtobuf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009C22E12CC000B9931A /* SwiftProtobuf.framework */; };
+		DB2B00D822E12EB300B9931A /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009822E12CC000B9931A /* SwiftyJSON.framework */; };
+		DB2B00D922E12F6A00B9931A /* Alamofire.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B009B22E12CC000B9931A /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DB2B00DA22E12F6A00B9931A /* JWTDecode.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B009E22E12CC000B9931A /* JWTDecode.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DB2B00DB22E12F6A00B9931A /* PromiseKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B009A22E12CC000B9931A /* PromiseKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DB2B00DC22E12F6A00B9931A /* SignalProtocol.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B009D22E12CC000B9931A /* SignalProtocol.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DB2B00DD22E12F6A00B9931A /* Starscream.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B009922E12CC000B9931A /* Starscream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DB2B00DE22E12F6A00B9931A /* SwiftProtobuf.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B009C22E12CC000B9931A /* SwiftProtobuf.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DB2B00DF22E12F6A00B9931A /* SwiftyJSON.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B009822E12CC000B9931A /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DBDB773122E124610027EEB0 /* LibRelaySwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBDB772722E124610027EEB0 /* LibRelaySwift.framework */; };
+		DBDB773622E124610027EEB0 /* LibRelaySwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDB773522E124610027EEB0 /* LibRelaySwiftTests.swift */; };
+		DBDB773822E124610027EEB0 /* LibRelaySwift.h in Headers */ = {isa = PBXBuildFile; fileRef = DBDB772A22E124610027EEB0 /* LibRelaySwift.h */; settings = {ATTRIBUTES = (Public, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		DBDB773222E124610027EEB0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DBDB771E22E124610027EEB0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DBDB772622E124610027EEB0;
+			remoteInfo = LibRelaySwift;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DB2B00D122E12E7F00B9931A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				DB2B00D922E12F6A00B9931A /* Alamofire.framework in CopyFiles */,
+				DB2B00DA22E12F6A00B9931A /* JWTDecode.framework in CopyFiles */,
+				DB2B00DB22E12F6A00B9931A /* PromiseKit.framework in CopyFiles */,
+				DB2B00DC22E12F6A00B9931A /* SignalProtocol.framework in CopyFiles */,
+				DB2B00DD22E12F6A00B9931A /* Starscream.framework in CopyFiles */,
+				DB2B00DE22E12F6A00B9931A /* SwiftProtobuf.framework in CopyFiles */,
+				DB2B00DF22E12F6A00B9931A /* SwiftyJSON.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		DB2B009822E12CC000B9931A /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/iOS/SwiftyJSON.framework; sourceTree = "<group>"; };
+		DB2B009922E12CC000B9931A /* Starscream.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Starscream.framework; path = Carthage/Build/iOS/Starscream.framework; sourceTree = "<group>"; };
+		DB2B009A22E12CC000B9931A /* PromiseKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PromiseKit.framework; path = Carthage/Build/iOS/PromiseKit.framework; sourceTree = "<group>"; };
+		DB2B009B22E12CC000B9931A /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/iOS/Alamofire.framework; sourceTree = "<group>"; };
+		DB2B009C22E12CC000B9931A /* SwiftProtobuf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftProtobuf.framework; path = Carthage/Build/iOS/SwiftProtobuf.framework; sourceTree = "<group>"; };
+		DB2B009D22E12CC000B9931A /* SignalProtocol.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SignalProtocol.framework; path = Carthage/Build/iOS/SignalProtocol.framework; sourceTree = "<group>"; };
+		DB2B009E22E12CC000B9931A /* JWTDecode.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JWTDecode.framework; path = Carthage/Build/iOS/JWTDecode.framework; sourceTree = "<group>"; };
+		DB2B00A722E12D4600B9931A /* AtlasClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AtlasClient.swift; sourceTree = "<group>"; };
+		DB2B00AA22E12D6100B9931A /* the-Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "the-Makefile"; sourceTree = "<group>"; };
+		DB2B00AB22E12D6100B9931A /* DeviceMessages.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.protobuf; path = DeviceMessages.proto; sourceTree = "<group>"; };
+		DB2B00AC22E12D6100B9931A /* IncomingPushMessageSignal.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IncomingPushMessageSignal.pb.swift; sourceTree = "<group>"; };
+		DB2B00AD22E12D6100B9931A /* SubProtocol.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.protobuf; path = SubProtocol.proto; sourceTree = "<group>"; };
+		DB2B00AE22E12D6100B9931A /* DeviceMessages.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceMessages.pb.swift; sourceTree = "<group>"; };
+		DB2B00AF22E12D6100B9931A /* SubProtocol.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubProtocol.pb.swift; sourceTree = "<group>"; };
+		DB2B00B022E12D6100B9931A /* IncomingPushMessageSignal.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.protobuf; path = IncomingPushMessageSignal.proto; sourceTree = "<group>"; };
+		DB2B00B922E12D6A00B9931A /* WebSocketResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocketResource.swift; sourceTree = "<group>"; };
+		DB2B00BA22E12D6A00B9931A /* SignalClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalClient.swift; sourceTree = "<group>"; };
+		DB2B00BE22E12D7100B9931A /* RelayStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RelayStore.swift; sourceTree = "<group>"; };
+		DB2B00BF22E12D7100B9931A /* KVStorageProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KVStorageProtocol.swift; sourceTree = "<group>"; };
+		DB2B00C322E12D7800B9931A /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		DB2B00C422E12D7800B9931A /* SignalCommonCrypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalCommonCrypto.swift; sourceTree = "<group>"; };
+		DB2B00C522E12D7800B9931A /* RelayError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RelayError.swift; sourceTree = "<group>"; };
+		DB2B00C622E12D7800B9931A /* SignalCryptoProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalCryptoProvider.swift; sourceTree = "<group>"; };
+		DB2B00CB22E12DB200B9931A /* KVStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KVStoreTests.swift; sourceTree = "<group>"; };
+		DB2B00CC22E12DB200B9931A /* AtlasClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AtlasClientTests.swift; sourceTree = "<group>"; };
+		DB2B00CD22E12DB200B9931A /* SignalClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalClientTests.swift; sourceTree = "<group>"; };
+		DBDB772722E124610027EEB0 /* LibRelaySwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LibRelaySwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBDB772A22E124610027EEB0 /* LibRelaySwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LibRelaySwift.h; sourceTree = "<group>"; };
+		DBDB772B22E124610027EEB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DBDB773022E124610027EEB0 /* LibRelaySwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LibRelaySwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBDB773522E124610027EEB0 /* LibRelaySwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibRelaySwiftTests.swift; sourceTree = "<group>"; };
+		DBDB773722E124610027EEB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DBDB772422E124610027EEB0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB2B009F22E12CC000B9931A /* SwiftyJSON.framework in Frameworks */,
+				DB2B00A022E12CC000B9931A /* Starscream.framework in Frameworks */,
+				DB2B00A122E12CC000B9931A /* PromiseKit.framework in Frameworks */,
+				DB2B00A222E12CC000B9931A /* Alamofire.framework in Frameworks */,
+				DB2B00A322E12CC000B9931A /* SwiftProtobuf.framework in Frameworks */,
+				DB2B00A422E12CC000B9931A /* SignalProtocol.framework in Frameworks */,
+				DB2B00A522E12CC000B9931A /* JWTDecode.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DBDB772D22E124610027EEB0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB2B00D822E12EB300B9931A /* SwiftyJSON.framework in Frameworks */,
+				DB2B00D322E12EA400B9931A /* JWTDecode.framework in Frameworks */,
+				DB2B00D622E12EAD00B9931A /* Starscream.framework in Frameworks */,
+				DBDB773122E124610027EEB0 /* LibRelaySwift.framework in Frameworks */,
+				DB2B00D222E12EA000B9931A /* Alamofire.framework in Frameworks */,
+				DB2B00D422E12EA700B9931A /* PromiseKit.framework in Frameworks */,
+				DB2B00D522E12EAA00B9931A /* SignalProtocol.framework in Frameworks */,
+				DB2B00D722E12EB000B9931A /* SwiftProtobuf.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DB2B00A622E12D4600B9931A /* Atlas */ = {
+			isa = PBXGroup;
+			children = (
+				DB2B00A722E12D4600B9931A /* AtlasClient.swift */,
+			);
+			path = Atlas;
+			sourceTree = "<group>";
+		};
+		DB2B00A922E12D6100B9931A /* protos */ = {
+			isa = PBXGroup;
+			children = (
+				DB2B00AA22E12D6100B9931A /* the-Makefile */,
+				DB2B00AB22E12D6100B9931A /* DeviceMessages.proto */,
+				DB2B00AC22E12D6100B9931A /* IncomingPushMessageSignal.pb.swift */,
+				DB2B00AD22E12D6100B9931A /* SubProtocol.proto */,
+				DB2B00AE22E12D6100B9931A /* DeviceMessages.pb.swift */,
+				DB2B00AF22E12D6100B9931A /* SubProtocol.pb.swift */,
+				DB2B00B022E12D6100B9931A /* IncomingPushMessageSignal.proto */,
+			);
+			path = protos;
+			sourceTree = "<group>";
+		};
+		DB2B00B822E12D6A00B9931A /* Signal */ = {
+			isa = PBXGroup;
+			children = (
+				DB2B00B922E12D6A00B9931A /* WebSocketResource.swift */,
+				DB2B00BA22E12D6A00B9931A /* SignalClient.swift */,
+			);
+			path = Signal;
+			sourceTree = "<group>";
+		};
+		DB2B00BD22E12D7100B9931A /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				DB2B00BE22E12D7100B9931A /* RelayStore.swift */,
+				DB2B00BF22E12D7100B9931A /* KVStorageProtocol.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		DB2B00C222E12D7800B9931A /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				DB2B00C322E12D7800B9931A /* Utilities.swift */,
+				DB2B00C422E12D7800B9931A /* SignalCommonCrypto.swift */,
+				DB2B00C522E12D7800B9931A /* RelayError.swift */,
+				DB2B00C622E12D7800B9931A /* SignalCryptoProvider.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		DBDB771D22E124610027EEB0 = {
+			isa = PBXGroup;
+			children = (
+				DBDB772922E124610027EEB0 /* LibRelaySwift */,
+				DBDB773422E124610027EEB0 /* LibRelaySwiftTests */,
+				DBDB772822E124610027EEB0 /* Products */,
+				DBDB774122E128060027EEB0 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		DBDB772822E124610027EEB0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DBDB772722E124610027EEB0 /* LibRelaySwift.framework */,
+				DBDB773022E124610027EEB0 /* LibRelaySwiftTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DBDB772922E124610027EEB0 /* LibRelaySwift */ = {
+			isa = PBXGroup;
+			children = (
+				DB2B00C222E12D7800B9931A /* Utilities */,
+				DB2B00BD22E12D7100B9931A /* Storage */,
+				DB2B00B822E12D6A00B9931A /* Signal */,
+				DB2B00A922E12D6100B9931A /* protos */,
+				DB2B00A622E12D4600B9931A /* Atlas */,
+				DBDB772A22E124610027EEB0 /* LibRelaySwift.h */,
+				DBDB772B22E124610027EEB0 /* Info.plist */,
+			);
+			path = LibRelaySwift;
+			sourceTree = "<group>";
+		};
+		DBDB773422E124610027EEB0 /* LibRelaySwiftTests */ = {
+			isa = PBXGroup;
+			children = (
+				DB2B00CC22E12DB200B9931A /* AtlasClientTests.swift */,
+				DB2B00CB22E12DB200B9931A /* KVStoreTests.swift */,
+				DB2B00CD22E12DB200B9931A /* SignalClientTests.swift */,
+				DBDB773522E124610027EEB0 /* LibRelaySwiftTests.swift */,
+				DBDB773722E124610027EEB0 /* Info.plist */,
+			);
+			path = LibRelaySwiftTests;
+			sourceTree = "<group>";
+		};
+		DBDB774122E128060027EEB0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DB2B009B22E12CC000B9931A /* Alamofire.framework */,
+				DB2B009E22E12CC000B9931A /* JWTDecode.framework */,
+				DB2B009A22E12CC000B9931A /* PromiseKit.framework */,
+				DB2B009D22E12CC000B9931A /* SignalProtocol.framework */,
+				DB2B009922E12CC000B9931A /* Starscream.framework */,
+				DB2B009C22E12CC000B9931A /* SwiftProtobuf.framework */,
+				DB2B009822E12CC000B9931A /* SwiftyJSON.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		DBDB772222E124610027EEB0 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DBDB773822E124610027EEB0 /* LibRelaySwift.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		DBDB772622E124610027EEB0 /* LibRelaySwift */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DBDB773B22E124610027EEB0 /* Build configuration list for PBXNativeTarget "LibRelaySwift" */;
+			buildPhases = (
+				DBDB772222E124610027EEB0 /* Headers */,
+				DBDB772322E124610027EEB0 /* Sources */,
+				DBDB772422E124610027EEB0 /* Frameworks */,
+				DBDB772522E124610027EEB0 /* Resources */,
+				DBDB775022E128370027EEB0 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LibRelaySwift;
+			productName = LibRelaySwift;
+			productReference = DBDB772722E124610027EEB0 /* LibRelaySwift.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		DBDB772F22E124610027EEB0 /* LibRelaySwiftTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DBDB773E22E124610027EEB0 /* Build configuration list for PBXNativeTarget "LibRelaySwiftTests" */;
+			buildPhases = (
+				DBDB772C22E124610027EEB0 /* Sources */,
+				DBDB772D22E124610027EEB0 /* Frameworks */,
+				DBDB772E22E124610027EEB0 /* Resources */,
+				DB2B00D122E12E7F00B9931A /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DBDB773322E124610027EEB0 /* PBXTargetDependency */,
+			);
+			name = LibRelaySwiftTests;
+			productName = LibRelaySwiftTests;
+			productReference = DBDB773022E124610027EEB0 /* LibRelaySwiftTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DBDB771E22E124610027EEB0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1020;
+				LastUpgradeCheck = 1020;
+				ORGANIZATIONNAME = "Forsta, Inc.";
+				TargetAttributes = {
+					DBDB772622E124610027EEB0 = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
+					DBDB772F22E124610027EEB0 = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
+				};
+			};
+			buildConfigurationList = DBDB772122E124610027EEB0 /* Build configuration list for PBXProject "LibRelaySwift" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = DBDB771D22E124610027EEB0;
+			productRefGroup = DBDB772822E124610027EEB0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DBDB772622E124610027EEB0 /* LibRelaySwift */,
+				DBDB772F22E124610027EEB0 /* LibRelaySwiftTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DBDB772522E124610027EEB0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB2B00B122E12D6100B9931A /* the-Makefile in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DBDB772E22E124610027EEB0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		DBDB775022E128370027EEB0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"$(SRCROOT)/carthageInput.xcfilelist",
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/usr/local/bin/carthage copy-frameworks\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DBDB772322E124610027EEB0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB2B00B222E12D6100B9931A /* DeviceMessages.proto in Sources */,
+				DB2B00C022E12D7100B9931A /* RelayStore.swift in Sources */,
+				DB2B00C922E12D7800B9931A /* RelayError.swift in Sources */,
+				DB2B00BB22E12D6A00B9931A /* WebSocketResource.swift in Sources */,
+				DB2B00A822E12D4600B9931A /* AtlasClient.swift in Sources */,
+				DB2B00C822E12D7800B9931A /* SignalCommonCrypto.swift in Sources */,
+				DB2B00B322E12D6100B9931A /* IncomingPushMessageSignal.pb.swift in Sources */,
+				DB2B00C122E12D7100B9931A /* KVStorageProtocol.swift in Sources */,
+				DB2B00C722E12D7800B9931A /* Utilities.swift in Sources */,
+				DB2B00B622E12D6100B9931A /* SubProtocol.pb.swift in Sources */,
+				DB2B00B522E12D6100B9931A /* DeviceMessages.pb.swift in Sources */,
+				DB2B00CA22E12D7800B9931A /* SignalCryptoProvider.swift in Sources */,
+				DB2B00B422E12D6100B9931A /* SubProtocol.proto in Sources */,
+				DB2B00BC22E12D6A00B9931A /* SignalClient.swift in Sources */,
+				DB2B00B722E12D6100B9931A /* IncomingPushMessageSignal.proto in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DBDB772C22E124610027EEB0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB2B00CF22E12DB200B9931A /* AtlasClientTests.swift in Sources */,
+				DB2B00CE22E12DB200B9931A /* KVStoreTests.swift in Sources */,
+				DB2B00D022E12DB200B9931A /* SignalClientTests.swift in Sources */,
+				DBDB773622E124610027EEB0 /* LibRelaySwiftTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DBDB773322E124610027EEB0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DBDB772622E124610027EEB0 /* LibRelaySwift */;
+			targetProxy = DBDB773222E124610027EEB0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		DBDB773922E124610027EEB0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		DBDB773A22E124610027EEB0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		DBDB773C22E124610027EEB0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = THHR8L4QV3;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				INFOPLIST_FILE = LibRelaySwift/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.forsta.LibRelaySwift;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DBDB773D22E124610027EEB0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = THHR8L4QV3;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				INFOPLIST_FILE = LibRelaySwift/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.forsta.LibRelaySwift;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DBDB773F22E124610027EEB0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = THHR8L4QV3;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				INFOPLIST_FILE = LibRelaySwiftTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.forsta.LibRelaySwiftTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DBDB774022E124610027EEB0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = THHR8L4QV3;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				INFOPLIST_FILE = LibRelaySwiftTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.forsta.LibRelaySwiftTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DBDB772122E124610027EEB0 /* Build configuration list for PBXProject "LibRelaySwift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DBDB773922E124610027EEB0 /* Debug */,
+				DBDB773A22E124610027EEB0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DBDB773B22E124610027EEB0 /* Build configuration list for PBXNativeTarget "LibRelaySwift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DBDB773C22E124610027EEB0 /* Debug */,
+				DBDB773D22E124610027EEB0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DBDB773E22E124610027EEB0 /* Build configuration list for PBXNativeTarget "LibRelaySwiftTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DBDB773F22E124610027EEB0 /* Debug */,
+				DBDB774022E124610027EEB0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DBDB771E22E124610027EEB0 /* Project object */;
+}

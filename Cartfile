@@ -1,0 +1,8 @@
+github "ForstaLabs/libsignal-protocol-swift" "tweaks"
+github "apple/swift-protobuf" ~> 1.0
+github "daltoniam/Starscream"
+github "Alamofire/Alamofire"
+github "SwiftyJSON/SwiftyJSON"
+github "mxcl/PromiseKit"
+github "auth0/JWTDecode.swift"
+#  pod 'SwiftOTP'
