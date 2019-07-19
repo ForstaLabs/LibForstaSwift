@@ -5,4 +5,4 @@ github "Alamofire/Alamofire"
 github "SwiftyJSON/SwiftyJSON"
 github "mxcl/PromiseKit"
 github "auth0/JWTDecode.swift"
-#  pod 'SwiftOTP'
+github "mattrubin/OneTimePassword"

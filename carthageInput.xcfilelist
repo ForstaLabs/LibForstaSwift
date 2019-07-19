@@ -5,3 +5,5 @@ $(SRCROOT)/Carthage/Build/iOS/SignalProtocol.framework
 $(SRCROOT)/Carthage/Build/iOS/Starscream.framework
 $(SRCROOT)/Carthage/Build/iOS/SwiftProtobuf.framework
 $(SRCROOT)/Carthage/Build/iOS/SwiftyJSON.framework
+$(SRCROOT)/Carthage/Build/iOS/Base32.framework
+$(SRCROOT)/Carthage/Build/iOS/OneTimePassword.framework

@@ -47,8 +47,13 @@
 		DB2B00DD22E12F6A00B9931A /* Starscream.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B009922E12CC000B9931A /* Starscream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DB2B00DE22E12F6A00B9931A /* SwiftProtobuf.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B009C22E12CC000B9931A /* SwiftProtobuf.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DB2B00DF22E12F6A00B9931A /* SwiftyJSON.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B009822E12CC000B9931A /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DB2B00E222E2342F00B9931A /* Base32.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B00E022E2342E00B9931A /* Base32.framework */; };
+		DB2B00E322E2342F00B9931A /* OneTimePassword.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B00E122E2342F00B9931A /* OneTimePassword.framework */; };
+		DB2B00E422E2349B00B9931A /* Base32.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B00E022E2342E00B9931A /* Base32.framework */; };
+		DB2B00E522E2349E00B9931A /* OneTimePassword.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B00E122E2342F00B9931A /* OneTimePassword.framework */; };
+		DB2B00E622E234AF00B9931A /* Base32.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B00E022E2342E00B9931A /* Base32.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DB2B00E722E234AF00B9931A /* OneTimePassword.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B00E122E2342F00B9931A /* OneTimePassword.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DBDB773122E124610027EEB0 /* LibRelaySwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBDB772722E124610027EEB0 /* LibRelaySwift.framework */; };
-		DBDB773622E124610027EEB0 /* LibRelaySwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDB773522E124610027EEB0 /* LibRelaySwiftTests.swift */; };
 		DBDB773822E124610027EEB0 /* LibRelaySwift.h in Headers */ = {isa = PBXBuildFile; fileRef = DBDB772A22E124610027EEB0 /* LibRelaySwift.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -76,6 +81,8 @@
 				DB2B00DD22E12F6A00B9931A /* Starscream.framework in CopyFiles */,
 				DB2B00DE22E12F6A00B9931A /* SwiftProtobuf.framework in CopyFiles */,
 				DB2B00DF22E12F6A00B9931A /* SwiftyJSON.framework in CopyFiles */,
+				DB2B00E622E234AF00B9931A /* Base32.framework in CopyFiles */,
+				DB2B00E722E234AF00B9931A /* OneTimePassword.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,11 +115,12 @@
 		DB2B00CB22E12DB200B9931A /* KVStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KVStoreTests.swift; sourceTree = "<group>"; };
 		DB2B00CC22E12DB200B9931A /* AtlasClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AtlasClientTests.swift; sourceTree = "<group>"; };
 		DB2B00CD22E12DB200B9931A /* SignalClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalClientTests.swift; sourceTree = "<group>"; };
+		DB2B00E022E2342E00B9931A /* Base32.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Base32.framework; path = Carthage/Build/iOS/Base32.framework; sourceTree = "<group>"; };
+		DB2B00E122E2342F00B9931A /* OneTimePassword.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OneTimePassword.framework; path = Carthage/Build/iOS/OneTimePassword.framework; sourceTree = "<group>"; };
 		DBDB772722E124610027EEB0 /* LibRelaySwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LibRelaySwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBDB772A22E124610027EEB0 /* LibRelaySwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LibRelaySwift.h; sourceTree = "<group>"; };
 		DBDB772B22E124610027EEB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DBDB773022E124610027EEB0 /* LibRelaySwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LibRelaySwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		DBDB773522E124610027EEB0 /* LibRelaySwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibRelaySwiftTests.swift; sourceTree = "<group>"; };
 		DBDB773722E124610027EEB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -121,6 +129,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB2B00E222E2342F00B9931A /* Base32.framework in Frameworks */,
+				DB2B00E322E2342F00B9931A /* OneTimePassword.framework in Frameworks */,
 				DB2B009F22E12CC000B9931A /* SwiftyJSON.framework in Frameworks */,
 				DB2B00A022E12CC000B9931A /* Starscream.framework in Frameworks */,
 				DB2B00A122E12CC000B9931A /* PromiseKit.framework in Frameworks */,
@@ -136,11 +146,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB2B00D822E12EB300B9931A /* SwiftyJSON.framework in Frameworks */,
+				DB2B00E522E2349E00B9931A /* OneTimePassword.framework in Frameworks */,
 				DB2B00D322E12EA400B9931A /* JWTDecode.framework in Frameworks */,
 				DB2B00D622E12EAD00B9931A /* Starscream.framework in Frameworks */,
 				DBDB773122E124610027EEB0 /* LibRelaySwift.framework in Frameworks */,
 				DB2B00D222E12EA000B9931A /* Alamofire.framework in Frameworks */,
 				DB2B00D422E12EA700B9931A /* PromiseKit.framework in Frameworks */,
+				DB2B00E422E2349B00B9931A /* Base32.framework in Frameworks */,
 				DB2B00D522E12EAA00B9931A /* SignalProtocol.framework in Frameworks */,
 				DB2B00D722E12EB000B9931A /* SwiftProtobuf.framework in Frameworks */,
 			);
@@ -239,7 +251,6 @@
 				DB2B00CC22E12DB200B9931A /* AtlasClientTests.swift */,
 				DB2B00CB22E12DB200B9931A /* KVStoreTests.swift */,
 				DB2B00CD22E12DB200B9931A /* SignalClientTests.swift */,
-				DBDB773522E124610027EEB0 /* LibRelaySwiftTests.swift */,
 				DBDB773722E124610027EEB0 /* Info.plist */,
 			);
 			path = LibRelaySwiftTests;
@@ -248,6 +259,8 @@
 		DBDB774122E128060027EEB0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DB2B00E022E2342E00B9931A /* Base32.framework */,
+				DB2B00E122E2342F00B9931A /* OneTimePassword.framework */,
 				DB2B009B22E12CC000B9931A /* Alamofire.framework */,
 				DB2B009E22E12CC000B9931A /* JWTDecode.framework */,
 				DB2B009A22E12CC000B9931A /* PromiseKit.framework */,
@@ -416,7 +429,6 @@
 				DB2B00CF22E12DB200B9931A /* AtlasClientTests.swift in Sources */,
 				DB2B00CE22E12DB200B9931A /* KVStoreTests.swift in Sources */,
 				DB2B00D022E12DB200B9931A /* SignalClientTests.swift in Sources */,
-				DBDB773622E124610027EEB0 /* LibRelaySwiftTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

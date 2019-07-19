@@ -9,7 +9,8 @@
 import XCTest
 import PromiseKit
 import SwiftyJSON
-// import SwiftOTP
+import OneTimePassword
+import Base32
 
 @testable import LibRelaySwift
 
@@ -20,8 +21,28 @@ let testOrgSlug = "test.org.\(String(Int.random(in: 1000..<10000)))"
 var (testOrgReady, testOrgReadyResolver) = Promise<Void>.pending()
 
 let totpSecret = "4242424242424242"
-// let totp = TOTP(secret: Data.init(base32Decode(totpSecret)!))
+let totpGenerator = setupTotp()
 var passwordUserAuthToken = "tbd"
+
+func setupTotp() -> Token? {
+    guard let secretData = MF_Base32Codec.data(fromBase32String: totpSecret),
+        !secretData.isEmpty else {
+            print("Invalid secret")
+            return nil
+    }
+    
+    guard let generator = Generator(
+        factor: .timer(period: 30),
+        secret: secretData,
+        algorithm: .sha1,
+        digits: 6) else {
+            print("Invalid generator parameters")
+            return nil
+    }
+    
+    let token = Token(name: "me", issuer: "forsta", generator: generator)
+    return token
+}
 
 class AtlasClientTests: XCTestCase {
     //
@@ -67,7 +88,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 atlas.createUser(["first_name": "Twofactor", "tag_slug": "twofactor", "password": "asdfasdf24"])
             }
             .then { twofactor -> Promise<JSON> in
-                let otpString = "fixme" // totp?.generate(time: Date()) ?? "feels bad man"
+                let otpString = totpGenerator?.currentPassword ?? "ugh"
                 return atlas.updateUser(twofactor["id"].stringValue, [
                     "password_proof": "asdfasdf24",
                     "new_totp_secret": totpSecret,
@@ -272,7 +293,7 @@ export JWT_PROXY_AUDIENCE='atlas'
         atlas.requestAuthentication("@twofactor:\(testOrgSlug)")
             .then { authMethod -> Promise<AuthenticatedAtlasUser> in
                 XCTAssert(authMethod == .passwordOtp)
-                let otpString = "fixme" // totp?.generate(time: Date()) ?? "feels bad man"
+                let otpString = totpGenerator?.currentPassword ?? "ugh"
                 return atlas.authenticateViaPasswordOtp(userTag: "@twofactor:\(testOrgSlug)", password: "asdfasdf24", otp: otpString)
             }.done { user in
                 XCTAssert(user["first_name"].stringValue == "Twofactor")
