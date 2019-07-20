@@ -70,17 +70,42 @@ class MessageReceiver {
     }
     
     func handleContentMessage(_ envelope: Relay_Envelope) throws {
-        print("handleContentMessage", envelope)
-        
-        // let session = SessionCipher(store: self.signalClient.store, remoteAddress: envelope.source)
-        // let msg = try PreKeySignalMessage(from: envelope.content)
-
-        // let bundle = SessionPreKeyBundle(msg)
-        // let foo = try session.decrypt(envelope.content)
+        let plainText = try self.decrypt(envelope, envelope.content);
+        let content = try Relay_Content(serializedData: plainText)
+        if content.hasSyncMessage {
+            print("notifying of sync contentMessage")
+            NotificationCenter.broadcast(.relaySyncMessage, ["envelope": envelope, "syncMessage": content.syncMessage])
+        } else if content.hasDataMessage {
+            print("notifying of data contentMessage")
+            NotificationCenter.broadcast(.relayDataMessage, ["envelope": envelope, "dataMessage": content.dataMessage])
+        } else {
+            throw LibRelayError.internalError(why: "Received content message with no dataMessage or syncMessage.")
+        }
+    }
+    
+    func unpad(paddedPlaintext: Data) throws -> Data {
+        for idx in (0...paddedPlaintext.count-1).reversed() {
+            if paddedPlaintext[idx] == 0x00 { continue }
+            else if paddedPlaintext[idx] == 0x80 {
+                return paddedPlaintext.prefix(upTo: idx)
+            } else {
+                throw LibRelayError.internalError(why: "Invalid padding.")
+            }
+        }
+        throw LibRelayError.internalError(why: "Invalid buffer.")
+    }
+    
+    func decrypt(_ envelope: Relay_Envelope, _ cyphertext: Data) throws -> Data {
+        let addr = SignalAddress(name: envelope.source, deviceId: Int32(envelope.sourceDevice))
+        let sessionCipher = SessionCipher(for: addr, in: self.signalClient.store)
+        // just assume a prekey message for now
+        let plainText = try sessionCipher.decrypt(preKeySignalMessage: cyphertext)
+        return try unpad(paddedPlaintext: plainText)
     }
     
     func handleLegacyMessage(_ envelope: Relay_Envelope) throws {
         print("handleLegacyMessage", envelope)
+        throw LibRelayError.internalError(why: "Not implemented.")
     }
 }
 

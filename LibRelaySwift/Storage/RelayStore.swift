@@ -66,9 +66,10 @@ extension SignalStore {
         guard let identity = self.identityKeyStore.identityKeyPair() else {
             throw LibRelayError.internalError(why: "unable to retrieve self identity")
         }
-        var lastPreKeyId = self.relayPreKeyStore.lastId
+        let lastPreKeyId = self.relayPreKeyStore.lastId
         let signedPreKey = try Signal.generate(signedPreKey: lastPreKeyId, identity: identity, timestamp: 0)
-        self.relaySignedPreKeyStore.lastId = signedPreKey.id
+        let _ = try self.relaySignedPreKeyStore.store(signedPreKey: signedPreKey.data(), for: lastPreKeyId)
+        self.relaySignedPreKeyStore.lastId = lastPreKeyId
         
         return signedPreKey
     }

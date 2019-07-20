@@ -22,8 +22,14 @@ extension Notification.Name {
     /// Identity key changed on an incoming message
     static let relayIdentityKeyChanged = Notification.Name("relayIdentityKeyChanged")
     
-    /// Delivery receipt on an incoming message
+    /// Incoming delivery receipt
     static let relayDeliveryReceipt = Notification.Name("relayDeliveryReceipt")
+
+    /// Incoming sync message
+    static let relaySyncMessage = Notification.Name("relaySyncMessage")
+    
+    /// Incoming data message
+    static let relayDataMessage = Notification.Name("relayDataMessage")
 }
 
 extension NotificationCenter {

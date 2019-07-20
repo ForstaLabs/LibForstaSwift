@@ -56,6 +56,7 @@ class SignalClientTests: XCTestCase {
     }
     
     func testSomething() {
+
         do {
             let atlasClient = AtlasClient(kvstore: MemoryKVStore())
             let signalClient = try SignalClient(atlasClient: atlasClient)
@@ -80,11 +81,19 @@ class SignalClientTests: XCTestCase {
             }
             wait(for: [registrated], timeout: 10.0)
             
-            let connectified = XCTestExpectation()
+            let connectAndReceive = XCTestExpectation()
+            let dataMessageObserver = NotificationCenter.default.addObserver(
+                forName: .relayDataMessage,
+                object: nil,
+                queue: nil) { notification in
+                    print(notification.userInfo?["dataMessage"])
+                    connectAndReceive.fulfill()
+            }
+            defer { NotificationCenter.default.removeObserver(dataMessageObserver) }
             let wsr = WebSocketResource(signalClient: signalClient)
             let _ = MessageReceiver(signalClient: signalClient, webSocketResource: wsr)
             wsr.connect()
-            wait(for: [connectified], timeout: 3 * 60.0)
+            wait(for: [connectAndReceive], timeout: 2 * 60.0)
             wsr.disconnect()
         } catch {
             XCTFail("surprising error")
