@@ -10,6 +10,7 @@ import Foundation
 import SwiftyJSON
 import Alamofire
 import CommonCrypto
+import SignalProtocol
 
 
 extension Notification.Name {
@@ -81,6 +82,29 @@ extension Request {
 
 typealias RelayAddress = String
 /// generate a RelayAddress (String of userId.deviceId)
-func raddr(_ userId: String, _ deviceId: Int32) -> RelayAddress {
+func raddr(_ userId: String, _ deviceId: UInt32) -> RelayAddress {
     return "\(userId).\(deviceId)"
+}
+
+extension Date {
+    var millisecondsSince1970:Int64 {
+        return Int64((self.timeIntervalSince1970 * 1000.0).rounded())
+    }
+    
+    init(milliseconds:Int64) {
+        self = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000)
+    }
+}
+
+extension SignalAddress {
+    convenience init(userId: String, deviceId: UInt32) {
+        self.init(name: userId, deviceId: (Int32(deviceId)))
+    }
+}
+
+extension JSON {
+    init(string: String) throws {
+        let dataFromString = string.data(using: .utf8, allowLossyConversion: false)!
+        try self.init(data: dataFromString)
+    }
 }
