@@ -116,12 +116,12 @@ class SignalClient {
             .map { result in
                 guard
                     let serverUrl = result["serverUrl"].string,
-                    let userId = result["userId"].string,
+                    let userId = UUID(uuidString: result["userId"].stringValue),
                     let deviceId = result["deviceId"].uInt32 else {
                         throw LibRelayError.internalError(why: "unexpected result from provisionAccount")
                 }
                 
-                let username = raddr(userId, deviceId)
+                let username = raddr(userId.lcString, deviceId)
                 
                 let identity = try Signal.generateIdentityKeyPair()
                 self.store.relayIdentityKeyStore.setIdentityKeyPair(identity: identity)

@@ -101,16 +101,15 @@ class SignalClientTests: XCTestCase {
             wait(for: [connectAndReceive], timeout: 2 * 60.0)
             let thenSend = XCTestExpectation()
             
-            let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
-            let message = Message()
-            let bodyStr = incomingMessage!.body
-            message.body = try JSON(string:bodyStr)
-            let userId = atlasClient.kvstore.get(DNK.ssAddress) as String?
+            let userId = atlasClient.kvstore.get(DNK.ssAddress) as UUID?
             let deviceId = atlasClient.kvstore.get(DNK.ssDeviceId) as UInt32?
-            message.body![0]["sender"] = JSON(["userId": userId ?? "wut", "device": deviceId ?? 42])
-            message.body![0]["data"] = JSON(["body": ["type": "text/plain", "value": "How 'bout them apples?"]])
-            message.body![0]["messageId"] = JSON(UUID())
-            
+            let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
+            let response = Message(senderUserId: userId ?? UUID(),
+                                   senderDeviceId: deviceId ?? 0,
+                                   distributionExpression: "", // message.body![0]["distribution"]["expression"].stringValue,
+                                   data: TextMessageData(plain: "Hello, world!")
+            )
+
             signalClient.getKeysForAddr(addr: incomingEnvelope!.source, deviceId: incomingEnvelope!.sourceDevice)
                 .done { result in
                     print("GET KEYS FOR PARTICULAR DEVICE", result)
@@ -128,8 +127,8 @@ class SignalClientTests: XCTestCase {
             }
             
             
-            message.recipients.append(SignalAddress(userId: incomingEnvelope!.source, deviceId: incomingEnvelope!.sourceDevice))
-            try sender.send(message)
+            response.recipients.append(.device(address: SignalAddress(userId: incomingEnvelope!.source, deviceId: incomingEnvelope!.sourceDevice)))
+            try sender.send(response)
                 .done { result in
                     print("SEND COMPLETE", result)
                 }
@@ -172,88 +171,69 @@ class SignalClientTests: XCTestCase {
             }
             wait(for: [registrated], timeout: 10.0)
             
-            let connectAndReceive = XCTestExpectation()
+            let connectified = XCTestExpectation()
             var incomingMessage: Relay_DataMessage? = nil
             var incomingEnvelope: Relay_Envelope? = nil
             let dataMessageObserver = NotificationCenter.default.addObserver(
-                forName: .relayDataMessage,
+                forName: .relayEmptyQueue,
                 object: nil,
-                queue: nil) { notification in
-                    incomingMessage = notification.userInfo?["dataMessage"] as! Relay_DataMessage
-                    incomingEnvelope = notification.userInfo?["envelope"] as! Relay_Envelope
-                    print("RECEIVED", incomingMessage!.body)
-                    connectAndReceive.fulfill()
+                queue: nil) { _ in
+                    print("connection up and running")
+                    connectified.fulfill()
             }
             defer { NotificationCenter.default.removeObserver(dataMessageObserver) }
             let wsr = WebSocketResource(signalClient: signalClient)
             let _ = MessageReceiver(signalClient: signalClient, webSocketResource: wsr)
             wsr.connect()
-            // wait(for: [connectAndReceive], timeout: 2 * 60.0)
+            wait(for: [connectified], timeout: 2 * 60.0)
+            print("proceeding with send")
             
             let theGoodPart = XCTestExpectation()
             
-            let myUserId = atlasClient.kvstore.get(DNK.ssAddress) as String?
+            let myUserId = atlasClient.kvstore.get(DNK.ssAddress) as UUID?
             let myDeviceId = atlasClient.kvstore.get(DNK.ssDeviceId) as UInt32?
-            let message = Message()
+            let message = Message(senderUserId: myUserId ?? UUID(),
+                                  senderDeviceId: myDeviceId ?? 0,
+                                  distributionExpression: "(<2b53e98b-170f-4102-9d82-e43d5abb7998>+<e98bf10d-528f-44c4-99cd-c488385771cc>)",
+                                  data: TextMessageData(plain: "Hello, world!")
+            )
             let theirUserId = "bd1f7e2d-55f5-4a3b-933d-ab7cf51503ca"
             let theirDeviceId = 1
-            message.recipients.append(SignalAddress(userId: theirUserId, deviceId: UInt32(theirDeviceId)))
-            message.body = try JSON(string:#"""
-[
-  {
-    "version": 1,
-    "threadType": "conversation",
-    "messageType": "content",
-    "messageId": "\#(UUID().uuidString.lowercased())",
-    "threadId": "be5b66ee-f6f4-45e2-9f5f-bdae9ee9c7a8",
-    "userAgent": "LibRelaySwift",
-    "data": {
-      "body": [
-        {
-          "type": "text/plain",
-          "value": "Foo the bar!"
-        }
-      ]
-    },
-    "sender": {
-      "userId": "\#(myUserId ?? "wut")",
-      "device": \#(myDeviceId ?? 42)
-    },
-    "distribution": {
-      "expression": "(<2b53e98b-170f-4102-9d82-e43d5abb7998>+<e98bf10d-528f-44c4-99cd-c488385771cc>)"
-    }
-  }
-]
-"""#)
-            print("here is the body json:", message.body!)
 
+            let receiptReceived = XCTestExpectation()
+            let receiptObserver = NotificationCenter.default.addObserver(
+                forName: .relayDeliveryReceipt,
+                object: nil,
+                queue: nil) { notification in
+                    let envelope = notification.userInfo?["envelope"] as! Relay_Envelope
+                    print("delivery receipt:", envelope)
+                    receiptReceived.fulfill()
+            }
+            defer { NotificationCenter.default.removeObserver(receiptObserver) }
+
+            let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
             signalClient.getKeysForAddr(addr: theirUserId)
-                .done { result in
-                    print("GET KEYS FOR ALL DEVICES", result)
+                .map { result in
+                    print("GOT KEYS FOR ALL DEVICES", result)
+                    for bundle in result {
+                        let addr = SignalAddress(name: theirUserId, deviceId: bundle.deviceId)
+                        try SessionBuilder(for: addr, in: signalClient.store).process(preKeyBundle: bundle)
+                        message.recipients.append(.device(address: addr))
+                    }
+                    return message
+                }
+                .then { message in
+                    sender.send(message)
                 }
                 .catch { error in
                     print("ERROR", error)
+                    XCTFail("error \(error)")
                 }
                 .finally {
-                    XCTFail("stop here")
-                    theGoodPart.fulfill()
+                    print("message sent!")
+                    // theGoodPart.fulfill()
             }
             
-                    // do something with the result
-
-            /*
-            let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
-            try sender.send(message)
-                .done { result in
-                    print("SEND COMPLETE", result)
-                }
-                .catch { error in
-                    print("SEND ERROR", error)
-                }
-                .finally {
-                    thenSend.fulfill()
-            }
-            */
             wait(for: [theGoodPart], timeout: 2 * 60.0)
             wsr.disconnect()
         } catch let error {

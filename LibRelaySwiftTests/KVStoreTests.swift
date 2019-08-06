@@ -108,6 +108,13 @@ class KVStoreTests: XCTestCase {
         store.set("y", Double(24.24))
         XCTAssert((store.get("x") as Double?)! == 42.42)
         XCTAssert((store.get("y") as Double?)! == 24.24)
+        
+        let u1 = UUID()
+        let u2 = UUID()
+        store.set("x", u1)
+        store.set("y", u2)
+        XCTAssert((store.get("x") as UUID?)! == u1)
+        XCTAssert((store.get("y") as UUID?)! == u2)
     }
     func testMismatch() {
         let store = MemoryKVStore()

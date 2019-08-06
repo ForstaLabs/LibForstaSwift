@@ -1,5 +1,5 @@
 github "Alamofire/Alamofire" "4.8.2"
-github "ForstaLabs/libsignal-protocol-swift" "e59d46e5ddf8f76075fdb51e95172b2d27c20ac9"
+github "ForstaLabs/libsignal-protocol-swift" "86ffce1e616e093115cbf58baa40768c2ad439c3"
 github "SwiftyJSON/SwiftyJSON" "5.0.0"
 github "apple/swift-protobuf" "1.6.0"
 github "auth0/JWTDecode.swift" "2.3.0"

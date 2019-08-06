@@ -135,3 +135,14 @@ extension JSON: ToFromData {
     }
 }
 
+extension UUID: ToFromData {
+    public func toData() throws -> Data {
+        return withUnsafeBytes(of: self.uuid, { Data($0) })
+    }
+    static public func fromData(_ data: Data) throws -> UUID {
+        var value = UUID(uuid: (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
+        assert(data.count == MemoryLayout.size(ofValue: value))
+        let _ = withUnsafeMutableBytes(of: &value, { data.copyBytes(to: $0)} )
+        return value
+    }
+}

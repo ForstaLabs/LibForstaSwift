@@ -22,28 +22,36 @@ class MessageSender {
         self.wsr = webSocketResource ?? WebSocketResource(signalClient: signalClient)
     }
     
-    func send(_ message: Message) throws -> Promise<(Int, JSON)> {
-        var results: [Promise<(Int, JSON)>] = []
-        var clearMessage = try message.toProto().serializedData()
-        pad(&clearMessage)
-        
-        for recipient in message.recipients {
-            let cipher = SessionCipher(for: recipient, in: self.signalClient.store)
-            let encryptedMessage = try cipher.encrypt(clearMessage)
-            let remoteRegistrationId = try cipher.remoteRegistrationId()
+    func send(_ message: Message) -> Promise<(Int, JSON)> {
+        return firstly { () -> Promise<(Int, JSON)> in
+            var results: [Promise<(Int, JSON)>] = []
+            var clearMessage = try message.toProto().serializedData()
+            pad(&clearMessage)
             
-            let bundle: [String: Any] = [
-                "type": Relay_Envelope.TypeEnum.ciphertext.rawValue,
-                "content": encryptedMessage.data.base64EncodedString(),
-                "destinationRegistrationId": remoteRegistrationId,
-                "destinationDeviceId": recipient.deviceId,
-                "timestamp": Date().millisecondsSince1970
-            ]
+            for recipient in message.recipients {
+                let specificAddress: SignalAddress
+                switch recipient {
+                case .device(let addr): specificAddress = addr
+                case .user: continue
+                }
+                let cipher = SessionCipher(for: specificAddress, in: self.signalClient.store)
+                let encryptedMessage = try cipher.encrypt(clearMessage)
+                let remoteRegistrationId = try cipher.remoteRegistrationId()
+                
+                let bundle: [String: Any] = [
+                    "type": Relay_Envelope.TypeEnum.ciphertext.rawValue,
+                    "content": encryptedMessage.data.base64EncodedString(),
+                    "destinationRegistrationId": remoteRegistrationId,
+                    "destinationDeviceId": specificAddress.deviceId,
+                    "timestamp": Date().millisecondsSince1970
+                ]
+                
+                print("outgoing message bundle", bundle)
+                results.append(self.signalClient.deliverToDevice(address: specificAddress, parameters: bundle))
+            }
             
-            results.append(self.signalClient.deliverToDevice(address: recipient, parameters: bundle))
+            return results[0] // TODO: make this plural!
         }
-        
-        return results[0] // TODO: make this plural!
     }
     
     func pad(_ plaintext: inout Data, partSize: Int = 160, terminator: UInt8 = 0x80) {

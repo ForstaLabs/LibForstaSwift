@@ -31,13 +31,16 @@ extension Notification.Name {
     
     /// Incoming data message
     static let relayDataMessage = Notification.Name("relayDataMessage")
+    
+    /// Incoming queue is now empty
+    static let relayEmptyQueue = Notification.Name("relayEmptyQueue")
 }
 
 extension NotificationCenter {
     ///
     /// Broadcast a notification on the main thread.
     ///
-    static func broadcast(_ name: Notification.Name, _ userInfo: [String: Any]?) {
+    static func broadcast(_ name: Notification.Name, _ userInfo: [String: Any]? = nil) {
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: name, object: nil, userInfo: userInfo)
         }
@@ -100,11 +103,29 @@ extension SignalAddress {
     convenience init(userId: String, deviceId: UInt32) {
         self.init(name: userId, deviceId: (Int32(deviceId)))
     }
+    
+    convenience init(userId: UUID, deviceId: UInt32) {
+        self.init(name: userId.lcString, deviceId: (Int32(deviceId)))
+    }
+    
+    var userId: UUID {
+        get {
+            return UUID(uuidString: self.name)!
+        }
+    }
 }
 
 extension JSON {
     init(string: String) throws {
         let dataFromString = string.data(using: .utf8, allowLossyConversion: false)!
         try self.init(data: dataFromString)
+    }
+}
+
+extension UUID {
+    var lcString: String {
+        get {
+            return self.uuidString.lowercased()
+        }
     }
 }

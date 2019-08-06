@@ -27,6 +27,7 @@ class MessageReceiver {
         print("Handling request \(request.verb) \(request.path)...")
         if request.path == WSRequest.Path.queueEmpty {
             print("Websocket queue empty")
+            NotificationCenter.broadcast(.relayEmptyQueue)
             let _ = request.respond(status: 200, message: "OK")
             return
         } else if request.path != WSRequest.Path.message || request.verb != "PUT" {
