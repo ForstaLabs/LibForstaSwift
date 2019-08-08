@@ -25,7 +25,7 @@ class MessageSender {
     func send(_ message: Message) -> Promise<(Int, JSON)> {
         return firstly { () -> Promise<(Int, JSON)> in
             var results: [Promise<(Int, JSON)>] = []
-            var clearMessage = try message.toProto().serializedData()
+            var clearMessage = try message.contentProto.serializedData()
             pad(&clearMessage)
             
             for recipient in message.recipients {

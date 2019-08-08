@@ -24,17 +24,21 @@ extension Notification.Name {
     static let relayIdentityKeyChanged = Notification.Name("relayIdentityKeyChanged")
     
     /// Incoming delivery receipt
+    /// -- includes "deliveryReceipt" of type DeliveryReceipt
     static let relayDeliveryReceipt = Notification.Name("relayDeliveryReceipt")
 
-    /// Incoming sync message
-    static let relaySyncMessage = Notification.Name("relaySyncMessage")
+    /// Incoming message
+    /// -- includes "inboundMessage" of type InboundMessage
+    static let relayMessage = Notification.Name("relayMessage")
     
-    /// Incoming data message
-    static let relayDataMessage = Notification.Name("relayDataMessage")
-    
+    /// Incoming read receipts
+    /// -- includes "readSyncReceipts" of type [ReadSyncReceipt]
+    static let relayReadSyncReceipts = Notification.Name("relayReadSyncReceipts")
+
     /// Incoming queue is now empty
     static let relayEmptyQueue = Notification.Name("relayEmptyQueue")
 }
+
 
 extension NotificationCenter {
     ///
@@ -90,16 +94,35 @@ func raddr(_ userId: String, _ deviceId: UInt32) -> RelayAddress {
 }
 
 extension Date {
-    var millisecondsSince1970:Int64 {
-        return Int64((self.timeIntervalSince1970 * 1000.0).rounded())
+    var millisecondsSince1970:UInt64 {
+        return UInt64((self.timeIntervalSince1970 * 1000.0).rounded())
     }
     
-    init(milliseconds:Int64) {
-        self = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000)
+    init(millisecondsSince1970:Int64) {
+        self.init(timeIntervalSince1970: TimeInterval(milliseconds: millisecondsSince1970))
+    }
+    
+    init(millisecondsSince1970:UInt64) {
+        self.init(timeIntervalSince1970: TimeInterval(milliseconds: millisecondsSince1970))
     }
 }
 
-extension SignalAddress {
+extension TimeInterval {
+    var milliseconds:UInt64 {
+        return UInt64((self * 1000.0).rounded())
+    }
+    init(milliseconds:UInt64) {
+        self.init(milliseconds / 1000)
+    }
+    init(milliseconds:UInt32) {
+        self.init(milliseconds / 1000)
+    }
+    init(milliseconds:Int64) {
+        self.init(milliseconds / 1000)
+    }
+}
+
+extension SignalAddress: CustomStringConvertible {
     convenience init(userId: String, deviceId: UInt32) {
         self.init(name: userId, deviceId: (Int32(deviceId)))
     }
@@ -112,6 +135,10 @@ extension SignalAddress {
         get {
             return UUID(uuidString: self.name)!
         }
+    }
+    
+    public var description: String {
+        return "\(self.name).\(self.deviceId )"
     }
 }
 

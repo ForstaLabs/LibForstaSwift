@@ -13,6 +13,71 @@ import Starscream
 import SignalProtocol
 
 
+class ReadSyncReceipt: CustomStringConvertible {
+    let sender: UUID
+    let timestamp: Date
+    
+    init(_ sender: UUID, _ timestamp: Date) {
+        self.sender = sender
+        self.timestamp = timestamp
+    }
+    var description: String {
+        return "ReadSyncReceipt(\(self.sender) @ \(self.timestamp ))"
+    }
+}
+
+class DeliveryReceipt: CustomStringConvertible {
+    let address: SignalAddress
+    let timestamp: Date
+    
+    init(_ address: SignalAddress, _ timestamp: Date) {
+        self.address = address
+        self.timestamp = timestamp
+    }
+    var description: String {
+        return "DeliveryReceipt(\(self.address) @ \(self.timestamp ))"
+    }
+}
+
+class InboundMessage: CustomStringConvertible {
+    var source: SignalAddress
+    var timestamp: Date
+    var expiration: TimeInterval?
+    var serverAge: TimeInterval
+    var serverReceived: Date
+    
+    var body: JSON
+    
+    // specific to sync messages
+    var expirationStart: Date?
+    var destination: String?
+    
+    init(source: SignalAddress,
+         timestamp: Date,
+         expiration: TimeInterval? = nil,
+         serverAge: TimeInterval,
+         serverReceived: Date,
+         body: JSON,
+         expirationStart: Date? = nil,
+         destination: String? = nil) {
+        self.source = source
+        self.timestamp = timestamp
+        self.expiration = expiration
+        self.serverAge = serverAge
+        self.serverReceived = serverReceived
+        self.body = body
+        self.expirationStart = expirationStart
+        self.destination = destination
+    }
+    
+    var description: String {
+        return """
+        InboundMessage from \(source) @ \(timestamp) for \(expiration ?? -1)
+        \(body.rawString() ?? "<malformed body>")
+        """
+    }
+}
+
 class MessageReceiver {
     let signalClient: SignalClient
     let wsr: WebSocketResource
@@ -57,7 +122,9 @@ class MessageReceiver {
         print("got envelope! \(envelope.type)")
         do {
             if envelope.type == .receipt {
-                NotificationCenter.broadcast(.relayDeliveryReceipt, ["envelope": envelope])
+                let receipt = DeliveryReceipt(SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice),
+                                              Date(millisecondsSince1970: envelope.timestamp))
+                NotificationCenter.broadcast(.relayDeliveryReceipt, ["deliveryReceipt": receipt])
             } else if envelope.hasContent {
                 try handleContentMessage(envelope)
             } else if envelope.hasLegacyMessage {
@@ -73,12 +140,39 @@ class MessageReceiver {
     func handleContentMessage(_ envelope: Relay_Envelope) throws {
         let plainText = try self.decrypt(envelope, envelope.content);
         let content = try Relay_Content(serializedData: plainText)
-        if content.hasSyncMessage {
-            print("notifying of sync contentMessage")
-            NotificationCenter.broadcast(.relaySyncMessage, ["envelope": envelope, "syncMessage": content.syncMessage])
+        var sent: Relay_SyncMessage.Sent? = nil
+        var dm: Relay_DataMessage? = nil
+        if content.hasSyncMessage && content.syncMessage.hasSent {
+            sent = content.syncMessage.sent
+            dm = sent!.message
         } else if content.hasDataMessage {
-            print("notifying of data contentMessage")
-            NotificationCenter.broadcast(.relayDataMessage, ["envelope": envelope, "dataMessage": content.dataMessage])
+            dm = content.dataMessage
+        } else if content.hasSyncMessage && content.syncMessage.read.count > 0 {
+            var receipts = [ReadSyncReceipt]()
+            for r in content.syncMessage.read {
+                guard let sender: UUID = UUID(uuidString: r.sender) else {
+                    throw LibRelayError.internalError(why: "Received sync message with malformed read receipt sender: \(r.sender).")
+                }
+                let timestamp: Date = Date(millisecondsSince1970: r.timestamp)
+                receipts.append(ReadSyncReceipt(sender, timestamp))
+            }
+            NotificationCenter.broadcast(.relayReadSyncReceipts, ["readSyncReceipts": receipts])
+        }
+        
+        if dm != nil {
+            let msg = InboundMessage(source: SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice),
+                                     timestamp: Date(millisecondsSince1970: envelope.timestamp),
+                                     expiration: (dm?.hasExpireTimer ?? false)
+                                        ? TimeInterval(milliseconds: dm!.expireTimer)
+                                        : nil,
+                                     serverAge: TimeInterval(milliseconds: envelope.age),
+                                     serverReceived: Date(millisecondsSince1970: envelope.received),
+                                     body: try JSON(string: dm?.body ?? "[]"),
+                                     expirationStart: (sent?.hasExpirationStartTimestamp ?? false)
+                                        ? Date(millisecondsSince1970: sent!.expirationStartTimestamp)
+                                        : nil,
+                                     destination: (sent?.hasDestination ?? false) ? sent!.destination : nil)
+            NotificationCenter.broadcast(.relayMessage, ["inboundMessage": msg])
         } else {
             throw LibRelayError.internalError(why: "Received content message with no dataMessage or syncMessage.")
         }

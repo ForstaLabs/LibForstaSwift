@@ -78,6 +78,7 @@ protocol Sendable {
     var userAgent: String? { get }
     var threadTitle: String? { get }
     var threadType: FLIThreadType? { get }
+    var messageRef: UUID? { get }
 }
 
 func TextMessageData(plain: String? = nil, html: String? = nil) -> JSON {
@@ -88,44 +89,58 @@ func TextMessageData(plain: String? = nil, html: String? = nil) -> JSON {
 }
 
 extension Sendable {
-    func toProto() -> Relay_Content {
-        var body = JSON([[
-            "version": 1,
-            "messageId": self.messageId.lcString,
-            "messageType": self.messageType.rawValue,
-            "threadId": self.threadId.lcString,
-            "sender": [
-                "userId": self.senderUserId.lcString,
-                "device": self.senderDeviceId,
-            ],
-            "distribution": [
-                "expression": self.distributionExpression
-            ]
-            ]])
-
-        if self.data != nil { body[0]["data"] = self.data! }
-        if self.userAgent != nil { body[0]["userAgent"] = JSON(self.userAgent!) }
-        if self.threadTitle != nil { body[0]["threadTitle"] = JSON(self.threadTitle!) }
-        if self.threadType != nil { body[0]["threadType"] = JSON(self.threadType!) }
+    var contentProto: Relay_Content {
+        get {
+            var body = JSON([[
+                "version": 1,
+                "messageId": self.messageId.lcString,
+                "messageType": self.messageType.rawValue,
+                "threadId": self.threadId.lcString,
+                "sender": [
+                    "userId": self.senderUserId.lcString,
+                    "device": self.senderDeviceId,
+                ],
+                "distribution": [
+                    "expression": self.distributionExpression
+                ]
+                ]])
+            
+            if self.data != nil { body[0]["data"] = self.data! }
+            if self.userAgent != nil { body[0]["userAgent"] = JSON(self.userAgent!) }
+            if self.threadTitle != nil { body[0]["threadTitle"] = JSON(self.threadTitle!) }
+            if self.threadType != nil { body[0]["threadType"] = JSON(self.threadType!) }
+            if self.messageRef != nil { body[0]["messageRef"] = JSON(self.messageRef!.lcString) }
+            
+            var dm = Relay_DataMessage()
+            dm.body = body.rawString([.castNilToNSNull: true])!
+            var content = Relay_Content()
+            content.dataMessage = dm
+            
+            /*
+             if (this.attachmentPointers && this.attachmentPointers.length) {
+             data.attachments = this.attachmentPointers;
+             }
+             if (this.flags) {
+             data.flags = this.flags;
+             }
+             if (this.expiration) {
+             data.expireTimer = this.expiration;
+             }
+             */
+            
+            return content;
+        }
+    }
+    
+    var description: String {
+        return """
+        Sendable from \(senderUserId).\(senderDeviceId) @ \(timestamp)
+        distribution: \(distributionExpression)
         
-        var dm = Relay_DataMessage()
-        dm.body = body.rawString([.castNilToNSNull: true])!
-        var content = Relay_Content()
-        content.dataMessage = dm
-        
-        /*
-         if (this.attachmentPointers && this.attachmentPointers.length) {
-         data.attachments = this.attachmentPointers;
-         }
-         if (this.flags) {
-         data.flags = this.flags;
-         }
-         if (this.expiration) {
-         data.expireTimer = this.expiration;
-         }
-         */
-        
-        return content;
+        \(messageType) message \(messageId) in \(threadType?.rawValue ?? "<no type>") thread \(threadId) (\(threadTitle ?? "<no title>"))
+        \(messageRef != nil ? "references message \(messageRef!)" : "")
+        \(data != nil ? "data: \(data!.rawString() ?? "<malformed body>"))" : "")
+        """
     }
 }
 
@@ -149,6 +164,7 @@ class Message: Sendable {
     public var userAgent: String?
     public var threadTitle: String?
     public var threadType: FLIThreadType?
+    public var messageRef: UUID?
 
     init(recipients: [MessageRecipient] = [MessageRecipient](),
          timestamp: Date = Date(),
@@ -161,7 +177,8 @@ class Message: Sendable {
          data: JSON? = nil,
          userAgent: String = "LibRelaySwift Client",
          threadTitle: String? = nil,
-         threadType: FLIThreadType? = nil
+         threadType: FLIThreadType? = nil,
+         messageRef: UUID? = nil
          ) {
         self.recipients = recipients
         self.timestamp = timestamp
@@ -175,5 +192,6 @@ class Message: Sendable {
         self.userAgent = userAgent
         self.threadTitle = threadTitle
         self.threadType = threadType
+        self.messageRef = messageRef
     }
 }

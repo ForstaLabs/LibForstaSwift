@@ -83,15 +83,13 @@ class SignalClientTests: XCTestCase {
             wait(for: [registrated], timeout: 10.0)
             
             let connectAndReceive = XCTestExpectation()
-            var incomingMessage: Relay_DataMessage? = nil
-            var incomingEnvelope: Relay_Envelope? = nil
+            var inboundMessage: InboundMessage? = nil
             let dataMessageObserver = NotificationCenter.default.addObserver(
-                forName: .relayDataMessage,
+                forName: .relayMessage,
                 object: nil,
                 queue: nil) { notification in
-                    incomingMessage = notification.userInfo?["dataMessage"] as! Relay_DataMessage
-                    incomingEnvelope = notification.userInfo?["envelope"] as! Relay_Envelope
-                    print("RECEIVED", incomingMessage!.body)
+                    inboundMessage = notification.userInfo?["inboundMessage"] as! InboundMessage
+                    print("RECEIVED", inboundMessage)
                     connectAndReceive.fulfill()
             }
             defer { NotificationCenter.default.removeObserver(dataMessageObserver) }
@@ -110,7 +108,7 @@ class SignalClientTests: XCTestCase {
                                    data: TextMessageData(plain: "Hello, world!")
             )
 
-            signalClient.getKeysForAddr(addr: incomingEnvelope!.source, deviceId: incomingEnvelope!.sourceDevice)
+            signalClient.getKeysForAddr(inboundMessage!.source)
                 .done { result in
                     print("GET KEYS FOR PARTICULAR DEVICE", result)
                 }
@@ -118,7 +116,7 @@ class SignalClientTests: XCTestCase {
                     print("ERROR", error)
             }
             
-            signalClient.getKeysForAddr(addr: incomingEnvelope!.source)
+            signalClient.getKeysForAddr(addr: inboundMessage!.source.name)
                 .done { result in
                     print("GET KEYS FOR ALL DEVICES", result)
                 }
@@ -127,8 +125,8 @@ class SignalClientTests: XCTestCase {
             }
             
             
-            response.recipients.append(.device(address: SignalAddress(userId: incomingEnvelope!.source, deviceId: incomingEnvelope!.sourceDevice)))
-            try sender.send(response)
+            response.recipients.append(.device(address: inboundMessage!.source))
+            sender.send(response)
                 .done { result in
                     print("SEND COMPLETE", result)
                 }
@@ -205,8 +203,8 @@ class SignalClientTests: XCTestCase {
                 forName: .relayDeliveryReceipt,
                 object: nil,
                 queue: nil) { notification in
-                    let envelope = notification.userInfo?["envelope"] as! Relay_Envelope
-                    print("delivery receipt:", envelope)
+                    let receipt = notification.userInfo?["deliveryReceipt"] as! DeliveryReceipt
+                    print(receipt)
                     receiptReceived.fulfill()
             }
             defer { NotificationCenter.default.removeObserver(receiptObserver) }
@@ -220,13 +218,12 @@ class SignalClientTests: XCTestCase {
                         try SessionBuilder(for: addr, in: signalClient.store).process(preKeyBundle: bundle)
                         message.recipients.append(.device(address: addr))
                     }
-                    return message
+                    print("sending message", message.description)
                 }
-                .then { message in
+                .then {
                     sender.send(message)
                 }
                 .catch { error in
-                    print("ERROR", error)
                     XCTFail("error \(error)")
                 }
                 .finally {

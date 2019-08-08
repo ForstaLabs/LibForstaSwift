@@ -190,6 +190,9 @@ class SignalClient {
             parameters: parameters)
     }
     
+    func getKeysForAddr(_ addr: SignalAddress) -> Promise<[SessionPreKeyBundle]> {
+        return getKeysForAddr(addr: addr.name, deviceId: UInt32(addr.deviceId))
+    }
     
     func getKeysForAddr(addr: String, deviceId: UInt32? = nil) -> Promise<[SessionPreKeyBundle]> {
         let deviceStr = deviceId == nil ? "*" : String(deviceId!)
