@@ -90,7 +90,7 @@ class MessageReceiver {
     
     /// Handle an incoming websocket request (/queue/empty or /message)
     private func handleRequest(request: IncomingWSRequest) {
-        print("Handling WS request \(request.verb) \(request.path)...")
+        // print("Handling WS request \(request.verb) \(request.path)...")
         if request.path == WSRequest.Path.queueEmpty {
             NotificationCenter.broadcast(.relayEmptyQueue)
             let _ = request.respond(status: 200, message: "OK")
@@ -108,7 +108,7 @@ class MessageReceiver {
             guard signalingKey != nil else {
                 throw LibRelayError.internalError(why: "No signaling key established.")
             }
-            let data = try signalClient.decryptWebSocketMessage(message: request.body!, signalingKey: signalingKey!)
+            let data = try decryptWebSocketMessage(message: request.body!, signalingKey: signalingKey!)
             let envelope = try Relay_Envelope(serializedData: data)
             if envelope.type == .receipt {
                 let receipt = DeliveryReceipt(SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice),
@@ -182,9 +182,8 @@ class MessageReceiver {
         throw LibRelayError.internalError(why: "Not implemented.")
     }
     
-    /// Internal: Decrypt an incoming envelope's content
+    /// Internal: Axolotl-decrypt an incoming envelope's content
     private func decrypt(_ envelope: Relay_Envelope, _ cyphertext: Data) throws -> Data {
-        print(envelope.type)
         let addr = SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice)
         let sessionCipher = SessionCipher(for: addr, in: self.signalClient.store)
         let plainText: Data
@@ -209,5 +208,34 @@ class MessageReceiver {
             }
         }
         throw LibRelayError.internalError(why: "Invalid buffer.")
+    }
+    
+    private func verifyWSMessageMAC(data: Data, key: Data, expectedMAC: Data) throws {
+        let calculatedMAC = signalClient.crypto.hmacSHA256(for: data, with: key)
+        if calculatedMAC[..<expectedMAC.count] != expectedMAC {
+            throw LibRelayError.internalError(why: "Bad MAC")
+        }
+    }
+    
+    private func decryptWebSocketMessage(message: Data, signalingKey: Data) throws -> Data {
+        guard signalingKey.count == 52 else {
+            throw LibRelayError.internalError(why: "Invalid signalKey length.")
+        }
+        guard message.count >= 1 + 16 + 10 else {
+            throw LibRelayError.internalError(why: "Invalid message length.")
+        }
+        guard message[0] == 1 else {
+            throw LibRelayError.internalError(why: "Invalid message version number \(message[0]).")
+        }
+        
+        let aesKey = signalingKey[0...31]
+        let macKey = signalingKey[32...32+19]
+        let iv = message[1...16]
+        let ciphertext = message[1+16...message.count-11]
+        let ivAndCyphertext = message[0...message.count-11]
+        let mac = message[(message.count-10)...]
+        
+        try verifyWSMessageMAC(data: ivAndCyphertext, key: macKey, expectedMAC: mac)
+        return try signalClient.crypto.decrypt(message: ciphertext, with: .AES_CBCwithPKCS5, key: aesKey, iv: iv)
     }
 }

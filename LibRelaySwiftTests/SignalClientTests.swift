@@ -110,8 +110,8 @@ class SignalClientTests: XCTestCase {
     }
     
     func testPreKeyReceiveAndResponse() {
-
         do {
+            watchEverything()
             let atlasClient = AtlasClient(kvstore: MemoryKVStore())
             let signalClient = try SignalClient(atlasClient: atlasClient)
             
@@ -141,8 +141,7 @@ class SignalClientTests: XCTestCase {
                 forName: .relayInboundMessage,
                 object: nil,
                 queue: nil) { notification in
-                    inboundMessage = notification.userInfo?["inboundMessage"] as! InboundMessage
-                    print("RECEIVED", inboundMessage!)
+                    inboundMessage = notification.userInfo?["inboundMessage"] as? InboundMessage
                     connectAndReceive.fulfill()
             }
             defer { NotificationCenter.default.removeObserver(dataMessageObserver) }
@@ -157,9 +156,10 @@ class SignalClientTests: XCTestCase {
             let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
             let response = Message(senderUserId: userId ?? UUID(),
                                    senderDeviceId: deviceId ?? 0,
-                                   distributionExpression: "", // message.body![0]["distribution"]["expression"].stringValue,
-                                   data: TextMessageData(plain: "Hello, world!")
-            )
+                                   threadId: UUID(uuidString: inboundMessage!.body[0]["threadId"].stringValue)!,
+                                   distributionExpression: inboundMessage!.body[0]["distribution"]["expression"].stringValue,
+                                   data: TextMessageData(plain: "Hello, world!"),
+                                   threadType: .conversation)
 
             signalClient.getKeysForAddr(inboundMessage!.source)
                 .done { result in
@@ -179,6 +179,7 @@ class SignalClientTests: XCTestCase {
             
             
             response.recipients.append(.device(address: inboundMessage!.source))
+            print(response)
             sender.send(response)
                 .done { result in
                     print("SEND COMPLETE", result)
@@ -196,9 +197,50 @@ class SignalClientTests: XCTestCase {
         }
     }
     
+    func watchEverything() {
+        let _ = NotificationCenter.default.addObserver(
+            forName: .relayEmptyQueue,
+            object: nil,
+            queue: nil) { _ in
+                print(">>> message queue is empty")
+        }
+        
+        let _ = NotificationCenter.default.addObserver(
+            forName: .relayIdentityKeyChanged,
+            object: nil,
+            queue: nil) { notification in
+                print(">>> identity key changed [todo: get rest of info]")
+        }
+        
+        let _ = NotificationCenter.default.addObserver(
+            forName: .relayDeliveryReceipt,
+            object: nil,
+            queue: nil) { notification in
+                let receipt = notification.userInfo?["deliveryReceipt"] as! DeliveryReceipt
+                print(">>> ", receipt)
+        }
+        
+        let _ = NotificationCenter.default.addObserver(
+            forName: .relayInboundMessage,
+            object: nil,
+            queue: nil) { notification in
+                let inboundMessage = notification.userInfo?["inboundMessage"] as! InboundMessage
+                print(">>> ", inboundMessage)
+        }
+        
+        let _ = NotificationCenter.default.addObserver(
+            forName: .relayReadSyncReceipts,
+            object: nil,
+            queue: nil) { notification in
+                let receipts = notification.userInfo?["readSyncReceipts"] as! [ReadSyncReceipt]
+                print(">>> ", receipts)
+        }
+    }
+    
     func testPreKeySend() {
         
         do {
+            watchEverything()
             let atlasClient = AtlasClient(kvstore: MemoryKVStore())
             let signalClient = try SignalClient(atlasClient: atlasClient)
             
@@ -229,7 +271,6 @@ class SignalClientTests: XCTestCase {
                 forName: .relayEmptyQueue,
                 object: nil,
                 queue: nil) { _ in
-                    print("connection up and running")
                     connectified.fulfill()
             }
             defer { NotificationCenter.default.removeObserver(dataMessageObserver) }
@@ -256,7 +297,6 @@ class SignalClientTests: XCTestCase {
                 object: nil,
                 queue: nil) { notification in
                     let receipt = notification.userInfo?["deliveryReceipt"] as! DeliveryReceipt
-                    print(receipt)
                     receiptReceived.fulfill()
             }
             defer { NotificationCenter.default.removeObserver(receiptObserver) }

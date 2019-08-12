@@ -59,36 +59,6 @@ class SignalClient {
         return try crypto.random(bytes: 32 + 20)
     }
     
-    func verifyMAC(data: Data, key: Data, expectedMAC: Data) throws {
-        let calculatedMAC = crypto.hmacSHA256(for: data, with: key)
-        if calculatedMAC[..<expectedMAC.count] != expectedMAC {
-            throw LibRelayError.internalError(why: "Bad MAC")
-        }
-    }
-
-    func decryptWebSocketMessage(message: Data, signalingKey: Data) throws -> Data {
-        guard signalingKey.count == 52 else {
-            throw LibRelayError.internalError(why: "Invalid signalKey length.")
-        }
-        guard message.count >= 1 + 16 + 10 else {
-            throw LibRelayError.internalError(why: "Invalid message length.")
-        }
-        guard message[0] == 1 else {
-            throw LibRelayError.internalError(why: "Invalid message version number \(message[0]).")
-        }
-        
-        let aesKey = signalingKey[0...31]
-        let macKey = signalingKey[32...32+19]
-        let iv = message[1...16]
-        let ciphertext = message[1+16...message.count-11]
-        let ivAndCyphertext = message[0...message.count-11]
-        let mac = message[(message.count-10)...]
-        
-        try verifyMAC(data: ivAndCyphertext, key: macKey, expectedMAC: mac)
-        return try crypto.decrypt(message: ciphertext, with: .AES_CBCwithPKCS5, key: aesKey, iv: iv)
-    }
-
-    
     func registerAccount(name: String) -> Promise<(Int, JSON)> {
         var signalingKey: Data
         var signalServerPassword: String
@@ -150,7 +120,7 @@ class SignalClient {
         }
     }
     
-    func genKeystuffBundle() -> Promise<[String: Any]> {
+    private func genKeystuffBundle() -> Promise<[String: Any]> {
         do {
             guard let identity = self.store.identityKeyStore.identityKeyPair() else {
                 throw LibRelayError.internalError(why: "unable to retrieve self identity")
@@ -182,6 +152,14 @@ class SignalClient {
     }
     
     
+    /// Request delivery of an encrypted message to a specific device
+    ///
+    /// Expects parameters to include:
+    ///    - "type": Relay_Envelope.TypeEnum (int)
+    ///    - "content": encrypted message (base64 encoded)
+    ///    - "destinationRegistrationId": registration ID of destination (uint32)
+    ///    - "destinationDeviceId": device ID of destination (int32)
+    ///    - "timestamp": timestamp of the message (uint64, ms since 1970)
     func deliverToDevice(address: SignalAddress, parameters: [String: Any]) -> Promise<(Int, JSON)> {
         return self.request(
             .messages,
@@ -190,10 +168,12 @@ class SignalClient {
             parameters: parameters)
     }
     
+    /// Get prekey bundle for a specific device
     func getKeysForAddr(_ addr: SignalAddress) -> Promise<[SessionPreKeyBundle]> {
         return getKeysForAddr(addr: addr.name, deviceId: UInt32(addr.deviceId))
     }
     
+    /// Get prekey bundles for address (either all devices for the address, or only a specific device)
     func getKeysForAddr(addr: String, deviceId: UInt32? = nil) -> Promise<[SessionPreKeyBundle]> {
         let deviceStr = deviceId == nil ? "*" : String(deviceId!)
         return self.request(.keys, urlParameters: "/\(addr)/\(deviceStr)")
@@ -242,27 +222,9 @@ class SignalClient {
                     throw LibRelayError.requestRejected(why: json)
                 }
         }
-        /*
-        res.identityKey = relay.util.StringView.base64ToBytes(res.identityKey);
-        for (const device of res.devices) {
-            if (!validateResponse(device, {signedPreKey: 'object'}) ||
-                !validateResponse(device.signedPreKey, {publicKey: 'string', signature: 'string'})) {
-                throw new Error("Invalid signedPreKey");
-            }
-            if (device.preKey) {
-                if (!validateResponse(device, {preKey: 'object'}) ||
-                    !validateResponse(device.preKey, {publicKey: 'string'})) {
-                    throw new Error("Invalid preKey");
-                }
-                device.preKey.publicKey = relay.util.StringView.base64ToBytes(device.preKey.publicKey);
-            }
-            device.signedPreKey.publicKey = relay.util.StringView.base64ToBytes(device.signedPreKey.publicKey);
-            device.signedPreKey.signature = relay.util.StringView.base64ToBytes(device.signedPreKey.signature);
-        }
-        return res;
-        */
     }
 
+    /// Internal: Generate authorization header for Signal Server requests
     private func authHeader() -> [String: String] {
         if signalServerUsername != nil && password != nil {
             let up64 = "\(signalServerUsername!):\(password!)".data(using: .utf8)!.base64EncodedString()
@@ -273,7 +235,7 @@ class SignalClient {
         }
     }
     
-    /// Internal: Basic Atlas http request that returns a `Promise` of `(statuscode, JSON)`
+    /// Internal: Basic Signal Server http request that returns a `Promise` of `(statuscode, JSON)`
     private func request(_ call: ServerCall, urlParameters: String = "", method: HTTPMethod = .get, parameters: Parameters? = nil) -> Promise<(Int, JSON)> {
         guard serverUrl != nil else {
             return Promise(error: LibRelayError.internalError(why: "No signal server url available."))
@@ -303,5 +265,4 @@ class SignalClient {
         case messages = "/v1/messages"
         case attachment = "/v2/attachments"
     }
-    
 }

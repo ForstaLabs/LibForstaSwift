@@ -111,7 +111,6 @@ class WebSocketResource: WebSocketDelegate {
             return
         }
         let url = "\(signalClient.serverUrl!)/v1/websocket/?login=\(signalClient.signalServerUsername!)&password=\(signalClient.password!)"
-        print("CONNECTING to \(url)")
         socket = WebSocket(url: URL(string: url)!)
         socket!.delegate = self
         socket!.connect()

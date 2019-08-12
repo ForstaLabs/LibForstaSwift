@@ -47,7 +47,6 @@ class MessageSender {
                     "timestamp": Date().millisecondsSince1970
                 ]
                 
-                print("outgoing message bundle", bundle)
                 results.append(self.signalClient.deliverToDevice(address: specificAddress, parameters: bundle))
             }
             
