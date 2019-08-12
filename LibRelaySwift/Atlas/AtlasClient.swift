@@ -38,7 +38,7 @@ class AtlasClient {
     var kvstore: KVStorageProtocol
     
     var authenticatedUserJwt: String?
-    var authenticatedUserId: String?
+    var authenticatedUserId: UUID?
     
     /// predicate for whether this Atlas client is currently authenticated
     var isAuthenticated: Bool {
@@ -313,7 +313,7 @@ class AtlasClient {
     /// - returns: The new user's fully-qualified tag and the userId GUID: `(tag, guid)`
     ///
     func joinForsta(invitationToken: String? = nil,
-                    _ fields: [String: Any]) -> Promise<(String, String)> {
+                    _ fields: [String: Any]) -> Promise<(String, UUID)> {
         return request("/v1/join/\(invitationToken ?? "")", method: .post, parameters: fields)
             .map { result in
                 let (statusCode, json) = result
@@ -582,7 +582,11 @@ class AtlasClient {
             self.kvstore.set(DNK.atlasCredential, jwt)
             self.kvstore.set(DNK.atlasUrl, self.baseUrl)
 
-            self.authenticatedUserId = decodedJwt.body["user_id"] as? String
+            guard let id = decodedJwt.body["user_id"] as? String else {
+                print("warning: malformed jwt, missing user_id")
+                return false
+            }
+            self.authenticatedUserId = UUID(uuidString: id)
             self.authenticatedUserJwt = jwt
             
             NotificationCenter.broadcast(.atlasCredentialSet, ["jwt": jwt])
