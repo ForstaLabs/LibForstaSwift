@@ -106,11 +106,11 @@ class WebSocketResource: WebSocketDelegate {
     }
     
     func connect() {
-        guard signalClient.serverUrl != nil, signalClient.username != nil, signalClient.password != nil else {
+        guard signalClient.serverUrl != nil, signalClient.signalServerUsername != nil, signalClient.password != nil else {
             print("CANNOT CONNECT!")
             return
         }
-        let url = "\(signalClient.serverUrl!)/v1/websocket/?login=\(signalClient.username!)&password=\(signalClient.password!)"
+        let url = "\(signalClient.serverUrl!)/v1/websocket/?login=\(signalClient.signalServerUsername!)&password=\(signalClient.password!)"
         print("CONNECTING to \(url)")
         socket = WebSocket(url: URL(string: url)!)
         socket!.delegate = self
@@ -132,9 +132,7 @@ class WebSocketResource: WebSocketDelegate {
     func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
         do {
             let x = try Relay_WebSocketMessage(serializedData: data)
-            print("Got a ws message!")
             if x.hasRequest {
-                print("... it's a request!")
                 self.requestHandler(IncomingWSRequest(wsr: self, verb: x.request.verb, path: x.request.path, body: x.request.hasBody ? x.request.body : nil))
             } else if x.hasResponse {
                 let id = x.response.hasID ? x.response.id : 0
@@ -142,7 +140,7 @@ class WebSocketResource: WebSocketDelegate {
                 let message = x.response.hasMessage ? x.response.message : ""
                 let status = x.response.hasStatus ? x.response.status : 500
                 
-                print("... it's a response! (\(status), \(message))")
+                print("got a ws response! (\(status), \(message))")
                 
                 guard let request = outgoingRequests[id] else {
                     print("... but it has no matching request.")

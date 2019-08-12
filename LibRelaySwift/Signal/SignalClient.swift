@@ -27,7 +27,7 @@ class SignalClient {
         }
     }
     var serverUrl: String?
-    var username: String?
+    var signalServerUsername: String?
     var password: String?
     
     ///
@@ -40,7 +40,7 @@ class SignalClient {
         self.atlasClient = atlasClient
         let kv = atlasClient.kvstore
         self.serverUrl = kv.get(DNK.ssUrl)
-        self.username = kv.get(DNK.ssUsername)
+        self.signalServerUsername = kv.get(DNK.ssUsername)
         self.password = kv.get(DNK.ssPassword)
         self.store = try SignalStore(
             identityKeyStore: RelayIdentityKeyStore(kvstore: kv),
@@ -91,11 +91,11 @@ class SignalClient {
     
     func registerAccount(name: String) -> Promise<(Int, JSON)> {
         var signalingKey: Data
-        var password: String
+        var signalServerPassword: String
         var registrationId: UInt32
         do {
             signalingKey = try generateSignalingKey()
-            password = try generatePassword()
+            signalServerPassword = try generatePassword()
             registrationId = try Signal.generateRegistrationId()
         } catch {
             return Promise.init(error: LibRelayError.internalError(why: "Unable to generate random bits for account registration."))
@@ -104,7 +104,7 @@ class SignalClient {
         return firstly { () -> Promise<JSON> in
             let data: [String: Any] = [
                 "name": name,
-                "password": password,
+                "password": signalServerPassword,
                 "registrationId": registrationId,
                 "signalingKey": signalingKey.base64EncodedString(),
                 "fetchesMessages": true,
@@ -121,7 +121,7 @@ class SignalClient {
                         throw LibRelayError.internalError(why: "unexpected result from provisionAccount")
                 }
                 
-                let username = raddr(userId.lcString, deviceId)
+                let signalServerUsername = "\(userId.lcString).\(deviceId)"
                 
                 let identity = try Signal.generateIdentityKeyPair()
                 self.store.relayIdentityKeyStore.setIdentityKeyPair(identity: identity)
@@ -132,10 +132,10 @@ class SignalClient {
 
                 self.kvstore.set(DNK.ssUrl, serverUrl)
                 self.serverUrl = serverUrl
-                self.kvstore.set(DNK.ssUsername, username)
-                self.username = username
-                self.kvstore.set(DNK.ssPassword, password)
-                self.password = password
+                self.kvstore.set(DNK.ssUsername, signalServerUsername)
+                self.signalServerUsername = signalServerUsername
+                self.kvstore.set(DNK.ssPassword, signalServerPassword)
+                self.password = signalServerPassword
                 
                 self.kvstore.set(DNK.ssAddress, userId)
                 self.kvstore.set(DNK.ssDeviceId, deviceId)
@@ -264,8 +264,8 @@ class SignalClient {
     }
 
     private func authHeader() -> [String: String] {
-        if username != nil && password != nil {
-            let up64 = "\(username!):\(password!)".data(using: .utf8)!.base64EncodedString()
+        if signalServerUsername != nil && password != nil {
+            let up64 = "\(signalServerUsername!):\(password!)".data(using: .utf8)!.base64EncodedString()
             let auth = "Basic " + up64
             return ["Authorization": auth]
         } else {

@@ -1,5 +1,5 @@
 //
-//  Message.swift
+//  Sendable.swift
 //  LibRelaySwift
 //
 //  Created by Greg Perkins on 8/5/19.
@@ -135,63 +135,10 @@ extension Sendable {
     var description: String {
         return """
         Sendable from \(senderUserId).\(senderDeviceId) @ \(timestamp)
-        distribution: \(distributionExpression)
-        
-        \(messageType) message \(messageId) in \(threadType?.rawValue ?? "<no type>") thread \(threadId) (\(threadTitle ?? "<no title>"))
-        \(messageRef != nil ? "references message \(messageRef!)" : "")
-        \(data != nil ? "data: \(data!.rawString() ?? "<malformed body>"))" : "")
+        >>> distribution: \(distributionExpression)
+        >>> \(messageType) message \(messageId) in \(threadType?.rawValue ?? "<no type>") thread \(threadId) (\(threadTitle ?? "<no title>")) \
+        \(messageRef != nil ? "\n>>> references message \(messageRef!)" : "")
+        \((data != nil ? "data: \(data!.rawString() ?? "<malformed body>"))" : "").indentWith(">>> "))
         """
-    }
-}
-
-class Message: Sendable {
-    // handling stuff
-    public var recipients: [MessageRecipient]
-    
-    // envelope stuff
-    public var timestamp: Date
-    public var senderUserId: UUID
-    public var senderDeviceId: UInt32
-    
-    // mandatory body stuff
-    public var messageId: UUID
-    public var messageType: FLIMessageType
-    public var threadId: UUID
-    public var distributionExpression: String
-
-    // optional body stuff
-    public var data: JSON?
-    public var userAgent: String?
-    public var threadTitle: String?
-    public var threadType: FLIThreadType?
-    public var messageRef: UUID?
-
-    init(recipients: [MessageRecipient] = [MessageRecipient](),
-         timestamp: Date = Date(),
-         senderUserId: UUID,
-         senderDeviceId: UInt32,
-         messageId: UUID = UUID(),
-         messageType: FLIMessageType = .content,
-         threadId: UUID = UUID(),
-         distributionExpression: String,
-         data: JSON? = nil,
-         userAgent: String = "LibRelaySwift Client",
-         threadTitle: String? = nil,
-         threadType: FLIThreadType? = nil,
-         messageRef: UUID? = nil
-         ) {
-        self.recipients = recipients
-        self.timestamp = timestamp
-        self.senderUserId = senderUserId
-        self.senderDeviceId = senderDeviceId
-        self.messageId = messageId
-        self.messageType = messageType
-        self.threadId = threadId
-        self.distributionExpression = distributionExpression
-        self.data = data
-        self.userAgent = userAgent
-        self.threadTitle = threadTitle
-        self.threadType = threadType
-        self.messageRef = messageRef
     }
 }

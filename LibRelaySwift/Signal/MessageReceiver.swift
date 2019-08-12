@@ -72,8 +72,8 @@ class InboundMessage: CustomStringConvertible {
     
     var description: String {
         return """
-        InboundMessage from \(source) @ \(timestamp) for \(expiration ?? -1)
-        \(body.rawString() ?? "<malformed body>")
+        InboundMessage from \(source) @ \(timestamp) good for \(expiration ?? -1)
+        \((body.rawString() ?? "<malformed body>").indentWith(">>> "))
         """
     }
 }
@@ -88,10 +88,10 @@ class MessageReceiver {
         self.wsr.requestHandler = self.handleRequest
     }
     
-    func handleRequest(request: IncomingWSRequest) {
-        print("Handling request \(request.verb) \(request.path)...")
+    /// Handle an incoming websocket request (/queue/empty or /message)
+    private func handleRequest(request: IncomingWSRequest) {
+        print("Handling WS request \(request.verb) \(request.path)...")
         if request.path == WSRequest.Path.queueEmpty {
-            print("Websocket queue empty")
             NotificationCenter.broadcast(.relayEmptyQueue)
             let _ = request.respond(status: 200, message: "OK")
             return
@@ -110,17 +110,6 @@ class MessageReceiver {
             }
             let data = try signalClient.decryptWebSocketMessage(message: request.body!, signalingKey: signalingKey!)
             let envelope = try Relay_Envelope(serializedData: data)
-            handleEnvelope(envelope)
-            let _ = request.respond(status: 200, message: "OK")
-        } catch let error {
-            print("Error handling incoming message", error.localizedDescription)
-            let _ = request.respond(status: 500, message: "Bad encrypted websocket message")
-        }
-    }
-    
-    func handleEnvelope(_ envelope: Relay_Envelope) {
-        print("got envelope! \(envelope.type)")
-        do {
             if envelope.type == .receipt {
                 let receipt = DeliveryReceipt(SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice),
                                               Date(millisecondsSince1970: envelope.timestamp))
@@ -132,22 +121,29 @@ class MessageReceiver {
             } else {
                 throw LibRelayError.internalError(why: "Received message with no content.")
             }
+            let _ = request.respond(status: 200, message: "OK")
         } catch let error {
-            print("error in handleEnvelope!", error)
+            print("Error handling incoming message", error.localizedDescription)
+            let _ = request.respond(status: 500, message: "Bad encrypted websocket message")
         }
     }
     
-    func handleContentMessage(_ envelope: Relay_Envelope) throws {
+    /// Internal: Handle a "Content" message, extracting incoming messages, sync messages, sync read-receipts
+    private func handleContentMessage(_ envelope: Relay_Envelope) throws {
         let plainText = try self.decrypt(envelope, envelope.content);
         let content = try Relay_Content(serializedData: plainText)
         var sent: Relay_SyncMessage.Sent? = nil
         var dm: Relay_DataMessage? = nil
+        var happy = false
         if content.hasSyncMessage && content.syncMessage.hasSent {
+            // receiving a message sent by another device for this account
             sent = content.syncMessage.sent
             dm = sent!.message
         } else if content.hasDataMessage {
+            // receiving a message sent by some other account
             dm = content.dataMessage
         } else if content.hasSyncMessage && content.syncMessage.read.count > 0 {
+            // receiving a collection of read-receipts from another device for this account
             var receipts = [ReadSyncReceipt]()
             for r in content.syncMessage.read {
                 guard let sender: UUID = UUID(uuidString: r.sender) else {
@@ -156,6 +152,7 @@ class MessageReceiver {
                 let timestamp: Date = Date(millisecondsSince1970: r.timestamp)
                 receipts.append(ReadSyncReceipt(sender, timestamp))
             }
+            happy = true
             NotificationCenter.broadcast(.relayReadSyncReceipts, ["readSyncReceipts": receipts])
         }
         
@@ -172,17 +169,21 @@ class MessageReceiver {
                                         ? Date(millisecondsSince1970: sent!.expirationStartTimestamp)
                                         : nil,
                                      destination: (sent?.hasDestination ?? false) ? sent!.destination : nil)
-            NotificationCenter.broadcast(.relayMessage, ["inboundMessage": msg])
-        } else {
+            happy = true
+            NotificationCenter.broadcast(.relayInboundMessage, ["inboundMessage": msg])
+        }
+        
+        if !happy {
             throw LibRelayError.internalError(why: "Received content message with no dataMessage or syncMessage.")
         }
     }
     
-    func handleLegacyMessage(_ envelope: Relay_Envelope) throws {
+    private func handleLegacyMessage(_ envelope: Relay_Envelope) throws {
         throw LibRelayError.internalError(why: "Not implemented.")
     }
     
-    func decrypt(_ envelope: Relay_Envelope, _ cyphertext: Data) throws -> Data {
+    /// Internal: Decrypt an incoming envelope's content
+    private func decrypt(_ envelope: Relay_Envelope, _ cyphertext: Data) throws -> Data {
         print(envelope.type)
         let addr = SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice)
         let sessionCipher = SessionCipher(for: addr, in: self.signalClient.store)
@@ -197,7 +198,8 @@ class MessageReceiver {
         return try unpad(paddedPlaintext: plainText)
     }
     
-    func unpad(paddedPlaintext: Data) throws -> Data {
+    /// Internal: Unpad an incoming envelope's plaintext after decrypting
+    private func unpad(paddedPlaintext: Data) throws -> Data {
         for idx in (0...paddedPlaintext.count-1).reversed() {
             if paddedPlaintext[idx] == 0x00 { continue }
             else if paddedPlaintext[idx] == 0x80 {

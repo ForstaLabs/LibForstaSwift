@@ -29,13 +29,14 @@ extension Notification.Name {
 
     /// Incoming message
     /// -- includes "inboundMessage" of type InboundMessage
-    static let relayMessage = Notification.Name("relayMessage")
+    static let relayInboundMessage = Notification.Name("relayInboundMessage")
     
     /// Incoming read receipts
     /// -- includes "readSyncReceipts" of type [ReadSyncReceipt]
     static let relayReadSyncReceipts = Notification.Name("relayReadSyncReceipts")
 
     /// Incoming queue is now empty
+    /// -- includes no extra data
     static let relayEmptyQueue = Notification.Name("relayEmptyQueue")
 }
 
@@ -87,21 +88,13 @@ extension Request {
     }
 }
 
-typealias RelayAddress = String
-/// generate a RelayAddress (String of userId.deviceId)
-func raddr(_ userId: String, _ deviceId: UInt32) -> RelayAddress {
-    return "\(userId).\(deviceId)"
-}
-
 extension Date {
     var millisecondsSince1970:UInt64 {
         return UInt64((self.timeIntervalSince1970 * 1000.0).rounded())
     }
-    
     init(millisecondsSince1970:Int64) {
         self.init(timeIntervalSince1970: TimeInterval(milliseconds: millisecondsSince1970))
     }
-    
     init(millisecondsSince1970:UInt64) {
         self.init(timeIntervalSince1970: TimeInterval(milliseconds: millisecondsSince1970))
     }
@@ -126,17 +119,14 @@ extension SignalAddress: CustomStringConvertible {
     convenience init(userId: String, deviceId: UInt32) {
         self.init(name: userId, deviceId: (Int32(deviceId)))
     }
-    
     convenience init(userId: UUID, deviceId: UInt32) {
         self.init(name: userId.lcString, deviceId: (Int32(deviceId)))
     }
-    
     var userId: UUID {
         get {
             return UUID(uuidString: self.name)!
         }
     }
-    
     public var description: String {
         return "\(self.name).\(self.deviceId )"
     }
@@ -154,5 +144,11 @@ extension UUID {
         get {
             return self.uuidString.lowercased()
         }
+    }
+}
+
+extension String {
+    func indentWith(_ prefix: String) -> String {
+        return prefix + self.replacingOccurrences(of: "\n", with: "\n"+prefix)
     }
 }

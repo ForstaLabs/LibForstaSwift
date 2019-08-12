@@ -15,6 +15,59 @@ import SwiftyJSON
 @testable import LibRelaySwift
 import SignalProtocol
 
+
+class Message: Sendable, CustomStringConvertible {
+    // handling stuff
+    public var recipients: [MessageRecipient]
+    
+    // envelope stuff
+    public var timestamp: Date
+    public var senderUserId: UUID
+    public var senderDeviceId: UInt32
+    
+    // mandatory body stuff
+    public var messageId: UUID
+    public var messageType: FLIMessageType
+    public var threadId: UUID
+    public var distributionExpression: String
+    
+    // optional body stuff
+    public var data: JSON?
+    public var userAgent: String?
+    public var threadTitle: String?
+    public var threadType: FLIThreadType?
+    public var messageRef: UUID?
+    
+    init(recipients: [MessageRecipient] = [MessageRecipient](),
+         timestamp: Date = Date(),
+         senderUserId: UUID,
+         senderDeviceId: UInt32,
+         messageId: UUID = UUID(),
+         messageType: FLIMessageType = .content,
+         threadId: UUID = UUID(),
+         distributionExpression: String,
+         data: JSON? = nil,
+         userAgent: String = "LibRelaySwift Client",
+         threadTitle: String? = nil,
+         threadType: FLIThreadType? = nil,
+         messageRef: UUID? = nil
+        ) {
+        self.recipients = recipients
+        self.timestamp = timestamp
+        self.senderUserId = senderUserId
+        self.senderDeviceId = senderDeviceId
+        self.messageId = messageId
+        self.messageType = messageType
+        self.threadId = threadId
+        self.distributionExpression = distributionExpression
+        self.data = data
+        self.userAgent = userAgent
+        self.threadTitle = threadTitle
+        self.threadType = threadType
+        self.messageRef = messageRef
+    }
+}
+
 class SignalClientTests: XCTestCase {
     
     func testRegisterAndConnect() {
@@ -85,11 +138,11 @@ class SignalClientTests: XCTestCase {
             let connectAndReceive = XCTestExpectation()
             var inboundMessage: InboundMessage? = nil
             let dataMessageObserver = NotificationCenter.default.addObserver(
-                forName: .relayMessage,
+                forName: .relayInboundMessage,
                 object: nil,
                 queue: nil) { notification in
                     inboundMessage = notification.userInfo?["inboundMessage"] as! InboundMessage
-                    print("RECEIVED", inboundMessage)
+                    print("RECEIVED", inboundMessage!)
                     connectAndReceive.fulfill()
             }
             defer { NotificationCenter.default.removeObserver(dataMessageObserver) }
@@ -193,8 +246,7 @@ class SignalClientTests: XCTestCase {
             let message = Message(senderUserId: myUserId ?? UUID(),
                                   senderDeviceId: myDeviceId ?? 0,
                                   distributionExpression: "(<2b53e98b-170f-4102-9d82-e43d5abb7998>+<e98bf10d-528f-44c4-99cd-c488385771cc>)",
-                                  data: TextMessageData(plain: "Hello, world!")
-            )
+                                  data: TextMessageData(plain: "Hello, world!"))
             let theirUserId = "bd1f7e2d-55f5-4a3b-933d-ab7cf51503ca"
             let theirDeviceId = 1
 
@@ -218,7 +270,7 @@ class SignalClientTests: XCTestCase {
                         try SessionBuilder(for: addr, in: signalClient.store).process(preKeyBundle: bundle)
                         message.recipients.append(.device(address: addr))
                     }
-                    print("sending message", message.description)
+                    print("sending message", message)
                 }
                 .then {
                     sender.send(message)

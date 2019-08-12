@@ -55,7 +55,7 @@
 		DB2B00E722E234AF00B9931A /* OneTimePassword.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B00E122E2342F00B9931A /* OneTimePassword.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DBDB773122E124610027EEB0 /* LibRelaySwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBDB772722E124610027EEB0 /* LibRelaySwift.framework */; };
 		DBDB773822E124610027EEB0 /* LibRelaySwift.h in Headers */ = {isa = PBXBuildFile; fileRef = DBDB772A22E124610027EEB0 /* LibRelaySwift.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DBE3D57622F87B750016B800 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57522F87B750016B800 /* Message.swift */; };
+		DBE3D57622F87B750016B800 /* Sendable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57522F87B750016B800 /* Sendable.swift */; };
 		DBE3D57822F89E880016B800 /* MessageSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57722F89E880016B800 /* MessageSender.swift */; };
 		DBE3D57A22F89EB50016B800 /* MessageReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57922F89EB50016B800 /* MessageReceiver.swift */; };
 /* End PBXBuildFile section */
@@ -125,7 +125,7 @@
 		DBDB772B22E124610027EEB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DBDB773022E124610027EEB0 /* LibRelaySwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LibRelaySwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBDB773722E124610027EEB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DBE3D57522F87B750016B800 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		DBE3D57522F87B750016B800 /* Sendable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sendable.swift; sourceTree = "<group>"; };
 		DBE3D57722F89E880016B800 /* MessageSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSender.swift; sourceTree = "<group>"; };
 		DBE3D57922F89EB50016B800 /* MessageReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageReceiver.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -193,7 +193,7 @@
 			isa = PBXGroup;
 			children = (
 				DB2B00B922E12D6A00B9931A /* WebSocketResource.swift */,
-				DBE3D57522F87B750016B800 /* Message.swift */,
+				DBE3D57522F87B750016B800 /* Sendable.swift */,
 				DB2B00BA22E12D6A00B9931A /* SignalClient.swift */,
 				DBE3D57722F89E880016B800 /* MessageSender.swift */,
 				DBE3D57922F89EB50016B800 /* MessageReceiver.swift */,
@@ -428,7 +428,7 @@
 				DB2B00B522E12D6100B9931A /* DeviceMessages.pb.swift in Sources */,
 				DB2B00CA22E12D7800B9931A /* SignalCryptoProvider.swift in Sources */,
 				DB2B00B422E12D6100B9931A /* SubProtocol.proto in Sources */,
-				DBE3D57622F87B750016B800 /* Message.swift in Sources */,
+				DBE3D57622F87B750016B800 /* Sendable.swift in Sources */,
 				DB2B00BC22E12D6A00B9931A /* SignalClient.swift in Sources */,
 				DB2B00B722E12D6100B9931A /* IncomingPushMessageSignal.proto in Sources */,
 			);

@@ -22,7 +22,8 @@ class MessageSender {
         self.wsr = webSocketResource ?? WebSocketResource(signalClient: signalClient)
     }
     
-    func send(_ message: Message) -> Promise<(Int, JSON)> {
+    /// Transmit a Sendable (i.e., a message)
+    func send(_ message: Sendable) -> Promise<(Int, JSON)> {
         return firstly { () -> Promise<(Int, JSON)> in
             var results: [Promise<(Int, JSON)>] = []
             var clearMessage = try message.contentProto.serializedData()
@@ -54,9 +55,10 @@ class MessageSender {
         }
     }
     
-    func pad(_ plaintext: inout Data, partSize: Int = 160, terminator: UInt8 = 0x80) {
-        var muhPad = Data(count: partSize + 1 - ((plaintext.count + 1) % partSize))
-        muhPad[0] = terminator
-        plaintext.append(muhPad)
+    /// Internal: Pad outgoing plaintext before encryption
+    private func pad(_ plaintext: inout Data, partSize: Int = 160, terminator: UInt8 = 0x80) {
+        var thePad = Data(count: partSize + 1 - ((plaintext.count + 1) % partSize))
+        thePad[0] = terminator
+        plaintext.append(thePad)
     }
 }
