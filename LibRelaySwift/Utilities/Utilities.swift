@@ -21,23 +21,23 @@ extension Notification.Name {
     static let atlasCredentialExpired = Notification.Name("atlasCredentialExpired")
     
     /// Identity key changed on an incoming message
-    static let relayIdentityKeyChanged = Notification.Name("relayIdentityKeyChanged")
+    static let signalIdentityKeyChanged = Notification.Name("signalIdentityKeyChanged")
     
     /// Incoming delivery receipt
     /// -- includes "deliveryReceipt" of type DeliveryReceipt
-    static let relayDeliveryReceipt = Notification.Name("relayDeliveryReceipt")
+    static let signalDeliveryReceipt = Notification.Name("signalDeliveryReceipt")
 
     /// Incoming message
     /// -- includes "inboundMessage" of type InboundMessage
-    static let relayInboundMessage = Notification.Name("relayInboundMessage")
+    static let signalInboundMessage = Notification.Name("signalInboundMessage")
     
     /// Incoming read receipts
     /// -- includes "readSyncReceipts" of type [ReadSyncReceipt]
-    static let relayReadSyncReceipts = Notification.Name("relayReadSyncReceipts")
+    static let signalReadSyncReceipts = Notification.Name("signalReadSyncReceipts")
 
     /// Incoming queue is now empty
     /// -- includes no extra data
-    static let relayEmptyQueue = Notification.Name("relayEmptyQueue")
+    static let signalEmptyQueue = Notification.Name("signalEmptyQueue")
 }
 
 
@@ -54,12 +54,12 @@ extension NotificationCenter {
 
 
 /// The various LibRelay errors.
-enum LibRelayError: Error {
+enum LibForstaError: Error {
     case requestRejected(why: JSON)
     case requestFailure(why: Error)
     case internalError(why: String)
 }
-extension LibRelayError {
+extension LibForstaError {
     var isRequestFailure: Bool {
         get {
             switch self {

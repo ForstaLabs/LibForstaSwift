@@ -13,7 +13,7 @@
 import Foundation
 
 /// The different types of errors that can occur using the LibRelaySwift library.
-public enum RelayErrorType: String {
+public enum ForstaErrorType: String {
     /// Unknown errors should only be thrown of no other, more descriptive error type exists
     case unknown = "Unknown"
 
@@ -85,16 +85,16 @@ public enum RelayErrorType: String {
 }
 
 /// All errors thrown by `LibRelaySwift` are `RelayError` objects.
-public final class RelayError: CustomStringConvertible, Error {
+public final class ForstaError: CustomStringConvertible, Error {
 
     /// The error type
-    public let type: RelayErrorType
+    public let type: ForstaErrorType
 
     /// A decribing message accompaning the error
     public let message: String?
 
     /// If the error occured in a subfunction, then this variable can be used to construct an error trace.
-    public let cause: RelayError?
+    public let cause: ForstaError?
 
     /// The function were the error occured
     public let function: String
@@ -110,9 +110,9 @@ public final class RelayError: CustomStringConvertible, Error {
      - parameter file: A String describing the file where the error occured
      - parameter function: A String describing the function where the error occured
     */
-    public init(_ type: RelayErrorType,
+    public init(_ type: ForstaErrorType,
          _ message: String? = nil,
-         cause: RelayError? = nil,
+         cause: ForstaError? = nil,
          file: String = #file,
          function: String = #function) {
         self.type = type
@@ -130,7 +130,7 @@ public final class RelayError: CustomStringConvertible, Error {
      - parameter function: A String describing the function where the error occured
      */
     public init(_ message: String,
-         cause: RelayError,
+         cause: ForstaError,
          file: String = #file,
          function: String = #function) {
         self.type = cause.type
@@ -151,10 +151,10 @@ public final class RelayError: CustomStringConvertible, Error {
          cause: Error,
          file: String = #file,
          function: String = #function) {
-        if let reason = cause as? RelayError {
+        if let reason = cause as? ForstaError {
             self.init(message, cause: reason, file: file, function: function)
         } else {
-            let reason = RelayError(.unknown, cause.localizedDescription)
+            let reason = ForstaError(.unknown, cause.localizedDescription)
             self.init(message, cause: reason, file: file, function: function)
         }
     }

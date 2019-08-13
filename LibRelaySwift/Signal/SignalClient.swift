@@ -43,10 +43,10 @@ class SignalClient {
         self.signalServerUsername = kv.get(DNK.ssUsername)
         self.password = kv.get(DNK.ssPassword)
         self.store = try SignalStore(
-            identityKeyStore: RelayIdentityKeyStore(kvstore: kv),
-            preKeyStore: RelayPreKeyStore(kvstore: kv),
-            sessionStore: RelaySessionStore(kvstore: kv),
-            signedPreKeyStore: RelaySignedPreKeyStore(kvstore: kv),
+            identityKeyStore: ForstaIdentityKeyStore(kvstore: kv),
+            preKeyStore: ForstaPreKeyStore(kvstore: kv),
+            sessionStore: ForstaSessionStore(kvstore: kv),
+            signedPreKeyStore: ForstaSignedPreKeyStore(kvstore: kv),
             senderKeyStore: nil)
     }
     
@@ -68,7 +68,7 @@ class SignalClient {
             signalServerPassword = try generatePassword()
             registrationId = try Signal.generateRegistrationId()
         } catch {
-            return Promise.init(error: LibRelayError.internalError(why: "Unable to generate random bits for account registration."))
+            return Promise.init(error: LibForstaError.internalError(why: "Unable to generate random bits for account registration."))
         }
         
         return firstly { () -> Promise<JSON> in
@@ -88,17 +88,17 @@ class SignalClient {
                     let serverUrl = result["serverUrl"].string,
                     let userId = UUID(uuidString: result["userId"].stringValue),
                     let deviceId = result["deviceId"].uInt32 else {
-                        throw LibRelayError.internalError(why: "unexpected result from provisionAccount")
+                        throw LibForstaError.internalError(why: "unexpected result from provisionAccount")
                 }
                 
                 let signalServerUsername = "\(userId.lcString).\(deviceId)"
                 
                 let identity = try Signal.generateIdentityKeyPair()
-                self.store.relayIdentityKeyStore.setIdentityKeyPair(identity: identity)
-                if !self.store.relayIdentityKeyStore.save(identity: identity.publicKey, for: SignalAddress(userId: userId, deviceId: deviceId)) {
-                    throw LibRelayError.internalError(why: "unable to store self identity key")
+                self.store.forstaIdentityKeyStore.setIdentityKeyPair(identity: identity)
+                if !self.store.forstaIdentityKeyStore.save(identity: identity.publicKey, for: SignalAddress(userId: userId, deviceId: deviceId)) {
+                    throw LibForstaError.internalError(why: "unable to store self identity key")
                 }
-                self.store.relayIdentityKeyStore.setLocalRegistrationId(id: registrationId)
+                self.store.forstaIdentityKeyStore.setLocalRegistrationId(id: registrationId)
 
                 self.kvstore.set(DNK.ssUrl, serverUrl)
                 self.serverUrl = serverUrl
@@ -123,7 +123,7 @@ class SignalClient {
     private func genKeystuffBundle() -> Promise<[String: Any]> {
         do {
             guard let identity = self.store.identityKeyStore.identityKeyPair() else {
-                throw LibRelayError.internalError(why: "unable to retrieve self identity")
+                throw LibForstaError.internalError(why: "unable to retrieve self identity")
             }
             let preKeys = try self.store.generateAndStorePreKeys(count: 100)
             let signedPreKey = try self.store.updateSignedPreKey()
@@ -184,20 +184,20 @@ class SignalClient {
                         let devices = json["devices"].array,
                         let identityKeyBase64 = json["identityKey"].string,
                         let identityKey = Data(base64Encoded: identityKeyBase64) else {
-                            throw LibRelayError.internalError(why: "malformed prekeys response")
+                            throw LibForstaError.internalError(why: "malformed prekeys response")
                     }
                     var bundles = [SessionPreKeyBundle]()
                     for device in devices {
                         guard
                             let registrationId = device["registrationId"].uInt32,
                             let deviceId = device["deviceId"].int32 else {
-                                throw LibRelayError.internalError(why: "malformed prekeys bundle")
+                                throw LibForstaError.internalError(why: "malformed prekeys bundle")
                         }
                         guard
                             let preKeyId = device["preKey"]["keyId"].uInt32,
                             let preKeyBase64 = device["preKey"]["publicKey"].string,
                             let preKey = Data(base64Encoded: preKeyBase64) else {
-                                throw LibRelayError.internalError(why: "invalid prekey")
+                                throw LibForstaError.internalError(why: "invalid prekey")
                         }
                         guard
                             let signedPreKeyId = device["signedPreKey"]["keyId"].uInt32,
@@ -205,7 +205,7 @@ class SignalClient {
                             let signedPreKey = Data(base64Encoded: signedPreKeyBase64),
                             let signatureBase64 = device["signedPreKey"]["signature"].string,
                             let signature = Data(base64Encoded: signatureBase64) else {
-                                throw LibRelayError.internalError(why: "invalid signed prekey")
+                                throw LibForstaError.internalError(why: "invalid signed prekey")
                         }
                         bundles.append(SessionPreKeyBundle(
                             registrationId: registrationId,
@@ -219,7 +219,7 @@ class SignalClient {
                     }
                     return bundles
                 } else {
-                    throw LibRelayError.requestRejected(why: json)
+                    throw LibForstaError.requestRejected(why: json)
                 }
         }
     }
@@ -238,7 +238,7 @@ class SignalClient {
     /// Internal: Basic Signal Server http request that returns a `Promise` of `(statuscode, JSON)`
     private func request(_ call: ServerCall, urlParameters: String = "", method: HTTPMethod = .get, parameters: Parameters? = nil) -> Promise<(Int, JSON)> {
         guard serverUrl != nil else {
-            return Promise(error: LibRelayError.internalError(why: "No signal server url available."))
+            return Promise(error: LibForstaError.internalError(why: "No signal server url available."))
         }
         
         return Promise { seal in
@@ -252,7 +252,7 @@ class SignalClient {
                         let json = JSON(data)
                         seal.fulfill((statusCode, json))
                     case .failure(let error):
-                        return seal.reject(LibRelayError.requestFailure(why: error))
+                        return seal.reject(LibForstaError.requestFailure(why: error))
                     }
             }
         }

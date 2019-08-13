@@ -92,7 +92,7 @@ class MessageReceiver {
     private func handleRequest(request: IncomingWSRequest) {
         // print("Handling WS request \(request.verb) \(request.path)...")
         if request.path == WSRequest.Path.queueEmpty {
-            NotificationCenter.broadcast(.relayEmptyQueue)
+            NotificationCenter.broadcast(.signalEmptyQueue)
             let _ = request.respond(status: 200, message: "OK")
             return
         } else if request.path != WSRequest.Path.message || request.verb != "PUT" {
@@ -103,23 +103,23 @@ class MessageReceiver {
         do {
             let signalingKey = signalClient.kvstore.get(DNK.ssSignalingKey)
             guard request.body != nil else {
-                throw LibRelayError.internalError(why: "No body for incoming request.")
+                throw LibForstaError.internalError(why: "No body for incoming request.")
             }
             guard signalingKey != nil else {
-                throw LibRelayError.internalError(why: "No signaling key established.")
+                throw LibForstaError.internalError(why: "No signaling key established.")
             }
             let data = try decryptWebSocketMessage(message: request.body!, signalingKey: signalingKey!)
             let envelope = try Relay_Envelope(serializedData: data)
             if envelope.type == .receipt {
                 let receipt = DeliveryReceipt(SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice),
                                               Date(millisecondsSince1970: envelope.timestamp))
-                NotificationCenter.broadcast(.relayDeliveryReceipt, ["deliveryReceipt": receipt])
+                NotificationCenter.broadcast(.signalDeliveryReceipt, ["deliveryReceipt": receipt])
             } else if envelope.hasContent {
                 try handleContentMessage(envelope)
             } else if envelope.hasLegacyMessage {
                 try handleLegacyMessage(envelope)
             } else {
-                throw LibRelayError.internalError(why: "Received message with no content.")
+                throw LibForstaError.internalError(why: "Received message with no content.")
             }
             let _ = request.respond(status: 200, message: "OK")
         } catch let error {
@@ -147,13 +147,13 @@ class MessageReceiver {
             var receipts = [ReadSyncReceipt]()
             for r in content.syncMessage.read {
                 guard let sender: UUID = UUID(uuidString: r.sender) else {
-                    throw LibRelayError.internalError(why: "Received sync message with malformed read receipt sender: \(r.sender).")
+                    throw LibForstaError.internalError(why: "Received sync message with malformed read receipt sender: \(r.sender).")
                 }
                 let timestamp: Date = Date(millisecondsSince1970: r.timestamp)
                 receipts.append(ReadSyncReceipt(sender, timestamp))
             }
             happy = true
-            NotificationCenter.broadcast(.relayReadSyncReceipts, ["readSyncReceipts": receipts])
+            NotificationCenter.broadcast(.signalReadSyncReceipts, ["readSyncReceipts": receipts])
         }
         
         if dm != nil {
@@ -170,16 +170,16 @@ class MessageReceiver {
                                         : nil,
                                      destination: (sent?.hasDestination ?? false) ? sent!.destination : nil)
             happy = true
-            NotificationCenter.broadcast(.relayInboundMessage, ["inboundMessage": msg])
+            NotificationCenter.broadcast(.signalInboundMessage, ["inboundMessage": msg])
         }
         
         if !happy {
-            throw LibRelayError.internalError(why: "Received content message with no dataMessage or syncMessage.")
+            throw LibForstaError.internalError(why: "Received content message with no dataMessage or syncMessage.")
         }
     }
     
     private func handleLegacyMessage(_ envelope: Relay_Envelope) throws {
-        throw LibRelayError.internalError(why: "Not implemented.")
+        throw LibForstaError.internalError(why: "Not implemented.")
     }
     
     /// Internal: Axolotl-decrypt an incoming envelope's content
@@ -192,7 +192,7 @@ class MessageReceiver {
         } else if envelope.type == .ciphertext {
             plainText = try sessionCipher.decrypt(signalMessage: cyphertext)
         } else {
-            throw LibRelayError.internalError(why: "Unknown buffer type: \(envelope.type)")
+            throw LibForstaError.internalError(why: "Unknown buffer type: \(envelope.type)")
         }
         return try unpad(paddedPlaintext: plainText)
     }
@@ -204,28 +204,28 @@ class MessageReceiver {
             else if paddedPlaintext[idx] == 0x80 {
                 return paddedPlaintext.prefix(upTo: idx)
             } else {
-                throw LibRelayError.internalError(why: "Invalid padding.")
+                throw LibForstaError.internalError(why: "Invalid padding.")
             }
         }
-        throw LibRelayError.internalError(why: "Invalid buffer.")
+        throw LibForstaError.internalError(why: "Invalid buffer.")
     }
     
     private func verifyWSMessageMAC(data: Data, key: Data, expectedMAC: Data) throws {
         let calculatedMAC = signalClient.crypto.hmacSHA256(for: data, with: key)
         if calculatedMAC[..<expectedMAC.count] != expectedMAC {
-            throw LibRelayError.internalError(why: "Bad MAC")
+            throw LibForstaError.internalError(why: "Bad MAC")
         }
     }
     
     private func decryptWebSocketMessage(message: Data, signalingKey: Data) throws -> Data {
         guard signalingKey.count == 52 else {
-            throw LibRelayError.internalError(why: "Invalid signalKey length.")
+            throw LibForstaError.internalError(why: "Invalid signalKey length.")
         }
         guard message.count >= 1 + 16 + 10 else {
-            throw LibRelayError.internalError(why: "Invalid message length.")
+            throw LibForstaError.internalError(why: "Invalid message length.")
         }
         guard message[0] == 1 else {
-            throw LibRelayError.internalError(why: "Invalid message version number \(message[0]).")
+            throw LibForstaError.internalError(why: "Invalid message version number \(message[0]).")
         }
         
         let aesKey = signalingKey[0...31]

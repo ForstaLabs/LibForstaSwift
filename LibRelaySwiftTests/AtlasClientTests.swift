@@ -106,10 +106,10 @@ export JWT_PROXY_AUDIENCE='atlas'
             }
             .catch { error in
                 XCTFail("test org creation failed")
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     print(lre.rejectedBecause)
                 }
-                testOrgReadyResolver.reject(LibRelayError.internalError(why: "can't create test org"))
+                testOrgReadyResolver.reject(LibForstaError.internalError(why: "can't create test org"))
             }
     }
 
@@ -185,7 +185,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("should have failed to find the user")
             }
             .catch { error in
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     XCTAssert(lre.rejectedBecause["non_field_errors"].arrayValue.contains("unknown user"))
                 } else {
                     XCTFail("surprising error")
@@ -204,7 +204,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("should have failed to find the domain")
             }
             .catch { error in
-                XCTAssert((error as? LibRelayError)?.isRequestFailure ?? false)
+                XCTAssert((error as? LibForstaError)?.isRequestFailure ?? false)
             }
             .finally {
                 expectation3.fulfill()
@@ -219,7 +219,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("should have failed to find the domain")
             }
             .catch { error in
-                XCTAssert((error as? LibRelayError)?.isRequestFailure ?? false)
+                XCTAssert((error as? LibForstaError)?.isRequestFailure ?? false)
             }
             .finally {
                 expectation4.fulfill()
@@ -251,7 +251,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("password authentication should have failed")
             }
             .catch { error in
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     XCTAssert(lre.rejectedBecause["password"].arrayValue.contains("invalid password"))
                 } else {
                     XCTFail("surprising error")
@@ -267,7 +267,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("password authentication should have failed")
             }
             .catch { error in
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     XCTAssert(lre.rejectedBecause["password"].arrayValue.contains("invalid password"))
                 } else {
                     XCTFail("surprising error")
@@ -326,7 +326,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("invalid jwt-proxy authentication should have failed")
             }
             .catch { error in
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     XCTAssert(lre.rejectedBecause["non_field_errors"].arrayValue.contains("invalid auth"))
                 } else {
                     XCTFail("surprising error")
@@ -572,7 +572,7 @@ export JWT_PROXY_AUDIENCE='atlas'
             }
             .catch { error in
                 XCTFail("creation failed")
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     print(lre.rejectedBecause)
                 }
             }
@@ -594,7 +594,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("creation should have failed")
             }
             .catch { error in
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     XCTAssert(lre.rejectedBecause["org_slug"].arrayValue.contains("Already in use."))
                 } else {
                     XCTFail("surprising error")
@@ -618,7 +618,7 @@ export JWT_PROXY_AUDIENCE='atlas'
             }
             .catch { error in
                 XCTFail("creation failed")
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     print(lre.rejectedBecause)
                 }
             }
@@ -637,7 +637,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("creation should have failed")
             }
             .catch { error in
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     XCTAssert(lre.rejectedBecause["tag_slug"].arrayValue.contains("Already in use."))
                 } else {
                     XCTFail("surprising error")
@@ -659,7 +659,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("creation should have failed")
             }
             .catch { error in
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     XCTAssert(lre.rejectedBecause["non_field_errors"].arrayValue.contains("Invitation not found: deadbeef"))
                 } else {
                     XCTFail("surprising error")
@@ -694,7 +694,7 @@ export JWT_PROXY_AUDIENCE='atlas'
             }
             .catch { error in
                 XCTFail("creation failed")
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     print(lre.rejectedBecause)
                 }
             }
@@ -714,7 +714,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 
             }
             .catch { error in
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     print(lre.rejectedBecause)
                     XCTFail()
                 }
@@ -733,7 +733,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTAssert(result["id"].stringValue.count > 0)
             }
             .catch { error in
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     print(lre.rejectedBecause)
                 }
                 XCTFail("surprising error")
@@ -766,7 +766,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTAssert(pendingUserId.count > 0)
             }
             .catch { error in
-                if let lre = error as? LibRelayError {
+                if let lre = error as? LibForstaError {
                     print(lre.rejectedBecause)
                 }
                 XCTFail("surprising error")

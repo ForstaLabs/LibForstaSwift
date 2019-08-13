@@ -17,21 +17,17 @@ import SignalProtocol
 
 
 class Message: Sendable, CustomStringConvertible {
-    // handling stuff
     public var recipients: [MessageRecipient]
     
-    // envelope stuff
     public var timestamp: Date
     public var senderUserId: UUID
     public var senderDeviceId: UInt32
     
-    // mandatory body stuff
     public var messageId: UUID
     public var messageType: FLIMessageType
     public var threadId: UUID
     public var distributionExpression: String
     
-    // optional body stuff
     public var data: JSON?
     public var userAgent: String?
     public var threadTitle: String?
@@ -84,7 +80,7 @@ class SignalClientTests: XCTestCase {
                     print(result)
                 }
                 .catch { error in
-                    if let lre = error as? LibRelayError {
+                    if let lre = error as? LibForstaError {
                         XCTFail(lre.rejectedBecause.rawString()!)
                     } else {
                         XCTFail("surprising error")
@@ -124,7 +120,7 @@ class SignalClientTests: XCTestCase {
                     print(result)
                 }
                 .catch { error in
-                    if let lre = error as? LibRelayError {
+                    if let lre = error as? LibForstaError {
                         XCTFail(lre.rejectedBecause.rawString()!)
                     } else {
                         XCTFail("surprising error")
@@ -138,7 +134,7 @@ class SignalClientTests: XCTestCase {
             let connectAndReceive = XCTestExpectation()
             var inboundMessage: InboundMessage? = nil
             let dataMessageObserver = NotificationCenter.default.addObserver(
-                forName: .relayInboundMessage,
+                forName: .signalInboundMessage,
                 object: nil,
                 queue: nil) { notification in
                     inboundMessage = notification.userInfo?["inboundMessage"] as? InboundMessage
@@ -199,21 +195,21 @@ class SignalClientTests: XCTestCase {
     
     func watchEverything() {
         let _ = NotificationCenter.default.addObserver(
-            forName: .relayEmptyQueue,
+            forName: .signalEmptyQueue,
             object: nil,
             queue: nil) { _ in
                 print(">>> message queue is empty")
         }
         
         let _ = NotificationCenter.default.addObserver(
-            forName: .relayIdentityKeyChanged,
+            forName: .signalIdentityKeyChanged,
             object: nil,
             queue: nil) { notification in
                 print(">>> identity key changed [todo: get rest of info]")
         }
         
         let _ = NotificationCenter.default.addObserver(
-            forName: .relayDeliveryReceipt,
+            forName: .signalDeliveryReceipt,
             object: nil,
             queue: nil) { notification in
                 let receipt = notification.userInfo?["deliveryReceipt"] as! DeliveryReceipt
@@ -221,7 +217,7 @@ class SignalClientTests: XCTestCase {
         }
         
         let _ = NotificationCenter.default.addObserver(
-            forName: .relayInboundMessage,
+            forName: .signalInboundMessage,
             object: nil,
             queue: nil) { notification in
                 let inboundMessage = notification.userInfo?["inboundMessage"] as! InboundMessage
@@ -229,7 +225,7 @@ class SignalClientTests: XCTestCase {
         }
         
         let _ = NotificationCenter.default.addObserver(
-            forName: .relayReadSyncReceipts,
+            forName: .signalReadSyncReceipts,
             object: nil,
             queue: nil) { notification in
                 let receipts = notification.userInfo?["readSyncReceipts"] as! [ReadSyncReceipt]
@@ -253,7 +249,7 @@ class SignalClientTests: XCTestCase {
                     print(result)
                 }
                 .catch { error in
-                    if let lre = error as? LibRelayError {
+                    if let lre = error as? LibForstaError {
                         XCTFail(lre.rejectedBecause.rawString()!)
                     } else {
                         XCTFail("surprising error")
@@ -268,7 +264,7 @@ class SignalClientTests: XCTestCase {
             var incomingMessage: Relay_DataMessage? = nil
             var incomingEnvelope: Relay_Envelope? = nil
             let dataMessageObserver = NotificationCenter.default.addObserver(
-                forName: .relayEmptyQueue,
+                forName: .signalEmptyQueue,
                 object: nil,
                 queue: nil) { _ in
                     connectified.fulfill()
@@ -293,7 +289,7 @@ class SignalClientTests: XCTestCase {
 
             let receiptReceived = XCTestExpectation()
             let receiptObserver = NotificationCenter.default.addObserver(
-                forName: .relayDeliveryReceipt,
+                forName: .signalDeliveryReceipt,
                 object: nil,
                 queue: nil) { notification in
                     let receipt = notification.userInfo?["deliveryReceipt"] as! DeliveryReceipt

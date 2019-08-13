@@ -1,5 +1,5 @@
 //
-//  RelayStore.swift
+//  ForstaStore.swift
 //  LibRelaySwift
 //
 //  Created by Greg Perkins on 5/28/19.
@@ -31,31 +31,31 @@ enum DNK: String {
 }
 
 extension SignalStore {
-    var relayIdentityKeyStore: RelayIdentityKeyStore {
-        return self.identityKeyStore as! RelayIdentityKeyStore
+    var forstaIdentityKeyStore: ForstaIdentityKeyStore {
+        return self.identityKeyStore as! ForstaIdentityKeyStore
     }
     
-    var relayPreKeyStore: RelayPreKeyStore {
-        return self.preKeyStore as! RelayPreKeyStore
+    var forstaPreKeyStore: ForstaPreKeyStore {
+        return self.preKeyStore as! ForstaPreKeyStore
     }
     
-    var relaySignedPreKeyStore: RelaySignedPreKeyStore {
-        return self.signedPreKeyStore as! RelaySignedPreKeyStore
+    var forstaSignedPreKeyStore: ForstaSignedPreKeyStore {
+        return self.signedPreKeyStore as! ForstaSignedPreKeyStore
     }
     
     var kv: KVStorageProtocol {
-        return self.relayIdentityKeyStore.kvstore
+        return self.forstaIdentityKeyStore.kvstore
     }
     
     func generateAndStorePreKeys(count: Int) throws -> [SessionPreKey] {
-        var lastId = self.relayPreKeyStore.lastId
+        var lastId = self.forstaPreKeyStore.lastId
         let preKeys = try Signal.generatePreKeys(start: lastId &+ 1, count: count)
         lastId = preKeys[preKeys.count - 1].id
-        self.relayPreKeyStore.lastId = lastId
+        self.forstaPreKeyStore.lastId = lastId
         
         for preKey in preKeys {
             if !(try self.preKeyStore.store(preKey: preKey.data(), for: preKey.id)) {
-                throw LibRelayError.internalError(why: "couldn't store new session prekey")
+                throw LibForstaError.internalError(why: "couldn't store new session prekey")
             }
         }
         
@@ -64,18 +64,18 @@ extension SignalStore {
     
     func updateSignedPreKey() throws -> SessionSignedPreKey {
         guard let identity = self.identityKeyStore.identityKeyPair() else {
-            throw LibRelayError.internalError(why: "unable to retrieve self identity")
+            throw LibForstaError.internalError(why: "unable to retrieve self identity")
         }
-        let lastPreKeyId = self.relayPreKeyStore.lastId
+        let lastPreKeyId = self.forstaPreKeyStore.lastId
         let signedPreKey = try Signal.generate(signedPreKey: lastPreKeyId, identity: identity, timestamp: 0)
-        let _ = try self.relaySignedPreKeyStore.store(signedPreKey: signedPreKey.data(), for: lastPreKeyId)
-        self.relaySignedPreKeyStore.lastId = lastPreKeyId
+        let _ = try self.forstaSignedPreKeyStore.store(signedPreKey: signedPreKey.data(), for: lastPreKeyId)
+        self.forstaSignedPreKeyStore.lastId = lastPreKeyId
         
         return signedPreKey
     }
 }
 
-class RelayIdentityKeyStore: IdentityKeyStore {
+class ForstaIdentityKeyStore: IdentityKeyStore {
     let kvstore: KVStorageProtocol
     let ns = "IdentityKeys"
     
@@ -134,7 +134,7 @@ class RelayIdentityKeyStore: IdentityKeyStore {
     }
 }
 
-class RelayPreKeyStore: PreKeyStore {
+class ForstaPreKeyStore: PreKeyStore {
     let kvstore: KVStorageProtocol
     let ns = "PreKeys"
     let lastIdKey = "LastPreKeyId"
@@ -171,7 +171,7 @@ class RelayPreKeyStore: PreKeyStore {
     }
 }
 
-class RelaySessionStore: SessionStore {
+class ForstaSessionStore: SessionStore {
     let kvstore: KVStorageProtocol
     let sessionNs = "Sessions"
     let recordNs = "UserRecords"
@@ -220,7 +220,7 @@ class RelaySessionStore: SessionStore {
     }
 }
 
-class RelaySignedPreKeyStore: SignedPreKeyStore {
+class ForstaSignedPreKeyStore: SignedPreKeyStore {
     let kvstore: KVStorageProtocol
     let ns = "SignedPreKeys"
     let lastIdKey = "LastSignedPreKeyId"

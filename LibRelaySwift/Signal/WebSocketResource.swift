@@ -73,7 +73,7 @@ class OutgoingWSRequest: WSRequest {
             var dict: [String: Any] = [ "status": status,
                                         "message": message ]
             if data != nil { dict["data"] = data! }
-            seal.reject(LibRelayError.requestRejected(why: JSON(dict)))
+            seal.reject(LibForstaError.requestRejected(why: JSON(dict)))
         }
         
         self.onSuccess = { request, status, message, data in
@@ -151,7 +151,7 @@ class WebSocketResource: WebSocketDelegate {
                     callback(request, status, message, body)
                 }
             } else {
-                throw LibRelayError.internalError(why: "Unrecognized incoming WebSocket request type.")
+                throw LibForstaError.internalError(why: "Unrecognized incoming WebSocket request type.")
             }
         } catch let error {
             print("Error in websocketDidReceiveData:", error.localizedDescription)
@@ -164,9 +164,9 @@ class WebSocketResource: WebSocketDelegate {
             do {
                 data = try message.serializedData()
             } catch {
-                return seal.reject(LibRelayError.internalError(why: "Message not properly initialized."))
+                return seal.reject(LibForstaError.internalError(why: "Message not properly initialized."))
             }
-            if socket == nil || !socket!.isConnected { return seal.reject(LibRelayError.internalError(why: "No connected websocket.")) }
+            if socket == nil || !socket!.isConnected { return seal.reject(LibForstaError.internalError(why: "No connected websocket.")) }
             self.socket!.write(data: data, completion: { seal.fulfill(()) })
         }
     }

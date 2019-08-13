@@ -29,7 +29,7 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
         let result = SecRandomCopyBytes(nil, bytes, UnsafeMutableRawPointer(mutating: random))
 
         guard result == errSecSuccess else {
-            throw RelayError(.noRandomBytes, "Error getting random bytes: \(result)")
+            throw ForstaError(.noRandomBytes, "Error getting random bytes: \(result)")
         }
         return Data(random)
     }
@@ -70,7 +70,7 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
      */
     public func sha512(for message: Data) throws -> Data {
         guard message.count > 0 else {
-            throw RelayError(.invalidMessage, "Message length is 0")
+            throw ForstaError(.invalidMessage, "Message length is 0")
         }
         var context = CC_SHA512_CTX()
         return try withUnsafeMutablePointer(to: &context) { contextPtr in
@@ -81,7 +81,7 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
                 return CC_SHA512_Update(contextPtr, messagePtr, CC_LONG(message.count))
             }
             guard result == 1 else {
-                throw RelayError(.digestError, "Error on SHA512 Update: \(result)")
+                throw ForstaError(.digestError, "Error on SHA512 Update: \(result)")
             }
             var md = Data(count: Int(CC_SHA512_DIGEST_LENGTH))
             let result2: Int32 = md.withUnsafeMutableBytes { ptr4 in
@@ -89,7 +89,7 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
                 return CC_SHA512_Final(a, contextPtr)
             }
             guard result2 == 1 else {
-                throw RelayError(.digestError, "Error on SHA512 Final: \(result)")
+                throw ForstaError(.digestError, "Error on SHA512 Final: \(result)")
             }
             return md
         }
@@ -106,13 +106,13 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
      */
     public func encrypt(message: Data, with cipher: SignalEncryptionScheme, key: Data, iv: Data) throws -> Data {
         guard key.count == kCCKeySizeAES256 else {
-            throw RelayError(.invalidKey, "Invalid key length")
+            throw ForstaError(.invalidKey, "Invalid key length")
         }
         guard message.count > 0 else {
-            throw RelayError(.invalidMessage, "Message length is 0")
+            throw ForstaError(.invalidMessage, "Message length is 0")
         }
         guard iv.count == kCCBlockSizeAES128 else {
-            throw RelayError(.invalidIV, "The length of the IV is not correct")
+            throw ForstaError(.invalidIV, "The length of the IV is not correct")
         }
         switch cipher {
         case .AES_CBCwithPKCS5:
@@ -133,13 +133,13 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
      */
     public func decrypt(message: Data, with cipher: SignalEncryptionScheme, key: Data, iv: Data) throws -> Data {
         guard key.count == kCCKeySizeAES256 else {
-            throw RelayError(.invalidKey, "Invalid key length")
+            throw ForstaError(.invalidKey, "Invalid key length")
         }
         guard message.count > 0 else {
-            throw RelayError(.invalidMessage, "Message length is 0")
+            throw ForstaError(.invalidMessage, "Message length is 0")
         }
         guard iv.count == kCCBlockSizeAES128 else {
-            throw RelayError(.invalidIV, "The length of the IV is not correct")
+            throw ForstaError(.invalidIV, "The length of the IV is not correct")
         }
         switch cipher {
         case .AES_CBCwithPKCS5:
@@ -188,9 +188,9 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
         }
         guard status == kCCSuccess else {
             if encrypt {
-                throw RelayError(.encryptionError, "AES (CBC mode) encryption error: \(status)")
+                throw ForstaError(.encryptionError, "AES (CBC mode) encryption error: \(status)")
             } else {
-                throw RelayError(.decryptionError, "AES (CBC mode) decryption error: \(status)")
+                throw ForstaError(.decryptionError, "AES (CBC mode) decryption error: \(status)")
             }
         }
 
@@ -257,9 +257,9 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
 
         guard status == kCCSuccess, let ref = cryptoRef else {
             if encrypt {
-                throw RelayError(.encryptionError, "AES (CTR mode) encryption init error: \(status)")
+                throw ForstaError(.encryptionError, "AES (CTR mode) encryption init error: \(status)")
             } else {
-                throw RelayError(.decryptionError, "AES (CTR mode) Decryption init error: \(status)")
+                throw ForstaError(.decryptionError, "AES (CTR mode) Decryption init error: \(status)")
             }
         }
 
@@ -276,13 +276,13 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
             }
         }
         guard updateMovedLength <= outputLength else {
-            throw RelayError(.encryptionError, "Updated bytes \(updateMovedLength) for \(outputLength) total bytes")
+            throw ForstaError(.encryptionError, "Updated bytes \(updateMovedLength) for \(outputLength) total bytes")
         }
         guard status == kCCSuccess else {
             if encrypt {
-                throw RelayError(.encryptionError, "AES (CTR mode) encryption update error: \(status)")
+                throw ForstaError(.encryptionError, "AES (CTR mode) encryption update error: \(status)")
             } else {
-                throw RelayError(.decryptionError, "AES (CTR mode) Decryption update error: \(status)")
+                throw ForstaError(.decryptionError, "AES (CTR mode) Decryption update error: \(status)")
             }
         }
 
@@ -295,14 +295,14 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
         let finalLength = updateMovedLength + finalMovedLength
         guard status == kCCSuccess else {
             if encrypt {
-                throw RelayError(.encryptionError, "AES (CTR mode) encryption update error: \(status)")
+                throw ForstaError(.encryptionError, "AES (CTR mode) encryption update error: \(status)")
             } else {
-                throw RelayError(.decryptionError, "AES (CTR mode) Decryption update error: \(status)")
+                throw ForstaError(.decryptionError, "AES (CTR mode) Decryption update error: \(status)")
             }
         }
         // For decryption, the final length can be less due to padding
         if encrypt && finalLength != outputLength {
-            throw RelayError(.encryptionError, "AES (CTR mode): Output length not correct \(finalLength), \(outputLength), \(updateMovedLength), \(finalMovedLength)")
+            throw ForstaError(.encryptionError, "AES (CTR mode): Output length not correct \(finalLength), \(outputLength), \(updateMovedLength), \(finalMovedLength)")
         }
         return toArray(from: ptr, count: finalLength)
     }

@@ -59,22 +59,19 @@ enum MessageRecipient {
 }
 
 protocol Sendable {
-    // handling stuff
     var recipients: [MessageRecipient] { get }
     
-    // envelope stuff
     var timestamp: Date { get }
     var senderUserId: UUID { get }
     var senderDeviceId: UInt32 { get }
     
-    // mandatory body stuff
     var messageId: UUID { get }
     var messageType: FLIMessageType { get }
     var threadId: UUID { get }
     var distributionExpression: String { get }
 
     // optional body stuff
-    var data: JSON? { get }
+    var data: JSON? { get }         // the literal data field of the message exchange payload
     var userAgent: String? { get }
     var threadTitle: String? { get }
     var threadType: FLIThreadType? { get }
