@@ -1,6 +1,6 @@
 //
-//  LibRelaySwiftTests.swift
-//  LibRelaySwiftTests
+//  LibForstaSwiftTests.swift
+//  LibForstaSwiftTests
 //
 //  Created by Greg Perkins on 4/17/19.
 //  Copyright © 2019 Forsta, Inc. All rights reserved.

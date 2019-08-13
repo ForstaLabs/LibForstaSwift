@@ -1,8 +1,8 @@
 # Make sure we're failing even though we pipe to xcpretty
 SHELL := /bin/bash -o pipefail -o errexit
 WORKING_DIR := ./
-SCHEME = LibRelaySwift
-XCODE_BUILD := xcrun xcodebuild -scheme LibRelaySwift
+SCHEME = LibForstaSwift
+XCODE_BUILD := xcrun xcodebuild -scheme LibForstaSwift
 DEPENDENCIES := .dependencies-built
 
 .PHONY: build test retest clean dependencies ci pristine

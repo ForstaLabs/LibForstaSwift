@@ -1,5 +1,5 @@
 //
-//  RelayError.swift
+//  ForstaError.swift
 //  LibForstaSwift
 //
 //  Created by Greg Perkins on 4/24/19.
@@ -103,7 +103,7 @@ public final class ForstaError: CustomStringConvertible, Error {
     public let file: String
 
     /**
-     Create a new `RelayError`.
+     Create a new `ForstaError`.
      - parameter type: The error type
      - parameter message: A decription of why the error occured
      - parameter cause: Optional error thrown by a subroutine
@@ -123,7 +123,7 @@ public final class ForstaError: CustomStringConvertible, Error {
     }
 
     /**
-     Create a new `RelayError` using an already exisiting `RelayError` from a subroutine.
+     Create a new `ForstaError` using an already exisiting `ForstaError` from a subroutine.
      - parameter message: A decription of why the error occured
      - parameter cause: The error thrown by the subroutine
      - parameter file: A String describing the file where the error occured
@@ -141,7 +141,7 @@ public final class ForstaError: CustomStringConvertible, Error {
     }
 
     /**
-     Create a new `RelayError` using an already exisiting `Error` from a subroutine.
+     Create a new `ForstaError` using an already exisiting `Error` from a subroutine.
      - parameter message: A decription of why the error occured
      - parameter cause: The error thrown by the subroutine
      - parameter file: A String describing the file where the error occured

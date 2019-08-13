@@ -1,6 +1,6 @@
 //
 //  SignalClientTests.swift
-//  LibRelaySwiftTests
+//  LibForstaSwiftTests
 //
 //  Created by Greg Perkins on 5/22/19.
 //  Copyright © 2019 Forsta, Inc. All rights reserved.
