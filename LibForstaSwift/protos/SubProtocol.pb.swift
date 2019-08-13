@@ -19,7 +19,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
-struct Relay_WebSocketRequestMessage {
+struct Signal_WebSocketRequestMessage {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -70,7 +70,7 @@ struct Relay_WebSocketRequestMessage {
   fileprivate var _id: UInt64? = nil
 }
 
-struct Relay_WebSocketResponseMessage {
+struct Signal_WebSocketResponseMessage {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -121,12 +121,12 @@ struct Relay_WebSocketResponseMessage {
   fileprivate var _body: Data? = nil
 }
 
-struct Relay_WebSocketMessage {
+struct Signal_WebSocketMessage {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var type: Relay_WebSocketMessage.TypeEnum {
+  var type: Signal_WebSocketMessage.TypeEnum {
     get {return _storage._type ?? .unknown}
     set {_uniqueStorage()._type = newValue}
   }
@@ -135,8 +135,8 @@ struct Relay_WebSocketMessage {
   /// Clears the value of `type`. Subsequent reads from it will return its default value.
   mutating func clearType() {_uniqueStorage()._type = nil}
 
-  var request: Relay_WebSocketRequestMessage {
-    get {return _storage._request ?? Relay_WebSocketRequestMessage()}
+  var request: Signal_WebSocketRequestMessage {
+    get {return _storage._request ?? Signal_WebSocketRequestMessage()}
     set {_uniqueStorage()._request = newValue}
   }
   /// Returns true if `request` has been explicitly set.
@@ -144,8 +144,8 @@ struct Relay_WebSocketMessage {
   /// Clears the value of `request`. Subsequent reads from it will return its default value.
   mutating func clearRequest() {_uniqueStorage()._request = nil}
 
-  var response: Relay_WebSocketResponseMessage {
-    get {return _storage._response ?? Relay_WebSocketResponseMessage()}
+  var response: Signal_WebSocketResponseMessage {
+    get {return _storage._response ?? Signal_WebSocketResponseMessage()}
     set {_uniqueStorage()._response = newValue}
   }
   /// Returns true if `response` has been explicitly set.
@@ -191,7 +191,7 @@ struct Relay_WebSocketMessage {
 
 #if swift(>=4.2)
 
-extension Relay_WebSocketMessage.TypeEnum: CaseIterable {
+extension Signal_WebSocketMessage.TypeEnum: CaseIterable {
   // Support synthesized by the compiler.
 }
 
@@ -199,9 +199,9 @@ extension Relay_WebSocketMessage.TypeEnum: CaseIterable {
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
-fileprivate let _protobuf_package = "relay"
+fileprivate let _protobuf_package = "signal"
 
-extension Relay_WebSocketRequestMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_WebSocketRequestMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".WebSocketRequestMessage"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "verb"),
@@ -238,7 +238,7 @@ extension Relay_WebSocketRequestMessage: SwiftProtobuf.Message, SwiftProtobuf._M
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_WebSocketRequestMessage, rhs: Relay_WebSocketRequestMessage) -> Bool {
+  static func ==(lhs: Signal_WebSocketRequestMessage, rhs: Signal_WebSocketRequestMessage) -> Bool {
     if lhs._verb != rhs._verb {return false}
     if lhs._path != rhs._path {return false}
     if lhs._body != rhs._body {return false}
@@ -248,7 +248,7 @@ extension Relay_WebSocketRequestMessage: SwiftProtobuf.Message, SwiftProtobuf._M
   }
 }
 
-extension Relay_WebSocketResponseMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_WebSocketResponseMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".WebSocketResponseMessage"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "id"),
@@ -285,7 +285,7 @@ extension Relay_WebSocketResponseMessage: SwiftProtobuf.Message, SwiftProtobuf._
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_WebSocketResponseMessage, rhs: Relay_WebSocketResponseMessage) -> Bool {
+  static func ==(lhs: Signal_WebSocketResponseMessage, rhs: Signal_WebSocketResponseMessage) -> Bool {
     if lhs._id != rhs._id {return false}
     if lhs._status != rhs._status {return false}
     if lhs._message != rhs._message {return false}
@@ -295,7 +295,7 @@ extension Relay_WebSocketResponseMessage: SwiftProtobuf.Message, SwiftProtobuf._
   }
 }
 
-extension Relay_WebSocketMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_WebSocketMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".WebSocketMessage"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "type"),
@@ -304,9 +304,9 @@ extension Relay_WebSocketMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   ]
 
   fileprivate class _StorageClass {
-    var _type: Relay_WebSocketMessage.TypeEnum? = nil
-    var _request: Relay_WebSocketRequestMessage? = nil
-    var _response: Relay_WebSocketResponseMessage? = nil
+    var _type: Signal_WebSocketMessage.TypeEnum? = nil
+    var _request: Signal_WebSocketRequestMessage? = nil
+    var _response: Signal_WebSocketResponseMessage? = nil
 
     static let defaultInstance = _StorageClass()
 
@@ -355,7 +355,7 @@ extension Relay_WebSocketMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageI
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_WebSocketMessage, rhs: Relay_WebSocketMessage) -> Bool {
+  static func ==(lhs: Signal_WebSocketMessage, rhs: Signal_WebSocketMessage) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
@@ -372,7 +372,7 @@ extension Relay_WebSocketMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 }
 
-extension Relay_WebSocketMessage.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+extension Signal_WebSocketMessage.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     0: .same(proto: "UNKNOWN"),
     1: .same(proto: "REQUEST"),

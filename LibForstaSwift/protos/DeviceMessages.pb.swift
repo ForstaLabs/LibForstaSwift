@@ -19,7 +19,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
-struct Relay_ProvisioningUuid {
+struct Signal_ProvisioningUuid {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -40,7 +40,7 @@ struct Relay_ProvisioningUuid {
   fileprivate var _uuid: String? = nil
 }
 
-struct Relay_ProvisionEnvelope {
+struct Signal_ProvisionEnvelope {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -72,7 +72,7 @@ struct Relay_ProvisionEnvelope {
   fileprivate var _body: Data? = nil
 }
 
-struct Relay_ProvisionMessage {
+struct Signal_ProvisionMessage {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -125,9 +125,9 @@ struct Relay_ProvisionMessage {
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
-fileprivate let _protobuf_package = "relay"
+fileprivate let _protobuf_package = "signal"
 
-extension Relay_ProvisioningUuid: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_ProvisioningUuid: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".ProvisioningUuid"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "uuid"),
@@ -149,14 +149,14 @@ extension Relay_ProvisioningUuid: SwiftProtobuf.Message, SwiftProtobuf._MessageI
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_ProvisioningUuid, rhs: Relay_ProvisioningUuid) -> Bool {
+  static func ==(lhs: Signal_ProvisioningUuid, rhs: Signal_ProvisioningUuid) -> Bool {
     if lhs._uuid != rhs._uuid {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Relay_ProvisionEnvelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_ProvisionEnvelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".ProvisionEnvelope"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "publicKey"),
@@ -183,7 +183,7 @@ extension Relay_ProvisionEnvelope: SwiftProtobuf.Message, SwiftProtobuf._Message
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_ProvisionEnvelope, rhs: Relay_ProvisionEnvelope) -> Bool {
+  static func ==(lhs: Signal_ProvisionEnvelope, rhs: Signal_ProvisionEnvelope) -> Bool {
     if lhs._publicKey != rhs._publicKey {return false}
     if lhs._body != rhs._body {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -191,7 +191,7 @@ extension Relay_ProvisionEnvelope: SwiftProtobuf.Message, SwiftProtobuf._Message
   }
 }
 
-extension Relay_ProvisionMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_ProvisionMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".ProvisionMessage"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     2: .same(proto: "identityKeyPrivate"),
@@ -228,7 +228,7 @@ extension Relay_ProvisionMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageI
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_ProvisionMessage, rhs: Relay_ProvisionMessage) -> Bool {
+  static func ==(lhs: Signal_ProvisionMessage, rhs: Signal_ProvisionMessage) -> Bool {
     if lhs._identityKeyPrivate != rhs._identityKeyPrivate {return false}
     if lhs._addr != rhs._addr {return false}
     if lhs._provisioningCode != rhs._provisioningCode {return false}

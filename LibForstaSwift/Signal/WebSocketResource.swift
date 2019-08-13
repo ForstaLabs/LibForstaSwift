@@ -39,7 +39,7 @@ class WSRequest {
 
 class IncomingWSRequest: WSRequest {
     func respond(status: UInt32, message: String) -> Promise<Void> {
-        var msg = Relay_WebSocketMessage()
+        var msg = Signal_WebSocketMessage()
         msg.type = .response
         msg.response.id = self.id
         msg.response.status = status
@@ -60,7 +60,7 @@ class OutgoingWSRequest: WSRequest {
     }
     
     func send() -> Promise<JSON> {
-        var msg = Relay_WebSocketMessage()
+        var msg = Signal_WebSocketMessage()
         msg.type = .request
         msg.request.id = self.id
         msg.request.verb = self.verb
@@ -130,7 +130,7 @@ class WebSocketResource: WebSocketDelegate {
     
     func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
         do {
-            let x = try Relay_WebSocketMessage(serializedData: data)
+            let x = try Signal_WebSocketMessage(serializedData: data)
             if x.hasRequest {
                 self.requestHandler(IncomingWSRequest(wsr: self, verb: x.request.verb, path: x.request.path, body: x.request.hasBody ? x.request.body : nil))
             } else if x.hasResponse {
@@ -158,7 +158,7 @@ class WebSocketResource: WebSocketDelegate {
         }
     }
     
-    func send(_ message: Relay_WebSocketMessage) -> Promise<Void> {
+    func send(_ message: Signal_WebSocketMessage) -> Promise<Void> {
         return Promise { seal in
             var data: Data
             do {

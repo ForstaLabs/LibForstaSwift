@@ -40,7 +40,7 @@ class MessageSender {
                 let remoteRegistrationId = try cipher.remoteRegistrationId()
                 
                 let bundle: [String: Any] = [
-                    "type": Relay_Envelope.TypeEnum.ciphertext.rawValue,
+                    "type": Signal_Envelope.TypeEnum.ciphertext.rawValue,
                     "content": encryptedMessage.data.base64EncodedString(),
                     "destinationRegistrationId": remoteRegistrationId,
                     "destinationDeviceId": specificAddress.deviceId,

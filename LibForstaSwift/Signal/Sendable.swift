@@ -86,7 +86,7 @@ func TextMessageData(plain: String? = nil, html: String? = nil) -> JSON {
 }
 
 extension Sendable {
-    var contentProto: Relay_Content {
+    var contentProto: Signal_Content {
         get {
             var body = JSON([[
                 "version": 1,
@@ -108,9 +108,9 @@ extension Sendable {
             if self.threadType != nil { body[0]["threadType"] = JSON(self.threadType!) }
             if self.messageRef != nil { body[0]["messageRef"] = JSON(self.messageRef!.lcString) }
             
-            var dm = Relay_DataMessage()
+            var dm = Signal_DataMessage()
             dm.body = body.rawString([.castNilToNSNull: true])!
-            var content = Relay_Content()
+            var content = Signal_Content()
             content.dataMessage = dm
             
             /*

@@ -109,7 +109,7 @@ class MessageReceiver {
                 throw LibForstaError.internalError(why: "No signaling key established.")
             }
             let data = try decryptWebSocketMessage(message: request.body!, signalingKey: signalingKey!)
-            let envelope = try Relay_Envelope(serializedData: data)
+            let envelope = try Signal_Envelope(serializedData: data)
             if envelope.type == .receipt {
                 let receipt = DeliveryReceipt(SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice),
                                               Date(millisecondsSince1970: envelope.timestamp))
@@ -129,11 +129,11 @@ class MessageReceiver {
     }
     
     /// Internal: Handle a "Content" message, extracting incoming messages, sync messages, sync read-receipts
-    private func handleContentMessage(_ envelope: Relay_Envelope) throws {
+    private func handleContentMessage(_ envelope: Signal_Envelope) throws {
         let plainText = try self.decrypt(envelope, envelope.content);
-        let content = try Relay_Content(serializedData: plainText)
-        var sent: Relay_SyncMessage.Sent? = nil
-        var dm: Relay_DataMessage? = nil
+        let content = try Signal_Content(serializedData: plainText)
+        var sent: Signal_SyncMessage.Sent? = nil
+        var dm: Signal_DataMessage? = nil
         var happy = false
         if content.hasSyncMessage && content.syncMessage.hasSent {
             // receiving a message sent by another device for this account
@@ -178,12 +178,12 @@ class MessageReceiver {
         }
     }
     
-    private func handleLegacyMessage(_ envelope: Relay_Envelope) throws {
+    private func handleLegacyMessage(_ envelope: Signal_Envelope) throws {
         throw LibForstaError.internalError(why: "Not implemented.")
     }
     
     /// Internal: Axolotl-decrypt an incoming envelope's content
-    private func decrypt(_ envelope: Relay_Envelope, _ cyphertext: Data) throws -> Data {
+    private func decrypt(_ envelope: Signal_Envelope, _ cyphertext: Data) throws -> Data {
         let addr = SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice)
         let sessionCipher = SessionCipher(for: addr, in: self.signalClient.store)
         let plainText: Data

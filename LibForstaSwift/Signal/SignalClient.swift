@@ -155,7 +155,7 @@ class SignalClient {
     /// Request delivery of an encrypted message to a specific device
     ///
     /// Expects parameters to include:
-    ///    - "type": Relay_Envelope.TypeEnum (int)
+    ///    - "type": Signal_Envelope.TypeEnum (int)
     ///    - "content": encrypted message (base64 encoded)
     ///    - "destinationRegistrationId": registration ID of destination (uint32)
     ///    - "destinationDeviceId": device ID of destination (int32)

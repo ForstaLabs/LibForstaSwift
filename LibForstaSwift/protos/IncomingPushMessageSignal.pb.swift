@@ -19,12 +19,12 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
-struct Relay_Envelope {
+struct Signal_Envelope {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var type: Relay_Envelope.TypeEnum {
+  var type: Signal_Envelope.TypeEnum {
     get {return _type ?? .unknown}
     set {_type = newValue}
   }
@@ -148,7 +148,7 @@ struct Relay_Envelope {
 
   init() {}
 
-  fileprivate var _type: Relay_Envelope.TypeEnum? = nil
+  fileprivate var _type: Signal_Envelope.TypeEnum? = nil
   fileprivate var _source: String? = nil
   fileprivate var _sourceDevice: UInt32? = nil
   fileprivate var _relay: String? = nil
@@ -161,19 +161,19 @@ struct Relay_Envelope {
 
 #if swift(>=4.2)
 
-extension Relay_Envelope.TypeEnum: CaseIterable {
+extension Signal_Envelope.TypeEnum: CaseIterable {
   // Support synthesized by the compiler.
 }
 
 #endif  // swift(>=4.2)
 
-struct Relay_Content {
+struct Signal_Content {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var dataMessage: Relay_DataMessage {
-    get {return _storage._dataMessage ?? Relay_DataMessage()}
+  var dataMessage: Signal_DataMessage {
+    get {return _storage._dataMessage ?? Signal_DataMessage()}
     set {_uniqueStorage()._dataMessage = newValue}
   }
   /// Returns true if `dataMessage` has been explicitly set.
@@ -181,8 +181,8 @@ struct Relay_Content {
   /// Clears the value of `dataMessage`. Subsequent reads from it will return its default value.
   mutating func clearDataMessage() {_uniqueStorage()._dataMessage = nil}
 
-  var syncMessage: Relay_SyncMessage {
-    get {return _storage._syncMessage ?? Relay_SyncMessage()}
+  var syncMessage: Signal_SyncMessage {
+    get {return _storage._syncMessage ?? Signal_SyncMessage()}
     set {_uniqueStorage()._syncMessage = newValue}
   }
   /// Returns true if `syncMessage` has been explicitly set.
@@ -197,7 +197,7 @@ struct Relay_Content {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-struct Relay_DataMessage {
+struct Signal_DataMessage {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -211,13 +211,13 @@ struct Relay_DataMessage {
   /// Clears the value of `body`. Subsequent reads from it will return its default value.
   mutating func clearBody() {_uniqueStorage()._body = nil}
 
-  var attachments: [Relay_AttachmentPointer] {
+  var attachments: [Signal_AttachmentPointer] {
     get {return _storage._attachments}
     set {_uniqueStorage()._attachments = newValue}
   }
 
-  var group: Relay_GroupContext {
-    get {return _storage._group ?? Relay_GroupContext()}
+  var group: Signal_GroupContext {
+    get {return _storage._group ?? Signal_GroupContext()}
     set {_uniqueStorage()._group = newValue}
   }
   /// Returns true if `group` has been explicitly set.
@@ -278,19 +278,19 @@ struct Relay_DataMessage {
 
 #if swift(>=4.2)
 
-extension Relay_DataMessage.Flags: CaseIterable {
+extension Signal_DataMessage.Flags: CaseIterable {
   // Support synthesized by the compiler.
 }
 
 #endif  // swift(>=4.2)
 
-struct Relay_SyncMessage {
+struct Signal_SyncMessage {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var sent: Relay_SyncMessage.Sent {
-    get {return _storage._sent ?? Relay_SyncMessage.Sent()}
+  var sent: Signal_SyncMessage.Sent {
+    get {return _storage._sent ?? Signal_SyncMessage.Sent()}
     set {_uniqueStorage()._sent = newValue}
   }
   /// Returns true if `sent` has been explicitly set.
@@ -298,8 +298,8 @@ struct Relay_SyncMessage {
   /// Clears the value of `sent`. Subsequent reads from it will return its default value.
   mutating func clearSent() {_uniqueStorage()._sent = nil}
 
-  var contacts: Relay_SyncMessage.Contacts {
-    get {return _storage._contacts ?? Relay_SyncMessage.Contacts()}
+  var contacts: Signal_SyncMessage.Contacts {
+    get {return _storage._contacts ?? Signal_SyncMessage.Contacts()}
     set {_uniqueStorage()._contacts = newValue}
   }
   /// Returns true if `contacts` has been explicitly set.
@@ -307,8 +307,8 @@ struct Relay_SyncMessage {
   /// Clears the value of `contacts`. Subsequent reads from it will return its default value.
   mutating func clearContacts() {_uniqueStorage()._contacts = nil}
 
-  var groups: Relay_SyncMessage.Groups {
-    get {return _storage._groups ?? Relay_SyncMessage.Groups()}
+  var groups: Signal_SyncMessage.Groups {
+    get {return _storage._groups ?? Signal_SyncMessage.Groups()}
     set {_uniqueStorage()._groups = newValue}
   }
   /// Returns true if `groups` has been explicitly set.
@@ -316,8 +316,8 @@ struct Relay_SyncMessage {
   /// Clears the value of `groups`. Subsequent reads from it will return its default value.
   mutating func clearGroups() {_uniqueStorage()._groups = nil}
 
-  var request: Relay_SyncMessage.Request {
-    get {return _storage._request ?? Relay_SyncMessage.Request()}
+  var request: Signal_SyncMessage.Request {
+    get {return _storage._request ?? Signal_SyncMessage.Request()}
     set {_uniqueStorage()._request = newValue}
   }
   /// Returns true if `request` has been explicitly set.
@@ -325,13 +325,13 @@ struct Relay_SyncMessage {
   /// Clears the value of `request`. Subsequent reads from it will return its default value.
   mutating func clearRequest() {_uniqueStorage()._request = nil}
 
-  var read: [Relay_SyncMessage.Read] {
+  var read: [Signal_SyncMessage.Read] {
     get {return _storage._read}
     set {_uniqueStorage()._read = newValue}
   }
 
-  var blocked: Relay_SyncMessage.Blocked {
-    get {return _storage._blocked ?? Relay_SyncMessage.Blocked()}
+  var blocked: Signal_SyncMessage.Blocked {
+    get {return _storage._blocked ?? Signal_SyncMessage.Blocked()}
     set {_uniqueStorage()._blocked = newValue}
   }
   /// Returns true if `blocked` has been explicitly set.
@@ -364,8 +364,8 @@ struct Relay_SyncMessage {
     /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
     mutating func clearTimestamp() {_uniqueStorage()._timestamp = nil}
 
-    var message: Relay_DataMessage {
-      get {return _storage._message ?? Relay_DataMessage()}
+    var message: Signal_DataMessage {
+      get {return _storage._message ?? Signal_DataMessage()}
       set {_uniqueStorage()._message = newValue}
     }
     /// Returns true if `message` has been explicitly set.
@@ -394,8 +394,8 @@ struct Relay_SyncMessage {
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
-    var blob: Relay_AttachmentPointer {
-      get {return _storage._blob ?? Relay_AttachmentPointer()}
+    var blob: Signal_AttachmentPointer {
+      get {return _storage._blob ?? Signal_AttachmentPointer()}
       set {_uniqueStorage()._blob = newValue}
     }
     /// Returns true if `blob` has been explicitly set.
@@ -415,8 +415,8 @@ struct Relay_SyncMessage {
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
-    var blob: Relay_AttachmentPointer {
-      get {return _storage._blob ?? Relay_AttachmentPointer()}
+    var blob: Signal_AttachmentPointer {
+      get {return _storage._blob ?? Signal_AttachmentPointer()}
       set {_uniqueStorage()._blob = newValue}
     }
     /// Returns true if `blob` has been explicitly set.
@@ -448,7 +448,7 @@ struct Relay_SyncMessage {
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
-    var type: Relay_SyncMessage.Request.TypeEnum {
+    var type: Signal_SyncMessage.Request.TypeEnum {
       get {return _type ?? .unknown}
       set {_type = newValue}
     }
@@ -493,7 +493,7 @@ struct Relay_SyncMessage {
 
     init() {}
 
-    fileprivate var _type: Relay_SyncMessage.Request.TypeEnum? = nil
+    fileprivate var _type: Signal_SyncMessage.Request.TypeEnum? = nil
   }
 
   struct Read {
@@ -532,7 +532,7 @@ struct Relay_SyncMessage {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-struct Relay_AttachmentPointer {
+struct Signal_AttachmentPointer {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -573,7 +573,7 @@ struct Relay_AttachmentPointer {
   fileprivate var _key: Data? = nil
 }
 
-struct Relay_GroupContext {
+struct Signal_GroupContext {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -587,7 +587,7 @@ struct Relay_GroupContext {
   /// Clears the value of `id`. Subsequent reads from it will return its default value.
   mutating func clearID() {_uniqueStorage()._id = nil}
 
-  var type: Relay_GroupContext.TypeEnum {
+  var type: Signal_GroupContext.TypeEnum {
     get {return _storage._type ?? .unknown}
     set {_uniqueStorage()._type = newValue}
   }
@@ -610,8 +610,8 @@ struct Relay_GroupContext {
     set {_uniqueStorage()._members = newValue}
   }
 
-  var avatar: Relay_AttachmentPointer {
-    get {return _storage._avatar ?? Relay_AttachmentPointer()}
+  var avatar: Signal_AttachmentPointer {
+    get {return _storage._avatar ?? Signal_AttachmentPointer()}
     set {_uniqueStorage()._avatar = newValue}
   }
   /// Returns true if `avatar` has been explicitly set.
@@ -660,13 +660,13 @@ struct Relay_GroupContext {
 
 #if swift(>=4.2)
 
-extension Relay_GroupContext.TypeEnum: CaseIterable {
+extension Signal_GroupContext.TypeEnum: CaseIterable {
   // Support synthesized by the compiler.
 }
 
 #endif  // swift(>=4.2)
 
-struct Relay_Avatar {
+struct Signal_Avatar {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -697,7 +697,7 @@ struct Relay_Avatar {
   fileprivate var _length: UInt32? = nil
 }
 
-struct Relay_GroupDetails {
+struct Signal_GroupDetails {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -725,8 +725,8 @@ struct Relay_GroupDetails {
     set {_uniqueStorage()._members = newValue}
   }
 
-  var avatar: Relay_Avatar {
-    get {return _storage._avatar ?? Relay_Avatar()}
+  var avatar: Signal_Avatar {
+    get {return _storage._avatar ?? Signal_Avatar()}
     set {_uniqueStorage()._avatar = newValue}
   }
   /// Returns true if `avatar` has been explicitly set.
@@ -750,7 +750,7 @@ struct Relay_GroupDetails {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-struct Relay_ContactDetails {
+struct Signal_ContactDetails {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -773,8 +773,8 @@ struct Relay_ContactDetails {
   /// Clears the value of `name`. Subsequent reads from it will return its default value.
   mutating func clearName() {_uniqueStorage()._name = nil}
 
-  var avatar: Relay_Avatar {
-    get {return _storage._avatar ?? Relay_Avatar()}
+  var avatar: Signal_Avatar {
+    get {return _storage._avatar ?? Signal_Avatar()}
     set {_uniqueStorage()._avatar = newValue}
   }
   /// Returns true if `avatar` has been explicitly set.
@@ -800,9 +800,9 @@ struct Relay_ContactDetails {
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
-fileprivate let _protobuf_package = "relay"
+fileprivate let _protobuf_package = "signal"
 
-extension Relay_Envelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_Envelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Envelope"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "type"),
@@ -864,7 +864,7 @@ extension Relay_Envelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_Envelope, rhs: Relay_Envelope) -> Bool {
+  static func ==(lhs: Signal_Envelope, rhs: Signal_Envelope) -> Bool {
     if lhs._type != rhs._type {return false}
     if lhs._source != rhs._source {return false}
     if lhs._sourceDevice != rhs._sourceDevice {return false}
@@ -879,7 +879,7 @@ extension Relay_Envelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
   }
 }
 
-extension Relay_Envelope.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+extension Signal_Envelope.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     0: .same(proto: "UNKNOWN"),
     1: .same(proto: "CIPHERTEXT"),
@@ -889,7 +889,7 @@ extension Relay_Envelope.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   ]
 }
 
-extension Relay_Content: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_Content: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Content"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "dataMessage"),
@@ -897,8 +897,8 @@ extension Relay_Content: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementa
   ]
 
   fileprivate class _StorageClass {
-    var _dataMessage: Relay_DataMessage? = nil
-    var _syncMessage: Relay_SyncMessage? = nil
+    var _dataMessage: Signal_DataMessage? = nil
+    var _syncMessage: Signal_SyncMessage? = nil
 
     static let defaultInstance = _StorageClass()
 
@@ -942,7 +942,7 @@ extension Relay_Content: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_Content, rhs: Relay_Content) -> Bool {
+  static func ==(lhs: Signal_Content, rhs: Signal_Content) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
@@ -958,7 +958,7 @@ extension Relay_Content: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementa
   }
 }
 
-extension Relay_DataMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_DataMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".DataMessage"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "body"),
@@ -970,8 +970,8 @@ extension Relay_DataMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
 
   fileprivate class _StorageClass {
     var _body: String? = nil
-    var _attachments: [Relay_AttachmentPointer] = []
-    var _group: Relay_GroupContext? = nil
+    var _attachments: [Signal_AttachmentPointer] = []
+    var _group: Signal_GroupContext? = nil
     var _flags: UInt32? = nil
     var _expireTimer: UInt32? = nil
 
@@ -1032,7 +1032,7 @@ extension Relay_DataMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_DataMessage, rhs: Relay_DataMessage) -> Bool {
+  static func ==(lhs: Signal_DataMessage, rhs: Signal_DataMessage) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
@@ -1051,14 +1051,14 @@ extension Relay_DataMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   }
 }
 
-extension Relay_DataMessage.Flags: SwiftProtobuf._ProtoNameProviding {
+extension Signal_DataMessage.Flags: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "END_SESSION"),
     2: .same(proto: "EXPIRATION_TIMER_UPDATE"),
   ]
 }
 
-extension Relay_SyncMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_SyncMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".SyncMessage"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "sent"),
@@ -1070,12 +1070,12 @@ extension Relay_SyncMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   ]
 
   fileprivate class _StorageClass {
-    var _sent: Relay_SyncMessage.Sent? = nil
-    var _contacts: Relay_SyncMessage.Contacts? = nil
-    var _groups: Relay_SyncMessage.Groups? = nil
-    var _request: Relay_SyncMessage.Request? = nil
-    var _read: [Relay_SyncMessage.Read] = []
-    var _blocked: Relay_SyncMessage.Blocked? = nil
+    var _sent: Signal_SyncMessage.Sent? = nil
+    var _contacts: Signal_SyncMessage.Contacts? = nil
+    var _groups: Signal_SyncMessage.Groups? = nil
+    var _request: Signal_SyncMessage.Request? = nil
+    var _read: [Signal_SyncMessage.Read] = []
+    var _blocked: Signal_SyncMessage.Blocked? = nil
 
     static let defaultInstance = _StorageClass()
 
@@ -1139,7 +1139,7 @@ extension Relay_SyncMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_SyncMessage, rhs: Relay_SyncMessage) -> Bool {
+  static func ==(lhs: Signal_SyncMessage, rhs: Signal_SyncMessage) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
@@ -1159,8 +1159,8 @@ extension Relay_SyncMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
   }
 }
 
-extension Relay_SyncMessage.Sent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = Relay_SyncMessage.protoMessageName + ".Sent"
+extension Signal_SyncMessage.Sent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = Signal_SyncMessage.protoMessageName + ".Sent"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "destination"),
     2: .same(proto: "timestamp"),
@@ -1171,7 +1171,7 @@ extension Relay_SyncMessage.Sent: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   fileprivate class _StorageClass {
     var _destination: String? = nil
     var _timestamp: UInt64? = nil
-    var _message: Relay_DataMessage? = nil
+    var _message: Signal_DataMessage? = nil
     var _expirationStartTimestamp: UInt64? = nil
 
     static let defaultInstance = _StorageClass()
@@ -1226,7 +1226,7 @@ extension Relay_SyncMessage.Sent: SwiftProtobuf.Message, SwiftProtobuf._MessageI
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_SyncMessage.Sent, rhs: Relay_SyncMessage.Sent) -> Bool {
+  static func ==(lhs: Signal_SyncMessage.Sent, rhs: Signal_SyncMessage.Sent) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
@@ -1244,14 +1244,14 @@ extension Relay_SyncMessage.Sent: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 }
 
-extension Relay_SyncMessage.Contacts: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = Relay_SyncMessage.protoMessageName + ".Contacts"
+extension Signal_SyncMessage.Contacts: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = Signal_SyncMessage.protoMessageName + ".Contacts"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "blob"),
   ]
 
   fileprivate class _StorageClass {
-    var _blob: Relay_AttachmentPointer? = nil
+    var _blob: Signal_AttachmentPointer? = nil
 
     static let defaultInstance = _StorageClass()
 
@@ -1290,7 +1290,7 @@ extension Relay_SyncMessage.Contacts: SwiftProtobuf.Message, SwiftProtobuf._Mess
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_SyncMessage.Contacts, rhs: Relay_SyncMessage.Contacts) -> Bool {
+  static func ==(lhs: Signal_SyncMessage.Contacts, rhs: Signal_SyncMessage.Contacts) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
@@ -1305,14 +1305,14 @@ extension Relay_SyncMessage.Contacts: SwiftProtobuf.Message, SwiftProtobuf._Mess
   }
 }
 
-extension Relay_SyncMessage.Groups: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = Relay_SyncMessage.protoMessageName + ".Groups"
+extension Signal_SyncMessage.Groups: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = Signal_SyncMessage.protoMessageName + ".Groups"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "blob"),
   ]
 
   fileprivate class _StorageClass {
-    var _blob: Relay_AttachmentPointer? = nil
+    var _blob: Signal_AttachmentPointer? = nil
 
     static let defaultInstance = _StorageClass()
 
@@ -1351,7 +1351,7 @@ extension Relay_SyncMessage.Groups: SwiftProtobuf.Message, SwiftProtobuf._Messag
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_SyncMessage.Groups, rhs: Relay_SyncMessage.Groups) -> Bool {
+  static func ==(lhs: Signal_SyncMessage.Groups, rhs: Signal_SyncMessage.Groups) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
@@ -1366,8 +1366,8 @@ extension Relay_SyncMessage.Groups: SwiftProtobuf.Message, SwiftProtobuf._Messag
   }
 }
 
-extension Relay_SyncMessage.Blocked: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = Relay_SyncMessage.protoMessageName + ".Blocked"
+extension Signal_SyncMessage.Blocked: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = Signal_SyncMessage.protoMessageName + ".Blocked"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "addrs"),
   ]
@@ -1388,15 +1388,15 @@ extension Relay_SyncMessage.Blocked: SwiftProtobuf.Message, SwiftProtobuf._Messa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_SyncMessage.Blocked, rhs: Relay_SyncMessage.Blocked) -> Bool {
+  static func ==(lhs: Signal_SyncMessage.Blocked, rhs: Signal_SyncMessage.Blocked) -> Bool {
     if lhs.addrs != rhs.addrs {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Relay_SyncMessage.Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = Relay_SyncMessage.protoMessageName + ".Request"
+extension Signal_SyncMessage.Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = Signal_SyncMessage.protoMessageName + ".Request"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "type"),
   ]
@@ -1417,14 +1417,14 @@ extension Relay_SyncMessage.Request: SwiftProtobuf.Message, SwiftProtobuf._Messa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_SyncMessage.Request, rhs: Relay_SyncMessage.Request) -> Bool {
+  static func ==(lhs: Signal_SyncMessage.Request, rhs: Signal_SyncMessage.Request) -> Bool {
     if lhs._type != rhs._type {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Relay_SyncMessage.Request.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+extension Signal_SyncMessage.Request.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     0: .same(proto: "UNKNOWN"),
     1: .same(proto: "CONTACTS"),
@@ -1433,8 +1433,8 @@ extension Relay_SyncMessage.Request.TypeEnum: SwiftProtobuf._ProtoNameProviding 
   ]
 }
 
-extension Relay_SyncMessage.Read: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = Relay_SyncMessage.protoMessageName + ".Read"
+extension Signal_SyncMessage.Read: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = Signal_SyncMessage.protoMessageName + ".Read"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "sender"),
     2: .same(proto: "timestamp"),
@@ -1460,7 +1460,7 @@ extension Relay_SyncMessage.Read: SwiftProtobuf.Message, SwiftProtobuf._MessageI
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_SyncMessage.Read, rhs: Relay_SyncMessage.Read) -> Bool {
+  static func ==(lhs: Signal_SyncMessage.Read, rhs: Signal_SyncMessage.Read) -> Bool {
     if lhs._sender != rhs._sender {return false}
     if lhs._timestamp != rhs._timestamp {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1468,7 +1468,7 @@ extension Relay_SyncMessage.Read: SwiftProtobuf.Message, SwiftProtobuf._MessageI
   }
 }
 
-extension Relay_AttachmentPointer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_AttachmentPointer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".AttachmentPointer"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "id"),
@@ -1500,7 +1500,7 @@ extension Relay_AttachmentPointer: SwiftProtobuf.Message, SwiftProtobuf._Message
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_AttachmentPointer, rhs: Relay_AttachmentPointer) -> Bool {
+  static func ==(lhs: Signal_AttachmentPointer, rhs: Signal_AttachmentPointer) -> Bool {
     if lhs._id != rhs._id {return false}
     if lhs._contentType != rhs._contentType {return false}
     if lhs._key != rhs._key {return false}
@@ -1509,7 +1509,7 @@ extension Relay_AttachmentPointer: SwiftProtobuf.Message, SwiftProtobuf._Message
   }
 }
 
-extension Relay_GroupContext: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_GroupContext: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".GroupContext"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "id"),
@@ -1521,10 +1521,10 @@ extension Relay_GroupContext: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
 
   fileprivate class _StorageClass {
     var _id: Data? = nil
-    var _type: Relay_GroupContext.TypeEnum? = nil
+    var _type: Signal_GroupContext.TypeEnum? = nil
     var _name: String? = nil
     var _members: [String] = []
-    var _avatar: Relay_AttachmentPointer? = nil
+    var _avatar: Signal_AttachmentPointer? = nil
 
     static let defaultInstance = _StorageClass()
 
@@ -1583,7 +1583,7 @@ extension Relay_GroupContext: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_GroupContext, rhs: Relay_GroupContext) -> Bool {
+  static func ==(lhs: Signal_GroupContext, rhs: Signal_GroupContext) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
@@ -1602,7 +1602,7 @@ extension Relay_GroupContext: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   }
 }
 
-extension Relay_GroupContext.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+extension Signal_GroupContext.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     0: .same(proto: "UNKNOWN"),
     1: .same(proto: "UPDATE"),
@@ -1611,7 +1611,7 @@ extension Relay_GroupContext.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   ]
 }
 
-extension Relay_Avatar: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_Avatar: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Avatar"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "contentType"),
@@ -1638,7 +1638,7 @@ extension Relay_Avatar: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_Avatar, rhs: Relay_Avatar) -> Bool {
+  static func ==(lhs: Signal_Avatar, rhs: Signal_Avatar) -> Bool {
     if lhs._contentType != rhs._contentType {return false}
     if lhs._length != rhs._length {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1646,7 +1646,7 @@ extension Relay_Avatar: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
   }
 }
 
-extension Relay_GroupDetails: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_GroupDetails: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".GroupDetails"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "id"),
@@ -1660,7 +1660,7 @@ extension Relay_GroupDetails: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
     var _id: Data? = nil
     var _name: String? = nil
     var _members: [String] = []
-    var _avatar: Relay_Avatar? = nil
+    var _avatar: Signal_Avatar? = nil
     var _active: Bool? = nil
 
     static let defaultInstance = _StorageClass()
@@ -1720,7 +1720,7 @@ extension Relay_GroupDetails: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_GroupDetails, rhs: Relay_GroupDetails) -> Bool {
+  static func ==(lhs: Signal_GroupDetails, rhs: Signal_GroupDetails) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
@@ -1739,7 +1739,7 @@ extension Relay_GroupDetails: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   }
 }
 
-extension Relay_ContactDetails: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Signal_ContactDetails: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".ContactDetails"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "addr"),
@@ -1751,7 +1751,7 @@ extension Relay_ContactDetails: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
   fileprivate class _StorageClass {
     var _addr: String? = nil
     var _name: String? = nil
-    var _avatar: Relay_Avatar? = nil
+    var _avatar: Signal_Avatar? = nil
     var _color: String? = nil
 
     static let defaultInstance = _StorageClass()
@@ -1806,7 +1806,7 @@ extension Relay_ContactDetails: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Relay_ContactDetails, rhs: Relay_ContactDetails) -> Bool {
+  static func ==(lhs: Signal_ContactDetails, rhs: Signal_ContactDetails) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0

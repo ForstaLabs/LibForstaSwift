@@ -261,8 +261,6 @@ class SignalClientTests: XCTestCase {
             wait(for: [registrated], timeout: 10.0)
             
             let connectified = XCTestExpectation()
-            var incomingMessage: Relay_DataMessage? = nil
-            var incomingEnvelope: Relay_Envelope? = nil
             let dataMessageObserver = NotificationCenter.default.addObserver(
                 forName: .signalEmptyQueue,
                 object: nil,
