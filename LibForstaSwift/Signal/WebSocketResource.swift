@@ -1,6 +1,6 @@
 //
 //  WebSocketResource.swift
-//  LibRelaySwift
+//  LibSignalSwift
 //
 //  Created by Greg Perkins on 6/11/19.
 //  Copyright © 2019 Forsta, Inc. All rights reserved.

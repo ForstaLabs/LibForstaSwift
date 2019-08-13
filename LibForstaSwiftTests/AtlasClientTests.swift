@@ -12,7 +12,7 @@ import SwiftyJSON
 import OneTimePassword
 import Base32
 
-@testable import LibRelaySwift
+@testable import LibForstaSwift
 
 let dummyTwilioNumber = "+15005550006"
 

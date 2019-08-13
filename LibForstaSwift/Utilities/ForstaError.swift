@@ -1,6 +1,6 @@
 //
 //  RelayError.swift
-//  LibRelaySwift
+//  LibForstaSwift
 //
 //  Created by Greg Perkins on 4/24/19.
 //  Copyright © 2019 Forsta, Inc. All rights reserved.
@@ -12,7 +12,7 @@
 
 import Foundation
 
-/// The different types of errors that can occur using the LibRelaySwift library.
+/// The different types of errors that can occur using the LibForstaSwift library.
 public enum ForstaErrorType: String {
     /// Unknown errors should only be thrown of no other, more descriptive error type exists
     case unknown = "Unknown"
@@ -84,7 +84,7 @@ public enum ForstaErrorType: String {
     case decryptionError = "Decryption error"
 }
 
-/// All errors thrown by `LibRelaySwift` are `RelayError` objects.
+/// All errors thrown by `LibForstaSwift` are `ForstaError` objects.
 public final class ForstaError: CustomStringConvertible, Error {
 
     /// The error type

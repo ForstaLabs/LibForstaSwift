@@ -1,6 +1,6 @@
 //
 //  KVStorage.swift
-//  LibRelaySwift
+//  LibSignalSwift
 //
 //  Created by Greg Perkins on 4/23/19.
 //  Copyright © 2019 Forsta, Inc. All rights reserved.

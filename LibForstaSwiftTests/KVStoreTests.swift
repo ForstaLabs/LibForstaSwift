@@ -9,7 +9,7 @@
 import Foundation
 import XCTest
 import SwiftyJSON
-import LibRelaySwift
+import LibForstaSwift
 
 class MemoryKVStore: KVStorageProtocol {
     var data = [String: [AnyHashable: Data]]()

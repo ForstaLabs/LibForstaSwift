@@ -54,7 +54,7 @@
 		DB2B00E622E234AF00B9931A /* Base32.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B00E022E2342E00B9931A /* Base32.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DB2B00E722E234AF00B9931A /* OneTimePassword.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B00E122E2342F00B9931A /* OneTimePassword.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DBDB773122E124610027EEB0 /* LibForstaSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBDB772722E124610027EEB0 /* LibForstaSwift.framework */; };
-		DBDB773822E124610027EEB0 /* LibRelaySwift.h in Headers */ = {isa = PBXBuildFile; fileRef = DBDB772A22E124610027EEB0 /* LibRelaySwift.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DBDB773822E124610027EEB0 /* LibForstaSwift.h in Headers */ = {isa = PBXBuildFile; fileRef = DBDB772A22E124610027EEB0 /* LibForstaSwift.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DBE3D57622F87B750016B800 /* Sendable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57522F87B750016B800 /* Sendable.swift */; };
 		DBE3D57822F89E880016B800 /* MessageSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57722F89E880016B800 /* MessageSender.swift */; };
 		DBE3D57A22F89EB50016B800 /* MessageReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57922F89EB50016B800 /* MessageReceiver.swift */; };
@@ -66,7 +66,7 @@
 			containerPortal = DBDB771E22E124610027EEB0 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = DBDB772622E124610027EEB0;
-			remoteInfo = LibRelaySwift;
+			remoteInfo = LibForstaSwift;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -121,7 +121,7 @@
 		DB2B00E022E2342E00B9931A /* Base32.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Base32.framework; path = Carthage/Build/iOS/Base32.framework; sourceTree = "<group>"; };
 		DB2B00E122E2342F00B9931A /* OneTimePassword.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OneTimePassword.framework; path = Carthage/Build/iOS/OneTimePassword.framework; sourceTree = "<group>"; };
 		DBDB772722E124610027EEB0 /* LibForstaSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LibForstaSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DBDB772A22E124610027EEB0 /* LibRelaySwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LibRelaySwift.h; sourceTree = "<group>"; };
+		DBDB772A22E124610027EEB0 /* LibForstaSwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LibForstaSwift.h; sourceTree = "<group>"; };
 		DBDB772B22E124610027EEB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DBDB773022E124610027EEB0 /* LibForstaSwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LibForstaSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBDB773722E124610027EEB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -224,8 +224,8 @@
 		DBDB771D22E124610027EEB0 = {
 			isa = PBXGroup;
 			children = (
-				DBDB772922E124610027EEB0 /* LibRelaySwift */,
-				DBDB773422E124610027EEB0 /* LibRelaySwiftTests */,
+				DBDB772922E124610027EEB0 /* LibForstaSwift */,
+				DBDB773422E124610027EEB0 /* LibForstaSwiftTests */,
 				DBDB772822E124610027EEB0 /* Products */,
 				DBDB774122E128060027EEB0 /* Frameworks */,
 			);
@@ -240,7 +240,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		DBDB772922E124610027EEB0 /* LibRelaySwift */ = {
+		DBDB772922E124610027EEB0 /* LibForstaSwift */ = {
 			isa = PBXGroup;
 			children = (
 				DB2B00C222E12D7800B9931A /* Utilities */,
@@ -248,13 +248,13 @@
 				DB2B00B822E12D6A00B9931A /* Signal */,
 				DB2B00A922E12D6100B9931A /* protos */,
 				DB2B00A622E12D4600B9931A /* Atlas */,
-				DBDB772A22E124610027EEB0 /* LibRelaySwift.h */,
+				DBDB772A22E124610027EEB0 /* LibForstaSwift.h */,
 				DBDB772B22E124610027EEB0 /* Info.plist */,
 			);
-			path = LibRelaySwift;
+			path = LibForstaSwift;
 			sourceTree = "<group>";
 		};
-		DBDB773422E124610027EEB0 /* LibRelaySwiftTests */ = {
+		DBDB773422E124610027EEB0 /* LibForstaSwiftTests */ = {
 			isa = PBXGroup;
 			children = (
 				DB2B00CC22E12DB200B9931A /* AtlasClientTests.swift */,
@@ -262,7 +262,7 @@
 				DB2B00CD22E12DB200B9931A /* SignalClientTests.swift */,
 				DBDB773722E124610027EEB0 /* Info.plist */,
 			);
-			path = LibRelaySwiftTests;
+			path = LibForstaSwiftTests;
 			sourceTree = "<group>";
 		};
 		DBDB774122E128060027EEB0 /* Frameworks */ = {
@@ -288,7 +288,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBDB773822E124610027EEB0 /* LibRelaySwift.h in Headers */,
+				DBDB773822E124610027EEB0 /* LibForstaSwift.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,7 +310,7 @@
 			dependencies = (
 			);
 			name = LibForstaSwift;
-			productName = LibRelaySwift;
+			productName = LibForstaSwift;
 			productReference = DBDB772722E124610027EEB0 /* LibForstaSwift.framework */;
 			productType = "com.apple.product-type.framework";
 		};
@@ -329,7 +329,7 @@
 				DBDB773322E124610027EEB0 /* PBXTargetDependency */,
 			);
 			name = LibForstaSwiftTests;
-			productName = LibRelaySwiftTests;
+			productName = LibForstaSwiftTests;
 			productReference = DBDB773022E124610027EEB0 /* LibForstaSwiftTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -591,14 +591,14 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
-				INFOPLIST_FILE = LibRelaySwift/Info.plist;
+				INFOPLIST_FILE = LibForstaSwift/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.forsta.LibRelaySwift;
+				PRODUCT_BUNDLE_IDENTIFIER = io.forsta.LibForstaSwift;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -620,14 +620,14 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
-				INFOPLIST_FILE = LibRelaySwift/Info.plist;
+				INFOPLIST_FILE = LibForstaSwift/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.forsta.LibRelaySwift;
+				PRODUCT_BUNDLE_IDENTIFIER = io.forsta.LibForstaSwift;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -645,13 +645,13 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
-				INFOPLIST_FILE = LibRelaySwiftTests/Info.plist;
+				INFOPLIST_FILE = LibForstaSwiftTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.forsta.LibRelaySwiftTests;
+				PRODUCT_BUNDLE_IDENTIFIER = io.forsta.LibForstaSwiftTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -668,13 +668,13 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
-				INFOPLIST_FILE = LibRelaySwiftTests/Info.plist;
+				INFOPLIST_FILE = LibForstaSwiftTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.forsta.LibRelaySwiftTests;
+				PRODUCT_BUNDLE_IDENTIFIER = io.forsta.LibForstaSwiftTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

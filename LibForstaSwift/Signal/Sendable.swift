@@ -1,6 +1,6 @@
 //
 //  Sendable.swift
-//  LibRelaySwift
+//  LibSignalSwift
 //
 //  Created by Greg Perkins on 8/5/19.
 //  Copyright © 2019 Forsta, Inc. All rights reserved.

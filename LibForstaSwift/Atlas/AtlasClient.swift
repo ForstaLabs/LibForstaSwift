@@ -1,6 +1,6 @@
 //
 //  AtlasClient.swift
-//  LibRelaySwift
+//  LibSignalSwift
 //
 //  Created by Greg Perkins on 4/18/19.
 //  Copyright © 2019 Forsta, Inc. All rights reserved.
@@ -103,7 +103,7 @@ class AtlasClient {
     /// - parameters:
     ///     - userTag: Tag for the user. It takes the form [@]user[:org].
     ///     -    code: SMS code that was sent to the user when `requestAuthentication` was called.
-    /// - returns: A `Promise` that either fails with a `LibRelayError` or succeeds
+    /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
     ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
     func authenticateViaCode(userTag: String, code: String) -> Promise<AuthenticatedAtlasUser> {
@@ -120,7 +120,7 @@ class AtlasClient {
     /// - parameters:
     ///     -  userTag: Tag for the user. It takes the form [@]user[:org].
     ///     - password: The user's password.
-    /// - returns: A `Promise` that either fails with a `LibRelayError` or succeeds
+    /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
     ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
     func authenticateViaPassword(userTag: String, password: String) -> Promise<AuthenticatedAtlasUser> {
@@ -138,7 +138,7 @@ class AtlasClient {
     ///     -  userTag: Tag for the user. It takes the form [@]user[:org].
     ///     - password: The user's password.
     ///     -      otp: The current Authenticator code for the user.
-    /// - returns: A `Promise` that either fails with a `LibRelayError` or succeeds
+    /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
     ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
     func authenticateViaPasswordOtp(userTag: String, password: String, otp: String) -> Promise<AuthenticatedAtlasUser> {
@@ -154,7 +154,7 @@ class AtlasClient {
     /// Authentication via UserAuthToken
     ///
     /// - parameter token: A UserAuthToken for the authenticating user.
-    /// - returns: A `Promise` that either fails with a `LibRelayError` or succeeds
+    /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
     ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
     func authenticateViaUserAuthToken(token: String) -> Promise<AuthenticatedAtlasUser> {
@@ -168,7 +168,7 @@ class AtlasClient {
     /// Authentication via UserAuthToken
     ///
     /// - parameter jwt: A JWT proxy for the authenticating user.
-    /// - returns: A `Promise` that either fails with a `LibRelayError` or succeeds
+    /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
     ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
     func authenticateViaJwtProxy(jwt: String) -> Promise<AuthenticatedAtlasUser> {

@@ -12,7 +12,7 @@ import PromiseKit
 import SwiftyJSON
 // import SwiftOTP
 
-@testable import LibRelaySwift
+@testable import LibForstaSwift
 import SignalProtocol
 
 
@@ -43,7 +43,7 @@ class Message: Sendable, CustomStringConvertible {
          threadId: UUID = UUID(),
          distributionExpression: String,
          data: JSON? = nil,
-         userAgent: String = "LibRelaySwift Client",
+         userAgent: String = "LibSignalSwift Client",
          threadTitle: String? = nil,
          threadType: FLIThreadType? = nil,
          messageRef: UUID? = nil

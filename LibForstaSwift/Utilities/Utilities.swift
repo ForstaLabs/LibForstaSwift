@@ -1,6 +1,6 @@
 //
 //  Utilities.swift
-//  LibRelaySwift
+//  LibForstaSwift
 //
 //  Created by Greg Perkins on 4/24/19.
 //  Copyright © 2019 Forsta, Inc. All rights reserved.
@@ -53,7 +53,7 @@ extension NotificationCenter {
 }
 
 
-/// The various LibRelay errors.
+/// The various LibForsta errors.
 enum LibForstaError: Error {
     case requestRejected(why: JSON)
     case requestFailure(why: Error)
