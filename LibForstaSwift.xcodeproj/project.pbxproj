@@ -53,7 +53,7 @@
 		DB2B00E522E2349E00B9931A /* OneTimePassword.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B00E122E2342F00B9931A /* OneTimePassword.framework */; };
 		DB2B00E622E234AF00B9931A /* Base32.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B00E022E2342E00B9931A /* Base32.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DB2B00E722E234AF00B9931A /* OneTimePassword.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DB2B00E122E2342F00B9931A /* OneTimePassword.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		DBDB773122E124610027EEB0 /* LibRelaySwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBDB772722E124610027EEB0 /* LibRelaySwift.framework */; };
+		DBDB773122E124610027EEB0 /* LibForstaSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBDB772722E124610027EEB0 /* LibForstaSwift.framework */; };
 		DBDB773822E124610027EEB0 /* LibRelaySwift.h in Headers */ = {isa = PBXBuildFile; fileRef = DBDB772A22E124610027EEB0 /* LibRelaySwift.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DBE3D57622F87B750016B800 /* Sendable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57522F87B750016B800 /* Sendable.swift */; };
 		DBE3D57822F89E880016B800 /* MessageSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57722F89E880016B800 /* MessageSender.swift */; };
@@ -120,10 +120,10 @@
 		DB2B00CD22E12DB200B9931A /* SignalClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalClientTests.swift; sourceTree = "<group>"; };
 		DB2B00E022E2342E00B9931A /* Base32.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Base32.framework; path = Carthage/Build/iOS/Base32.framework; sourceTree = "<group>"; };
 		DB2B00E122E2342F00B9931A /* OneTimePassword.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OneTimePassword.framework; path = Carthage/Build/iOS/OneTimePassword.framework; sourceTree = "<group>"; };
-		DBDB772722E124610027EEB0 /* LibRelaySwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LibRelaySwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBDB772722E124610027EEB0 /* LibForstaSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LibForstaSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBDB772A22E124610027EEB0 /* LibRelaySwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LibRelaySwift.h; sourceTree = "<group>"; };
 		DBDB772B22E124610027EEB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DBDB773022E124610027EEB0 /* LibRelaySwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LibRelaySwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBDB773022E124610027EEB0 /* LibForstaSwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LibForstaSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBDB773722E124610027EEB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DBE3D57522F87B750016B800 /* Sendable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sendable.swift; sourceTree = "<group>"; };
 		DBE3D57722F89E880016B800 /* MessageSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSender.swift; sourceTree = "<group>"; };
@@ -155,7 +155,7 @@
 				DB2B00E522E2349E00B9931A /* OneTimePassword.framework in Frameworks */,
 				DB2B00D322E12EA400B9931A /* JWTDecode.framework in Frameworks */,
 				DB2B00D622E12EAD00B9931A /* Starscream.framework in Frameworks */,
-				DBDB773122E124610027EEB0 /* LibRelaySwift.framework in Frameworks */,
+				DBDB773122E124610027EEB0 /* LibForstaSwift.framework in Frameworks */,
 				DB2B00D222E12EA000B9931A /* Alamofire.framework in Frameworks */,
 				DB2B00D422E12EA700B9931A /* PromiseKit.framework in Frameworks */,
 				DB2B00E422E2349B00B9931A /* Base32.framework in Frameworks */,
@@ -234,8 +234,8 @@
 		DBDB772822E124610027EEB0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DBDB772722E124610027EEB0 /* LibRelaySwift.framework */,
-				DBDB773022E124610027EEB0 /* LibRelaySwiftTests.xctest */,
+				DBDB772722E124610027EEB0 /* LibForstaSwift.framework */,
+				DBDB773022E124610027EEB0 /* LibForstaSwiftTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -295,9 +295,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		DBDB772622E124610027EEB0 /* LibRelaySwift */ = {
+		DBDB772622E124610027EEB0 /* LibForstaSwift */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DBDB773B22E124610027EEB0 /* Build configuration list for PBXNativeTarget "LibRelaySwift" */;
+			buildConfigurationList = DBDB773B22E124610027EEB0 /* Build configuration list for PBXNativeTarget "LibForstaSwift" */;
 			buildPhases = (
 				DBDB772222E124610027EEB0 /* Headers */,
 				DBDB772322E124610027EEB0 /* Sources */,
@@ -309,14 +309,14 @@
 			);
 			dependencies = (
 			);
-			name = LibRelaySwift;
+			name = LibForstaSwift;
 			productName = LibRelaySwift;
-			productReference = DBDB772722E124610027EEB0 /* LibRelaySwift.framework */;
+			productReference = DBDB772722E124610027EEB0 /* LibForstaSwift.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		DBDB772F22E124610027EEB0 /* LibRelaySwiftTests */ = {
+		DBDB772F22E124610027EEB0 /* LibForstaSwiftTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DBDB773E22E124610027EEB0 /* Build configuration list for PBXNativeTarget "LibRelaySwiftTests" */;
+			buildConfigurationList = DBDB773E22E124610027EEB0 /* Build configuration list for PBXNativeTarget "LibForstaSwiftTests" */;
 			buildPhases = (
 				DBDB772C22E124610027EEB0 /* Sources */,
 				DBDB772D22E124610027EEB0 /* Frameworks */,
@@ -328,9 +328,9 @@
 			dependencies = (
 				DBDB773322E124610027EEB0 /* PBXTargetDependency */,
 			);
-			name = LibRelaySwiftTests;
+			name = LibForstaSwiftTests;
 			productName = LibRelaySwiftTests;
-			productReference = DBDB773022E124610027EEB0 /* LibRelaySwiftTests.xctest */;
+			productReference = DBDB773022E124610027EEB0 /* LibForstaSwiftTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -351,7 +351,7 @@
 					};
 				};
 			};
-			buildConfigurationList = DBDB772122E124610027EEB0 /* Build configuration list for PBXProject "LibRelaySwift" */;
+			buildConfigurationList = DBDB772122E124610027EEB0 /* Build configuration list for PBXProject "LibForstaSwift" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -363,8 +363,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DBDB772622E124610027EEB0 /* LibRelaySwift */,
-				DBDB772F22E124610027EEB0 /* LibRelaySwiftTests */,
+				DBDB772622E124610027EEB0 /* LibForstaSwift */,
+				DBDB772F22E124610027EEB0 /* LibForstaSwiftTests */,
 			);
 		};
 /* End PBXProject section */
@@ -449,7 +449,7 @@
 /* Begin PBXTargetDependency section */
 		DBDB773322E124610027EEB0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = DBDB772622E124610027EEB0 /* LibRelaySwift */;
+			target = DBDB772622E124610027EEB0 /* LibForstaSwift */;
 			targetProxy = DBDB773222E124610027EEB0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -684,7 +684,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		DBDB772122E124610027EEB0 /* Build configuration list for PBXProject "LibRelaySwift" */ = {
+		DBDB772122E124610027EEB0 /* Build configuration list for PBXProject "LibForstaSwift" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DBDB773922E124610027EEB0 /* Debug */,
@@ -693,7 +693,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DBDB773B22E124610027EEB0 /* Build configuration list for PBXNativeTarget "LibRelaySwift" */ = {
+		DBDB773B22E124610027EEB0 /* Build configuration list for PBXNativeTarget "LibForstaSwift" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DBDB773C22E124610027EEB0 /* Debug */,
@@ -702,7 +702,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DBDB773E22E124610027EEB0 /* Build configuration list for PBXNativeTarget "LibRelaySwiftTests" */ = {
+		DBDB773E22E124610027EEB0 /* Build configuration list for PBXNativeTarget "LibForstaSwiftTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DBDB773F22E124610027EEB0 /* Debug */,
