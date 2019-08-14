@@ -203,45 +203,33 @@ struct Signal_DataMessage {
   // methods supported on all messages.
 
   var body: String {
-    get {return _storage._body ?? String()}
-    set {_uniqueStorage()._body = newValue}
+    get {return _body ?? String()}
+    set {_body = newValue}
   }
   /// Returns true if `body` has been explicitly set.
-  var hasBody: Bool {return _storage._body != nil}
+  var hasBody: Bool {return self._body != nil}
   /// Clears the value of `body`. Subsequent reads from it will return its default value.
-  mutating func clearBody() {_uniqueStorage()._body = nil}
+  mutating func clearBody() {self._body = nil}
 
-  var attachments: [Signal_AttachmentPointer] {
-    get {return _storage._attachments}
-    set {_uniqueStorage()._attachments = newValue}
-  }
-
-  var group: Signal_GroupContext {
-    get {return _storage._group ?? Signal_GroupContext()}
-    set {_uniqueStorage()._group = newValue}
-  }
-  /// Returns true if `group` has been explicitly set.
-  var hasGroup: Bool {return _storage._group != nil}
-  /// Clears the value of `group`. Subsequent reads from it will return its default value.
-  mutating func clearGroup() {_uniqueStorage()._group = nil}
+  var attachments: [Signal_AttachmentPointer] = []
 
   var flags: UInt32 {
-    get {return _storage._flags ?? 0}
-    set {_uniqueStorage()._flags = newValue}
+    get {return _flags ?? 0}
+    set {_flags = newValue}
   }
   /// Returns true if `flags` has been explicitly set.
-  var hasFlags: Bool {return _storage._flags != nil}
+  var hasFlags: Bool {return self._flags != nil}
   /// Clears the value of `flags`. Subsequent reads from it will return its default value.
-  mutating func clearFlags() {_uniqueStorage()._flags = nil}
+  mutating func clearFlags() {self._flags = nil}
 
   var expireTimer: UInt32 {
-    get {return _storage._expireTimer ?? 0}
-    set {_uniqueStorage()._expireTimer = newValue}
+    get {return _expireTimer ?? 0}
+    set {_expireTimer = newValue}
   }
   /// Returns true if `expireTimer` has been explicitly set.
-  var hasExpireTimer: Bool {return _storage._expireTimer != nil}
+  var hasExpireTimer: Bool {return self._expireTimer != nil}
   /// Clears the value of `expireTimer`. Subsequent reads from it will return its default value.
-  mutating func clearExpireTimer() {_uniqueStorage()._expireTimer = nil}
+  mutating func clearExpireTimer() {self._expireTimer = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -273,7 +261,9 @@ struct Signal_DataMessage {
 
   init() {}
 
-  fileprivate var _storage = _StorageClass.defaultInstance
+  fileprivate var _body: String? = nil
+  fileprivate var _flags: UInt32? = nil
+  fileprivate var _expireTimer: UInt32? = nil
 }
 
 #if swift(>=4.2)
@@ -573,231 +563,6 @@ struct Signal_AttachmentPointer {
   fileprivate var _key: Data? = nil
 }
 
-struct Signal_GroupContext {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  var id: Data {
-    get {return _storage._id ?? SwiftProtobuf.Internal.emptyData}
-    set {_uniqueStorage()._id = newValue}
-  }
-  /// Returns true if `id` has been explicitly set.
-  var hasID: Bool {return _storage._id != nil}
-  /// Clears the value of `id`. Subsequent reads from it will return its default value.
-  mutating func clearID() {_uniqueStorage()._id = nil}
-
-  var type: Signal_GroupContext.TypeEnum {
-    get {return _storage._type ?? .unknown}
-    set {_uniqueStorage()._type = newValue}
-  }
-  /// Returns true if `type` has been explicitly set.
-  var hasType: Bool {return _storage._type != nil}
-  /// Clears the value of `type`. Subsequent reads from it will return its default value.
-  mutating func clearType() {_uniqueStorage()._type = nil}
-
-  var name: String {
-    get {return _storage._name ?? String()}
-    set {_uniqueStorage()._name = newValue}
-  }
-  /// Returns true if `name` has been explicitly set.
-  var hasName: Bool {return _storage._name != nil}
-  /// Clears the value of `name`. Subsequent reads from it will return its default value.
-  mutating func clearName() {_uniqueStorage()._name = nil}
-
-  var members: [String] {
-    get {return _storage._members}
-    set {_uniqueStorage()._members = newValue}
-  }
-
-  var avatar: Signal_AttachmentPointer {
-    get {return _storage._avatar ?? Signal_AttachmentPointer()}
-    set {_uniqueStorage()._avatar = newValue}
-  }
-  /// Returns true if `avatar` has been explicitly set.
-  var hasAvatar: Bool {return _storage._avatar != nil}
-  /// Clears the value of `avatar`. Subsequent reads from it will return its default value.
-  mutating func clearAvatar() {_uniqueStorage()._avatar = nil}
-
-  var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  enum TypeEnum: SwiftProtobuf.Enum {
-    typealias RawValue = Int
-    case unknown // = 0
-    case update // = 1
-    case deliver // = 2
-    case quit // = 3
-
-    init() {
-      self = .unknown
-    }
-
-    init?(rawValue: Int) {
-      switch rawValue {
-      case 0: self = .unknown
-      case 1: self = .update
-      case 2: self = .deliver
-      case 3: self = .quit
-      default: return nil
-      }
-    }
-
-    var rawValue: Int {
-      switch self {
-      case .unknown: return 0
-      case .update: return 1
-      case .deliver: return 2
-      case .quit: return 3
-      }
-    }
-
-  }
-
-  init() {}
-
-  fileprivate var _storage = _StorageClass.defaultInstance
-}
-
-#if swift(>=4.2)
-
-extension Signal_GroupContext.TypeEnum: CaseIterable {
-  // Support synthesized by the compiler.
-}
-
-#endif  // swift(>=4.2)
-
-struct Signal_Avatar {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  var contentType: String {
-    get {return _contentType ?? String()}
-    set {_contentType = newValue}
-  }
-  /// Returns true if `contentType` has been explicitly set.
-  var hasContentType: Bool {return self._contentType != nil}
-  /// Clears the value of `contentType`. Subsequent reads from it will return its default value.
-  mutating func clearContentType() {self._contentType = nil}
-
-  var length: UInt32 {
-    get {return _length ?? 0}
-    set {_length = newValue}
-  }
-  /// Returns true if `length` has been explicitly set.
-  var hasLength: Bool {return self._length != nil}
-  /// Clears the value of `length`. Subsequent reads from it will return its default value.
-  mutating func clearLength() {self._length = nil}
-
-  var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  init() {}
-
-  fileprivate var _contentType: String? = nil
-  fileprivate var _length: UInt32? = nil
-}
-
-struct Signal_GroupDetails {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  var id: Data {
-    get {return _storage._id ?? SwiftProtobuf.Internal.emptyData}
-    set {_uniqueStorage()._id = newValue}
-  }
-  /// Returns true if `id` has been explicitly set.
-  var hasID: Bool {return _storage._id != nil}
-  /// Clears the value of `id`. Subsequent reads from it will return its default value.
-  mutating func clearID() {_uniqueStorage()._id = nil}
-
-  var name: String {
-    get {return _storage._name ?? String()}
-    set {_uniqueStorage()._name = newValue}
-  }
-  /// Returns true if `name` has been explicitly set.
-  var hasName: Bool {return _storage._name != nil}
-  /// Clears the value of `name`. Subsequent reads from it will return its default value.
-  mutating func clearName() {_uniqueStorage()._name = nil}
-
-  var members: [String] {
-    get {return _storage._members}
-    set {_uniqueStorage()._members = newValue}
-  }
-
-  var avatar: Signal_Avatar {
-    get {return _storage._avatar ?? Signal_Avatar()}
-    set {_uniqueStorage()._avatar = newValue}
-  }
-  /// Returns true if `avatar` has been explicitly set.
-  var hasAvatar: Bool {return _storage._avatar != nil}
-  /// Clears the value of `avatar`. Subsequent reads from it will return its default value.
-  mutating func clearAvatar() {_uniqueStorage()._avatar = nil}
-
-  var active: Bool {
-    get {return _storage._active ?? true}
-    set {_uniqueStorage()._active = newValue}
-  }
-  /// Returns true if `active` has been explicitly set.
-  var hasActive: Bool {return _storage._active != nil}
-  /// Clears the value of `active`. Subsequent reads from it will return its default value.
-  mutating func clearActive() {_uniqueStorage()._active = nil}
-
-  var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  init() {}
-
-  fileprivate var _storage = _StorageClass.defaultInstance
-}
-
-struct Signal_ContactDetails {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  var addr: String {
-    get {return _storage._addr ?? String()}
-    set {_uniqueStorage()._addr = newValue}
-  }
-  /// Returns true if `addr` has been explicitly set.
-  var hasAddr: Bool {return _storage._addr != nil}
-  /// Clears the value of `addr`. Subsequent reads from it will return its default value.
-  mutating func clearAddr() {_uniqueStorage()._addr = nil}
-
-  var name: String {
-    get {return _storage._name ?? String()}
-    set {_uniqueStorage()._name = newValue}
-  }
-  /// Returns true if `name` has been explicitly set.
-  var hasName: Bool {return _storage._name != nil}
-  /// Clears the value of `name`. Subsequent reads from it will return its default value.
-  mutating func clearName() {_uniqueStorage()._name = nil}
-
-  var avatar: Signal_Avatar {
-    get {return _storage._avatar ?? Signal_Avatar()}
-    set {_uniqueStorage()._avatar = newValue}
-  }
-  /// Returns true if `avatar` has been explicitly set.
-  var hasAvatar: Bool {return _storage._avatar != nil}
-  /// Clears the value of `avatar`. Subsequent reads from it will return its default value.
-  mutating func clearAvatar() {_uniqueStorage()._avatar = nil}
-
-  var color: String {
-    get {return _storage._color ?? String()}
-    set {_uniqueStorage()._color = newValue}
-  }
-  /// Returns true if `color` has been explicitly set.
-  var hasColor: Bool {return _storage._color != nil}
-  /// Clears the value of `color`. Subsequent reads from it will return its default value.
-  mutating func clearColor() {_uniqueStorage()._color = nil}
-
-  var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  init() {}
-
-  fileprivate var _storage = _StorageClass.defaultInstance
-}
-
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 fileprivate let _protobuf_package = "signal"
@@ -963,89 +728,43 @@ extension Signal_DataMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "body"),
     2: .same(proto: "attachments"),
-    3: .same(proto: "group"),
     4: .same(proto: "flags"),
     5: .same(proto: "expireTimer"),
   ]
 
-  fileprivate class _StorageClass {
-    var _body: String? = nil
-    var _attachments: [Signal_AttachmentPointer] = []
-    var _group: Signal_GroupContext? = nil
-    var _flags: UInt32? = nil
-    var _expireTimer: UInt32? = nil
-
-    static let defaultInstance = _StorageClass()
-
-    private init() {}
-
-    init(copying source: _StorageClass) {
-      _body = source._body
-      _attachments = source._attachments
-      _group = source._group
-      _flags = source._flags
-      _expireTimer = source._expireTimer
-    }
-  }
-
-  fileprivate mutating func _uniqueStorage() -> _StorageClass {
-    if !isKnownUniquelyReferenced(&_storage) {
-      _storage = _StorageClass(copying: _storage)
-    }
-    return _storage
-  }
-
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    _ = _uniqueStorage()
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      while let fieldNumber = try decoder.nextFieldNumber() {
-        switch fieldNumber {
-        case 1: try decoder.decodeSingularStringField(value: &_storage._body)
-        case 2: try decoder.decodeRepeatedMessageField(value: &_storage._attachments)
-        case 3: try decoder.decodeSingularMessageField(value: &_storage._group)
-        case 4: try decoder.decodeSingularUInt32Field(value: &_storage._flags)
-        case 5: try decoder.decodeSingularUInt32Field(value: &_storage._expireTimer)
-        default: break
-        }
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      switch fieldNumber {
+      case 1: try decoder.decodeSingularStringField(value: &self._body)
+      case 2: try decoder.decodeRepeatedMessageField(value: &self.attachments)
+      case 4: try decoder.decodeSingularUInt32Field(value: &self._flags)
+      case 5: try decoder.decodeSingularUInt32Field(value: &self._expireTimer)
+      default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      if let v = _storage._body {
-        try visitor.visitSingularStringField(value: v, fieldNumber: 1)
-      }
-      if !_storage._attachments.isEmpty {
-        try visitor.visitRepeatedMessageField(value: _storage._attachments, fieldNumber: 2)
-      }
-      if let v = _storage._group {
-        try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-      }
-      if let v = _storage._flags {
-        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-      }
-      if let v = _storage._expireTimer {
-        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
-      }
+    if let v = self._body {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
+    }
+    if !self.attachments.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.attachments, fieldNumber: 2)
+    }
+    if let v = self._flags {
+      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
+    }
+    if let v = self._expireTimer {
+      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 5)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: Signal_DataMessage, rhs: Signal_DataMessage) -> Bool {
-    if lhs._storage !== rhs._storage {
-      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
-        let _storage = _args.0
-        let rhs_storage = _args.1
-        if _storage._body != rhs_storage._body {return false}
-        if _storage._attachments != rhs_storage._attachments {return false}
-        if _storage._group != rhs_storage._group {return false}
-        if _storage._flags != rhs_storage._flags {return false}
-        if _storage._expireTimer != rhs_storage._expireTimer {return false}
-        return true
-      }
-      if !storagesAreEqual {return false}
-    }
+    if lhs._body != rhs._body {return false}
+    if lhs.attachments != rhs.attachments {return false}
+    if lhs._flags != rhs._flags {return false}
+    if lhs._expireTimer != rhs._expireTimer {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -1504,321 +1223,6 @@ extension Signal_AttachmentPointer: SwiftProtobuf.Message, SwiftProtobuf._Messag
     if lhs._id != rhs._id {return false}
     if lhs._contentType != rhs._contentType {return false}
     if lhs._key != rhs._key {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-extension Signal_GroupContext: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GroupContext"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "id"),
-    2: .same(proto: "type"),
-    3: .same(proto: "name"),
-    4: .same(proto: "members"),
-    5: .same(proto: "avatar"),
-  ]
-
-  fileprivate class _StorageClass {
-    var _id: Data? = nil
-    var _type: Signal_GroupContext.TypeEnum? = nil
-    var _name: String? = nil
-    var _members: [String] = []
-    var _avatar: Signal_AttachmentPointer? = nil
-
-    static let defaultInstance = _StorageClass()
-
-    private init() {}
-
-    init(copying source: _StorageClass) {
-      _id = source._id
-      _type = source._type
-      _name = source._name
-      _members = source._members
-      _avatar = source._avatar
-    }
-  }
-
-  fileprivate mutating func _uniqueStorage() -> _StorageClass {
-    if !isKnownUniquelyReferenced(&_storage) {
-      _storage = _StorageClass(copying: _storage)
-    }
-    return _storage
-  }
-
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    _ = _uniqueStorage()
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      while let fieldNumber = try decoder.nextFieldNumber() {
-        switch fieldNumber {
-        case 1: try decoder.decodeSingularBytesField(value: &_storage._id)
-        case 2: try decoder.decodeSingularEnumField(value: &_storage._type)
-        case 3: try decoder.decodeSingularStringField(value: &_storage._name)
-        case 4: try decoder.decodeRepeatedStringField(value: &_storage._members)
-        case 5: try decoder.decodeSingularMessageField(value: &_storage._avatar)
-        default: break
-        }
-      }
-    }
-  }
-
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      if let v = _storage._id {
-        try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
-      }
-      if let v = _storage._type {
-        try visitor.visitSingularEnumField(value: v, fieldNumber: 2)
-      }
-      if let v = _storage._name {
-        try visitor.visitSingularStringField(value: v, fieldNumber: 3)
-      }
-      if !_storage._members.isEmpty {
-        try visitor.visitRepeatedStringField(value: _storage._members, fieldNumber: 4)
-      }
-      if let v = _storage._avatar {
-        try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
-      }
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  static func ==(lhs: Signal_GroupContext, rhs: Signal_GroupContext) -> Bool {
-    if lhs._storage !== rhs._storage {
-      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
-        let _storage = _args.0
-        let rhs_storage = _args.1
-        if _storage._id != rhs_storage._id {return false}
-        if _storage._type != rhs_storage._type {return false}
-        if _storage._name != rhs_storage._name {return false}
-        if _storage._members != rhs_storage._members {return false}
-        if _storage._avatar != rhs_storage._avatar {return false}
-        return true
-      }
-      if !storagesAreEqual {return false}
-    }
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-extension Signal_GroupContext.TypeEnum: SwiftProtobuf._ProtoNameProviding {
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    0: .same(proto: "UNKNOWN"),
-    1: .same(proto: "UPDATE"),
-    2: .same(proto: "DELIVER"),
-    3: .same(proto: "QUIT"),
-  ]
-}
-
-extension Signal_Avatar: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".Avatar"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "contentType"),
-    2: .same(proto: "length"),
-  ]
-
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      switch fieldNumber {
-      case 1: try decoder.decodeSingularStringField(value: &self._contentType)
-      case 2: try decoder.decodeSingularUInt32Field(value: &self._length)
-      default: break
-      }
-    }
-  }
-
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._contentType {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
-    }
-    if let v = self._length {
-      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  static func ==(lhs: Signal_Avatar, rhs: Signal_Avatar) -> Bool {
-    if lhs._contentType != rhs._contentType {return false}
-    if lhs._length != rhs._length {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-extension Signal_GroupDetails: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GroupDetails"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "id"),
-    2: .same(proto: "name"),
-    3: .same(proto: "members"),
-    4: .same(proto: "avatar"),
-    5: .same(proto: "active"),
-  ]
-
-  fileprivate class _StorageClass {
-    var _id: Data? = nil
-    var _name: String? = nil
-    var _members: [String] = []
-    var _avatar: Signal_Avatar? = nil
-    var _active: Bool? = nil
-
-    static let defaultInstance = _StorageClass()
-
-    private init() {}
-
-    init(copying source: _StorageClass) {
-      _id = source._id
-      _name = source._name
-      _members = source._members
-      _avatar = source._avatar
-      _active = source._active
-    }
-  }
-
-  fileprivate mutating func _uniqueStorage() -> _StorageClass {
-    if !isKnownUniquelyReferenced(&_storage) {
-      _storage = _StorageClass(copying: _storage)
-    }
-    return _storage
-  }
-
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    _ = _uniqueStorage()
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      while let fieldNumber = try decoder.nextFieldNumber() {
-        switch fieldNumber {
-        case 1: try decoder.decodeSingularBytesField(value: &_storage._id)
-        case 2: try decoder.decodeSingularStringField(value: &_storage._name)
-        case 3: try decoder.decodeRepeatedStringField(value: &_storage._members)
-        case 4: try decoder.decodeSingularMessageField(value: &_storage._avatar)
-        case 5: try decoder.decodeSingularBoolField(value: &_storage._active)
-        default: break
-        }
-      }
-    }
-  }
-
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      if let v = _storage._id {
-        try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
-      }
-      if let v = _storage._name {
-        try visitor.visitSingularStringField(value: v, fieldNumber: 2)
-      }
-      if !_storage._members.isEmpty {
-        try visitor.visitRepeatedStringField(value: _storage._members, fieldNumber: 3)
-      }
-      if let v = _storage._avatar {
-        try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
-      }
-      if let v = _storage._active {
-        try visitor.visitSingularBoolField(value: v, fieldNumber: 5)
-      }
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  static func ==(lhs: Signal_GroupDetails, rhs: Signal_GroupDetails) -> Bool {
-    if lhs._storage !== rhs._storage {
-      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
-        let _storage = _args.0
-        let rhs_storage = _args.1
-        if _storage._id != rhs_storage._id {return false}
-        if _storage._name != rhs_storage._name {return false}
-        if _storage._members != rhs_storage._members {return false}
-        if _storage._avatar != rhs_storage._avatar {return false}
-        if _storage._active != rhs_storage._active {return false}
-        return true
-      }
-      if !storagesAreEqual {return false}
-    }
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-extension Signal_ContactDetails: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".ContactDetails"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "addr"),
-    2: .same(proto: "name"),
-    3: .same(proto: "avatar"),
-    4: .same(proto: "color"),
-  ]
-
-  fileprivate class _StorageClass {
-    var _addr: String? = nil
-    var _name: String? = nil
-    var _avatar: Signal_Avatar? = nil
-    var _color: String? = nil
-
-    static let defaultInstance = _StorageClass()
-
-    private init() {}
-
-    init(copying source: _StorageClass) {
-      _addr = source._addr
-      _name = source._name
-      _avatar = source._avatar
-      _color = source._color
-    }
-  }
-
-  fileprivate mutating func _uniqueStorage() -> _StorageClass {
-    if !isKnownUniquelyReferenced(&_storage) {
-      _storage = _StorageClass(copying: _storage)
-    }
-    return _storage
-  }
-
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    _ = _uniqueStorage()
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      while let fieldNumber = try decoder.nextFieldNumber() {
-        switch fieldNumber {
-        case 1: try decoder.decodeSingularStringField(value: &_storage._addr)
-        case 2: try decoder.decodeSingularStringField(value: &_storage._name)
-        case 3: try decoder.decodeSingularMessageField(value: &_storage._avatar)
-        case 4: try decoder.decodeSingularStringField(value: &_storage._color)
-        default: break
-        }
-      }
-    }
-  }
-
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      if let v = _storage._addr {
-        try visitor.visitSingularStringField(value: v, fieldNumber: 1)
-      }
-      if let v = _storage._name {
-        try visitor.visitSingularStringField(value: v, fieldNumber: 2)
-      }
-      if let v = _storage._avatar {
-        try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-      }
-      if let v = _storage._color {
-        try visitor.visitSingularStringField(value: v, fieldNumber: 4)
-      }
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  static func ==(lhs: Signal_ContactDetails, rhs: Signal_ContactDetails) -> Bool {
-    if lhs._storage !== rhs._storage {
-      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
-        let _storage = _args.0
-        let rhs_storage = _args.1
-        if _storage._addr != rhs_storage._addr {return false}
-        if _storage._name != rhs_storage._name {return false}
-        if _storage._avatar != rhs_storage._avatar {return false}
-        if _storage._color != rhs_storage._color {return false}
-        return true
-      }
-      if !storagesAreEqual {return false}
-    }
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

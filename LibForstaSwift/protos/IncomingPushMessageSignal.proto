@@ -1,3 +1,5 @@
+syntax = "proto2";
+
 package signal;
 
 message Envelope {
@@ -33,7 +35,6 @@ message DataMessage {
 
   optional string             body        = 1;
   repeated AttachmentPointer  attachments = 2;
-  optional GroupContext       group       = 3;
   optional uint32             flags       = 4;
   optional uint32             expireTimer = 5;
 }
@@ -84,38 +85,4 @@ message AttachmentPointer {
   optional fixed64 id          = 1;
   optional string  contentType = 2;
   optional bytes   key         = 3;
-}
-
-message GroupContext {
-  enum Type {
-    UNKNOWN = 0;
-    UPDATE  = 1;
-    DELIVER = 2;
-    QUIT    = 3;
-  }
-  optional bytes             id      = 1;
-  optional Type              type    = 2;
-  optional string            name    = 3;
-  repeated string            members = 4;
-  optional AttachmentPointer avatar  = 5;
-}
-
-message Avatar {
-  optional string contentType = 1;
-  optional uint32 length      = 2;
-}
-
-message GroupDetails {
-  optional bytes  id      = 1;
-  optional string name    = 2;
-  repeated string members = 3;
-  optional Avatar avatar  = 4;
-  optional bool   active  = 5 [default = true];
-}
-
-message ContactDetails {
-  optional string addr   = 1;
-  optional string name   = 2;
-  optional Avatar avatar = 3;
-  optional string color  = 4;
 }
