@@ -78,9 +78,8 @@ protocol Sendable {
     var messageRef: UUID? { get }
 }
 
-func TextMessageData(plain: String? = nil, html: String? = nil) -> JSON {
-    var body: [[String:String]] = []
-    if plain != nil { body.append(["type": "text/plain", "value": plain!]) }
+func TextMessageData(plain: String, html: String? = nil) -> JSON {
+    var body = [["type": "text/plain", "value": plain]]
     if html != nil { body.append(["type": "text/html", "value": html!]) }
     return JSON(["body" : body])
 }
