@@ -17,9 +17,6 @@ public enum ForstaErrorType: String {
     /// Unknown errors should only be thrown of no other, more descriptive error type exists
     case unknown = "Unknown"
 
-    /// Curve25519 functions returned an error
-    case curveError = "Curve25519"
-
     /// The local storage implementation produced an error
     case storageError = "Storage"
 

@@ -103,10 +103,10 @@ public class MessageReceiver {
         do {
             let signalingKey = signalClient.kvstore.get(DNK.ssSignalingKey)
             guard request.body != nil else {
-                throw LibForstaError.internalError(why: "No body for incoming request.")
+                throw ForstaError(.invalidMessage, "No body for incoming WS request.")
             }
             guard signalingKey != nil else {
-                throw LibForstaError.internalError(why: "No signaling key established.")
+                throw ForstaError(.decryptionError, "No signaling key established.")
             }
             let data = try decryptWebSocketMessage(message: request.body!, signalingKey: signalingKey!)
             let envelope = try Signal_Envelope(serializedData: data)
@@ -117,9 +117,9 @@ public class MessageReceiver {
             } else if envelope.hasContent {
                 try handleContentMessage(envelope)
             } else if envelope.hasLegacyMessage {
-                try handleLegacyMessage(envelope)
+                throw ForstaError(.legacyMessage, "Legacy signal messages not supported.")
             } else {
-                throw LibForstaError.internalError(why: "Received message with no content.")
+                throw ForstaError(.invalidMessage, "Received message with no content.")
             }
             let _ = request.respond(status: 200, message: "OK")
         } catch let error {
@@ -147,7 +147,7 @@ public class MessageReceiver {
             var receipts = [ReadSyncReceipt]()
             for r in content.syncMessage.read {
                 guard let sender: UUID = UUID(uuidString: r.sender) else {
-                    throw LibForstaError.internalError(why: "Received sync message with malformed read receipt sender: \(r.sender).")
+                    throw ForstaError(.invalidMessage, "Synced read-receipt has malformed sender: \(r.sender)")
                 }
                 let timestamp: Date = Date(millisecondsSince1970: r.timestamp)
                 receipts.append(ReadSyncReceipt(sender, timestamp))
@@ -174,12 +174,8 @@ public class MessageReceiver {
         }
         
         if !happy {
-            throw LibForstaError.internalError(why: "Received content message with no dataMessage or syncMessage.")
+            throw ForstaError(.invalidMessage, "Inbound content message has no dataMessage or syncMessage.")
         }
-    }
-    
-    private func handleLegacyMessage(_ envelope: Signal_Envelope) throws {
-        throw LibForstaError.internalError(why: "Not implemented.")
     }
     
     /// Internal: Axolotl-decrypt an incoming envelope's content
@@ -192,40 +188,40 @@ public class MessageReceiver {
         } else if envelope.type == .ciphertext {
             plainText = try sessionCipher.decrypt(signalMessage: cyphertext)
         } else {
-            throw LibForstaError.internalError(why: "Unknown buffer type: \(envelope.type)")
+            throw ForstaError(.invalidMessage, "Invalid envelope type: \(envelope.type)")
         }
         return try unpad(paddedPlaintext: plainText)
     }
     
     /// Internal: Unpad an incoming envelope's plaintext after decrypting
-    private func unpad(paddedPlaintext: Data) throws -> Data {
+    private func unpad(paddedPlaintext: Data, terminator: UInt8 = 0x80) throws -> Data {
         for idx in (0...paddedPlaintext.count-1).reversed() {
             if paddedPlaintext[idx] == 0x00 { continue }
-            else if paddedPlaintext[idx] == 0x80 {
+            else if paddedPlaintext[idx] == terminator {
                 return paddedPlaintext.prefix(upTo: idx)
             } else {
-                throw LibForstaError.internalError(why: "Invalid padding.")
+                throw ForstaError(.decryptionError, "Invalid padding terminator.")
             }
         }
-        throw LibForstaError.internalError(why: "Invalid buffer.")
+        throw ForstaError(.decryptionError, "Padding with no content.")
     }
     
     private func verifyWSMessageMAC(data: Data, key: Data, expectedMAC: Data) throws {
         let calculatedMAC = signalClient.crypto.hmacSHA256(for: data, with: key)
         if calculatedMAC[..<expectedMAC.count] != expectedMAC {
-            throw LibForstaError.internalError(why: "Bad MAC")
+            throw ForstaError(.invalidMac)
         }
     }
     
     private func decryptWebSocketMessage(message: Data, signalingKey: Data) throws -> Data {
         guard signalingKey.count == 52 else {
-            throw LibForstaError.internalError(why: "Invalid signalKey length.")
+            throw ForstaError(.invalidKey, "Invalid signaling key length.")
         }
         guard message.count >= 1 + 16 + 10 else {
-            throw LibForstaError.internalError(why: "Invalid message length.")
+            throw ForstaError(.invalidLength, "Invalid message length.")
         }
         guard message[0] == 1 else {
-            throw LibForstaError.internalError(why: "Invalid message version number \(message[0]).")
+            throw ForstaError(.invalidMessage, "Message version number \(message[0]) != 1.")
         }
         
         let aesKey = signalingKey[0...31]
