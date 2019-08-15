@@ -168,6 +168,22 @@ class SignalClient {
             parameters: parameters)
     }
     
+    /// Request delivery of an encrypted message to all of a user's devices
+    ///
+    /// Expects parameters to include:
+    ///    - "type": Signal_Envelope.TypeEnum (int)
+    ///    - "content": encrypted message (base64 encoded)
+    ///    - "destinationRegistrationId": registration ID of destination (uint32)
+    ///    - "destinationDeviceId": device ID of destination (int32)
+    ///    - "timestamp": timestamp of the message (uint64, ms since 1970)
+    func deliverToUser(userId: UUID, parameters: [String: Any]) -> Promise<(Int, JSON)> {
+        return self.request(
+            .messages,
+            urlParameters: "/\(userId.lcString)",
+            method: .put,
+            parameters: parameters)
+    }
+    
     /// Get prekey bundle for a specific device
     func getKeysForAddr(_ addr: SignalAddress) -> Promise<[SessionPreKeyBundle]> {
         return getKeysForAddr(addr: addr.name, deviceId: UInt32(addr.deviceId))

@@ -54,8 +54,8 @@ enum FLIControlMessageType: String {
 }
 
 enum MessageRecipient {
-    case device(address: SignalAddress)
-    case user(address: UUID)
+    case device(_ address: SignalAddress)
+    case user(_ address: UUID)
 }
 
 protocol Sendable {

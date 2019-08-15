@@ -174,7 +174,7 @@ class SignalClientTests: XCTestCase {
             }
             
             
-            response.recipients.append(.device(address: inboundMessage!.source))
+            response.recipients.append(.device(inboundMessage!.source))
             print(response)
             sender.send(response)
                 .done { result in
@@ -195,7 +195,7 @@ class SignalClientTests: XCTestCase {
     
     func watchEverything() {
         let _ = NotificationCenter.default.addObserver(
-            forName: .signalEmptyQueue,
+            forName: .signalQueueEmpty,
             object: nil,
             queue: nil) { _ in
                 print(">>> message queue is empty")
@@ -205,7 +205,8 @@ class SignalClientTests: XCTestCase {
             forName: .signalIdentityKeyChanged,
             object: nil,
             queue: nil) { notification in
-                print(">>> identity key changed [todo: get rest of info]")
+                let address = notification.userInfo?["address"] as! SignalAddress
+                print(">>> identity key changed", address)
         }
         
         let _ = NotificationCenter.default.addObserver(
@@ -213,7 +214,7 @@ class SignalClientTests: XCTestCase {
             object: nil,
             queue: nil) { notification in
                 let receipt = notification.userInfo?["deliveryReceipt"] as! DeliveryReceipt
-                print(">>> ", receipt)
+                print(">>>", receipt)
         }
         
         let _ = NotificationCenter.default.addObserver(
@@ -221,7 +222,7 @@ class SignalClientTests: XCTestCase {
             object: nil,
             queue: nil) { notification in
                 let inboundMessage = notification.userInfo?["inboundMessage"] as! InboundMessage
-                print(">>> ", inboundMessage)
+                print(">>>", inboundMessage)
         }
         
         let _ = NotificationCenter.default.addObserver(
@@ -229,7 +230,7 @@ class SignalClientTests: XCTestCase {
             object: nil,
             queue: nil) { notification in
                 let receipts = notification.userInfo?["readSyncReceipts"] as! [ReadSyncReceipt]
-                print(">>> ", receipts)
+                print(">>>", receipts)
         }
     }
     
@@ -262,7 +263,7 @@ class SignalClientTests: XCTestCase {
             
             let connectified = XCTestExpectation()
             let dataMessageObserver = NotificationCenter.default.addObserver(
-                forName: .signalEmptyQueue,
+                forName: .signalQueueEmpty,
                 object: nil,
                 queue: nil) { _ in
                     connectified.fulfill()
@@ -282,8 +283,7 @@ class SignalClientTests: XCTestCase {
                                   senderDeviceId: myDeviceId ?? 0,
                                   distributionExpression: "(<2b53e98b-170f-4102-9d82-e43d5abb7998>+<e98bf10d-528f-44c4-99cd-c488385771cc>)",
                                   data: TextMessageData(plain: "Hello, world!"))
-            let theirUserId = "bd1f7e2d-55f5-4a3b-933d-ab7cf51503ca"
-            let theirDeviceId = 1
+            message.recipients.append(MessageRecipient.device(SignalAddress(userId: "bd1f7e2d-55f5-4a3b-933d-ab7cf51503ca", deviceId: 1)))
 
             let receiptReceived = XCTestExpectation()
             let receiptObserver = NotificationCenter.default.addObserver(
@@ -296,27 +296,18 @@ class SignalClientTests: XCTestCase {
             defer { NotificationCenter.default.removeObserver(receiptObserver) }
 
             let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
-            signalClient.getKeysForAddr(addr: theirUserId)
-                .map { result in
-                    print("GOT KEYS FOR ALL DEVICES", result)
-                    for bundle in result {
-                        let addr = SignalAddress(name: theirUserId, deviceId: bundle.deviceId)
-                        try SessionBuilder(for: addr, in: signalClient.store).process(preKeyBundle: bundle)
-                        message.recipients.append(.device(address: addr))
-                    }
-                    print("sending message", message)
-                }
-                .then {
-                    sender.send(message)
+            print("sending message", message)
+            sender.send(message)
+                .done { response in
+                    print("message sent:", response)
                 }
                 .catch { error in
                     XCTFail("error \(error)")
                 }
                 .finally {
-                    print("message sent!")
                     // theGoodPart.fulfill()
             }
-            
+
             wait(for: [theGoodPart], timeout: 2 * 60.0)
             wsr.disconnect()
         } catch let error {

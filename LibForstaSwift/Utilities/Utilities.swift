@@ -21,6 +21,7 @@ extension Notification.Name {
     static let atlasCredentialExpired = Notification.Name("atlasCredentialExpired")
     
     /// Identity key changed on an incoming message
+    /// -- includes "address" of type SignalAddress
     static let signalIdentityKeyChanged = Notification.Name("signalIdentityKeyChanged")
     
     /// Incoming delivery receipt
@@ -37,7 +38,7 @@ extension Notification.Name {
 
     /// Incoming queue is now empty
     /// -- includes no extra data
-    static let signalEmptyQueue = Notification.Name("signalEmptyQueue")
+    static let signalQueueEmpty = Notification.Name("signalQueueEmpty")
 }
 
 
