@@ -13,7 +13,7 @@ import CommonCrypto
 import SignalProtocol
 
 
-extension Notification.Name {
+public extension Notification.Name {
     /// Atlas credential has been set in the KV store.
     static let atlasCredentialSet = Notification.Name("atlasCredentialSet")
     

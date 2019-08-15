@@ -13,7 +13,7 @@ import Starscream
 import SignalProtocol
 
 
-class ReadSyncReceipt: CustomStringConvertible {
+public class ReadSyncReceipt: CustomStringConvertible {
     let sender: UUID
     let timestamp: Date
     
@@ -21,12 +21,12 @@ class ReadSyncReceipt: CustomStringConvertible {
         self.sender = sender
         self.timestamp = timestamp
     }
-    var description: String {
+    public var description: String {
         return "ReadSyncReceipt(\(self.sender) @ \(self.timestamp ))"
     }
 }
 
-class DeliveryReceipt: CustomStringConvertible {
+public class DeliveryReceipt: CustomStringConvertible {
     let address: SignalAddress
     let timestamp: Date
     
@@ -34,12 +34,12 @@ class DeliveryReceipt: CustomStringConvertible {
         self.address = address
         self.timestamp = timestamp
     }
-    var description: String {
+    public var description: String {
         return "DeliveryReceipt(\(self.address) @ \(self.timestamp ))"
     }
 }
 
-class InboundMessage: CustomStringConvertible {
+public class InboundMessage: CustomStringConvertible {
     var source: SignalAddress
     var timestamp: Date
     var expiration: TimeInterval?
@@ -70,7 +70,7 @@ class InboundMessage: CustomStringConvertible {
         self.destination = destination
     }
     
-    var description: String {
+    public var description: String {
         return """
         InboundMessage from \(source) @ \(timestamp) good for \(expiration ?? -1)
         \((body.rawString() ?? "<malformed body>").indentWith(">>> "))
@@ -78,7 +78,7 @@ class InboundMessage: CustomStringConvertible {
     }
 }
 
-class MessageReceiver {
+public class MessageReceiver {
     let signalClient: SignalClient
     let wsr: WebSocketResource
     

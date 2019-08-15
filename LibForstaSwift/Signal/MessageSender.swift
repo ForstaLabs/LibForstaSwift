@@ -13,7 +13,7 @@ import Starscream
 import SignalProtocol
 
 
-class MessageSender {
+public class MessageSender {
     let signalClient: SignalClient
     let wsr: WebSocketResource
     
@@ -23,7 +23,7 @@ class MessageSender {
     }
     
     /// Transmit a Sendable (i.e., a message)
-    func send(_ message: Sendable) -> Promise<JSON> {
+    public func send(_ message: Sendable) -> Promise<JSON> {
         return firstly { () -> Promise<JSON> in
             var results: [Promise<JSON>] = []
             var messageData = try message.contentProto.serializedData()

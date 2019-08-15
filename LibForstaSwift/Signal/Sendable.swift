@@ -13,19 +13,19 @@ import Starscream
 import SignalProtocol
 
 
-enum FLIMessageType: String {
+public enum FLIMessageType: String {
     case control = "control"
     case content = "content"
     case poll = "poll"
     case pollResponse = "pollResponse"
 }
 
-enum FLIThreadType: String {
+public enum FLIThreadType: String {
     case conversation = "conversation"
     case announcement = "announcement"
 }
 
-enum FLIControlMessageType: String {
+public enum FLIControlMessageType: String {
     case threadUpdate = "threadUpdate"
     case threadClear = "threadClear"
     case threadArchive = "threadArchive"
@@ -53,12 +53,12 @@ enum FLIControlMessageType: String {
     case callICECandidates = "callICECandidates"
 }
 
-enum MessageRecipient {
+public enum MessageRecipient {
     case device(_ address: SignalAddress)
     case user(_ address: UUID)
 }
 
-protocol Sendable {
+public protocol Sendable {
     var recipients: [MessageRecipient] { get }
     
     var timestamp: Date { get }
@@ -128,7 +128,7 @@ extension Sendable {
         }
     }
     
-    var description: String {
+    public var description: String {
         return """
         Sendable from \(senderUserId).\(senderDeviceId) @ \(timestamp)
         >>> distribution: \(distributionExpression)

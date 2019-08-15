@@ -298,8 +298,14 @@ class SignalClientTests: XCTestCase {
             let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
             print("sending message", message)
             sender.send(message)
+                .map { response in
+                    print("FIRST message sent:", response)
+                }
+                .then {
+                    sender.send(message)
+                }
                 .done { response in
-                    print("message sent:", response)
+                    print("SECOND message sent:", response)
                 }
                 .catch { error in
                     XCTFail("error \(error)")
