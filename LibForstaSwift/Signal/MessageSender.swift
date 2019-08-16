@@ -26,12 +26,12 @@ public class MessageSender {
     public func send(_ message: Sendable) -> Promise<JSON> {
         return firstly { () -> Promise<JSON> in
             var results: [Promise<JSON>] = []
-            var messageData = try message.contentProto.serializedData()
-            pad(&messageData)
+            var paddedClearData = try message.contentProto.serializedData()
+            pad(&paddedClearData)
             
             for recipient in message.recipients {
                 switch recipient {
-                case .device(let address): results.append(self.sendToDevice(address: address, paddedClearMessage: messageData))
+                case .device(let address): results.append(self.sendToDevice(address: address, paddedClearData: paddedClearData))
                 case .user: continue
                 }
             }
@@ -56,15 +56,15 @@ public class MessageSender {
         }
     }
     
-    /// Encrypt padded clear message, accepting changed identity keys
+    /// Encrypt padded clear data, accepting changed identity keys
     /// Returns CiphertextMessage and remote registration id
-    func encryptWithKeyChangeRecovery(address: SignalAddress, paddedClearMessage: Data) -> Promise<(CiphertextMessage, UInt32)> {
+    func encryptWithKeyChangeRecovery(address: SignalAddress, paddedClearData: Data) -> Promise<(CiphertextMessage, UInt32)> {
         let cipher = SessionCipher(for: address, in: self.signalClient.store)
         var attempts = 0
         repeat {
             attempts += 1
             do {
-                let encryptedMessage = try cipher.encrypt(paddedClearMessage)
+                let encryptedMessage = try cipher.encrypt(paddedClearData)
                 return Promise.value((encryptedMessage, try cipher.remoteRegistrationId()))
             } catch SignalError.untrustedIdentity {
                 NotificationCenter.broadcast(.signalIdentityKeyChanged, ["address": address])
@@ -73,12 +73,12 @@ public class MessageSender {
                 return Promise.init(error: error)
             }
         } while attempts < 2
-        
+
         return Promise.init(error: SignalError.untrustedIdentity)
     }
     
-    /// Send a padded clear message to a specific device, fetching/updating keys as necessary
-    func sendToDevice(address: SignalAddress, paddedClearMessage: Data, retry: Bool = true) -> Promise<JSON> {
+    /// Send a padded clear data to a specific device, fetching/updating keys as necessary
+    func sendToDevice(address: SignalAddress, paddedClearData: Data, retry: Bool = true) -> Promise<JSON> {
         return firstly
             { () -> Promise<Void> in
                 if !self.signalClient.store.sessionStore.containsSession(for: address) {
@@ -88,7 +88,7 @@ public class MessageSender {
                 }
             }
             .then {
-                self.encryptWithKeyChangeRecovery(address: address, paddedClearMessage: paddedClearMessage)
+                self.encryptWithKeyChangeRecovery(address: address, paddedClearData: paddedClearData)
             }
             .map { (encryptedMessage, remoteRegistrationId) -> [String: Any] in
                 [
@@ -106,7 +106,7 @@ public class MessageSender {
                 let (statusCode, json) = result
                 if statusCode == 410 && retry {
                     let _ = self.signalClient.store.sessionStore.deleteSession(for: address) // force an updateKeys on retry
-                    return self.sendToDevice(address: address, paddedClearMessage: paddedClearMessage, retry: false)
+                    return self.sendToDevice(address: address, paddedClearData: paddedClearData, retry: false)
                 } else if statusCode >= 300 {
                     throw ForstaError(.requestRejected, json)
                 }
@@ -114,7 +114,7 @@ public class MessageSender {
         }
     }
     
-    func sendToUser(userId: UUID, paddedClearMessage: Data) -> Promise<(Int, JSON)> {
+    func sendToUser(userId: UUID, paddedClearData: Data) -> Promise<(Int, JSON)> {
         return Promise.value((42, JSON(42)))
     }
     

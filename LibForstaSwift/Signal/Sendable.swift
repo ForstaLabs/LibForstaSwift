@@ -69,6 +69,10 @@ public protocol Sendable {
     var messageType: FLIMessageType { get }
     var threadId: UUID { get }
     var distributionExpression: String { get }
+    
+    var expiration: TimeInterval? { get }
+    var endSessionFlag: Bool { get }
+    var expirationTimerUpdateFlag: Bool { get }
 
     // optional body stuff
     var data: JSON? { get }         // the literal data field of the message exchange payload
@@ -109,21 +113,17 @@ extension Sendable {
             
             var dm = Signal_DataMessage()
             dm.body = body.rawString([.castNilToNSNull: true])!
+            if self.expiration != nil { dm.expireTimer = UInt32(self.expiration!.milliseconds) }
+            var flags: UInt32 = 0
+            if self.endSessionFlag { flags |= UInt32(Signal_DataMessage.Flags.endSession.rawValue) }
+            if self.expirationTimerUpdateFlag { flags |= UInt32(Signal_DataMessage.Flags.expirationTimerUpdate.rawValue) }
+            if flags != 0 { dm.flags = flags }
+            
+            // TODO: set .attachments based on some sort of attachment pointers...
+
             var content = Signal_Content()
             content.dataMessage = dm
-            
-            /*
-             if (this.attachmentPointers && this.attachmentPointers.length) {
-             data.attachments = this.attachmentPointers;
-             }
-             if (this.flags) {
-             data.flags = this.flags;
-             }
-             if (this.expiration) {
-             data.expireTimer = this.expiration;
-             }
-             */
-            
+
             return content;
         }
     }

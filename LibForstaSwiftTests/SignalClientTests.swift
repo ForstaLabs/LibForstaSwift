@@ -28,6 +28,10 @@ class Message: Sendable, CustomStringConvertible {
     public var threadId: UUID
     public var distributionExpression: String
     
+    public var expiration: TimeInterval?
+    public var endSessionFlag: Bool
+    public var expirationTimerUpdateFlag: Bool
+    
     public var data: JSON?
     public var userAgent: String?
     public var threadTitle: String?
@@ -42,6 +46,9 @@ class Message: Sendable, CustomStringConvertible {
          messageType: FLIMessageType = .content,
          threadId: UUID = UUID(),
          distributionExpression: String,
+         expiration: TimeInterval? = nil,
+         endSessionFlag: Bool = false,
+         expirationTimerUpdateFlag: Bool = false,
          data: JSON? = nil,
          userAgent: String = "LibSignalSwift Client",
          threadTitle: String? = nil,
@@ -56,6 +63,9 @@ class Message: Sendable, CustomStringConvertible {
         self.messageType = messageType
         self.threadId = threadId
         self.distributionExpression = distributionExpression
+        self.expiration = expiration
+        self.endSessionFlag = endSessionFlag
+        self.expirationTimerUpdateFlag = expirationTimerUpdateFlag
         self.data = data
         self.userAgent = userAgent
         self.threadTitle = threadTitle

@@ -45,6 +45,8 @@ public class InboundMessage: CustomStringConvertible {
     var expiration: TimeInterval?
     var serverAge: TimeInterval
     var serverReceived: Date
+    var endSessionFlag: Bool
+    var expirationTimerUpdateFlag: Bool
     
     var body: JSON
     
@@ -57,6 +59,8 @@ public class InboundMessage: CustomStringConvertible {
          expiration: TimeInterval? = nil,
          serverAge: TimeInterval,
          serverReceived: Date,
+         endSessionFlag: Bool = false,
+         expirationTimerUpdateFlag: Bool = false,
          body: JSON,
          expirationStart: Date? = nil,
          destination: String? = nil) {
@@ -65,6 +69,8 @@ public class InboundMessage: CustomStringConvertible {
         self.expiration = expiration
         self.serverAge = serverAge
         self.serverReceived = serverReceived
+        self.endSessionFlag = endSessionFlag
+        self.expirationTimerUpdateFlag = expirationTimerUpdateFlag
         self.body = body
         self.expirationStart = expirationStart
         self.destination = destination
@@ -157,6 +163,8 @@ public class MessageReceiver {
         }
         
         if dm != nil {
+            let expirationTimerUpdateFlag = dm!.hasFlags && (dm!.flags & UInt32(Signal_DataMessage.Flags.expirationTimerUpdate.rawValue)) != 0
+            let endSessionFlag = dm!.hasFlags && (dm!.flags & UInt32(Signal_DataMessage.Flags.endSession.rawValue)) != 0
             let msg = InboundMessage(source: SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice),
                                      timestamp: Date(millisecondsSince1970: envelope.timestamp),
                                      expiration: (dm?.hasExpireTimer ?? false)
@@ -164,6 +172,8 @@ public class MessageReceiver {
                                         : nil,
                                      serverAge: TimeInterval(milliseconds: envelope.age),
                                      serverReceived: Date(millisecondsSince1970: envelope.received),
+                                     endSessionFlag: endSessionFlag,
+                                     expirationTimerUpdateFlag: expirationTimerUpdateFlag,
                                      body: try JSON(string: dm?.body ?? "[]"),
                                      expirationStart: (sent?.hasExpirationStartTimestamp ?? false)
                                         ? Date(millisecondsSince1970: sent!.expirationStartTimestamp)
@@ -182,23 +192,23 @@ public class MessageReceiver {
     private func decrypt(_ envelope: Signal_Envelope, _ cyphertext: Data) throws -> Data {
         let addr = SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice)
         let sessionCipher = SessionCipher(for: addr, in: self.signalClient.store)
-        let plainText: Data
+        let paddedClearData: Data
         if envelope.type == .prekeyBundle {
-            plainText = try sessionCipher.decrypt(preKeySignalMessage: cyphertext)
+            paddedClearData = try sessionCipher.decrypt(preKeySignalMessage: cyphertext)
         } else if envelope.type == .ciphertext {
-            plainText = try sessionCipher.decrypt(signalMessage: cyphertext)
+            paddedClearData = try sessionCipher.decrypt(signalMessage: cyphertext)
         } else {
             throw ForstaError(.invalidMessage, "Invalid envelope type: \(envelope.type)")
         }
-        return try unpad(paddedPlaintext: plainText)
+        return try unpad(paddedClearData: paddedClearData)
     }
     
     /// Internal: Unpad an incoming envelope's plaintext after decrypting
-    private func unpad(paddedPlaintext: Data, terminator: UInt8 = 0x80) throws -> Data {
-        for idx in (0...paddedPlaintext.count-1).reversed() {
-            if paddedPlaintext[idx] == 0x00 { continue }
-            else if paddedPlaintext[idx] == terminator {
-                return paddedPlaintext.prefix(upTo: idx)
+    private func unpad(paddedClearData: Data, terminator: UInt8 = 0x80) throws -> Data {
+        for idx in (0...paddedClearData.count-1).reversed() {
+            if paddedClearData[idx] == 0x00 { continue }
+            else if paddedClearData[idx] == terminator {
+                return paddedClearData.prefix(upTo: idx)
             } else {
                 throw ForstaError(.decryptionError, "Invalid padding terminator.")
             }
