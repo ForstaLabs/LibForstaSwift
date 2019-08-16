@@ -55,7 +55,7 @@ extension SignalStore {
         
         for preKey in preKeys {
             if !(try self.preKeyStore.store(preKey: preKey.data(), for: preKey.id)) {
-                throw LibForstaError.internalError(why: "couldn't store new session prekey")
+                throw ForstaError(.storageError, "couldn't store new session prekey")
             }
         }
         
@@ -64,7 +64,7 @@ extension SignalStore {
     
     func updateSignedPreKey() throws -> SessionSignedPreKey {
         guard let identity = self.identityKeyStore.identityKeyPair() else {
-            throw LibForstaError.internalError(why: "unable to retrieve self identity")
+            throw ForstaError(.storageError, "couldn't retrieve self identity")
         }
         let lastPreKeyId = self.forstaPreKeyStore.lastId
         let signedPreKey = try Signal.generate(signedPreKey: lastPreKeyId, identity: identity, timestamp: 0)

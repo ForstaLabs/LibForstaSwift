@@ -11,6 +11,7 @@
 //
 
 import Foundation
+import SwiftyJSON
 
 /// The different types of errors that can occur using the LibForstaSwift library.
 public enum ForstaErrorType: String {
@@ -79,6 +80,21 @@ public enum ForstaErrorType: String {
 
     /// An error occured during decryption
     case decryptionError = "Decryption error"
+
+    /// A JWT was malformed or expired
+    case invalidJWT = "Invalid JWT"
+    
+    /// Request failure
+    case requestFailure = "Request failure"
+    
+    /// Request rejected
+    case requestRejected = "Request rejected"
+
+    /// A request response was malformed
+    case malformedResponse = "Malformed response"
+    
+    /// A request response was malformed
+    case configuration = "Configuration error"
 }
 
 /// All errors thrown by `LibForstaSwift` are `ForstaError` objects.
@@ -138,6 +154,34 @@ public final class ForstaError: CustomStringConvertible, Error {
     }
 
     /**
+     Create a specific `ForstaError` with an `Error` as the annotating explanation.
+     - parameter type: The error type
+     - parameter cause: The error thrown by the subroutine
+     - parameter file: A String describing the file where the error occured
+     - parameter function: A String describing the function where the error occured
+     */
+    public convenience init(_ type: ForstaErrorType,
+         cause: Error,
+         file: String = #file,
+         function: String = #function) {
+        self.init(type, cause.localizedDescription)
+    }
+    
+    /**
+     Create a specific `ForstaError` with JSON giving details.
+     - parameter type: The error type
+     - parameter message: The JSON details
+     - parameter file: A String describing the file where the error occured
+     - parameter function: A String describing the function where the error occured
+     */
+    public convenience init(_ type: ForstaErrorType,
+                            _ message: JSON,
+                            file: String = #file,
+                            function: String = #function) {
+        self.init(type, message.rawString() ?? "{}")
+    }
+
+    /**
      Create a new `ForstaError` using an already exisiting `Error` from a subroutine.
      - parameter message: A decription of why the error occured
      - parameter cause: The error thrown by the subroutine
@@ -145,9 +189,9 @@ public final class ForstaError: CustomStringConvertible, Error {
      - parameter function: A String describing the function where the error occured
      */
     public convenience init(_ message: String,
-         cause: Error,
-         file: String = #file,
-         function: String = #function) {
+                            cause: Error,
+                            file: String = #file,
+                            function: String = #function) {
         if let reason = cause as? ForstaError {
             self.init(message, cause: reason, file: file, function: function)
         } else {
@@ -195,5 +239,15 @@ public final class ForstaError: CustomStringConvertible, Error {
     /// The description of the error
     public var localizedDescription: String {
         return description
+    }
+    
+    /// The error's message converted to JSON (i.e., for .requestRejected)
+    public var json: JSON {
+        do {
+            if self.message != nil {
+                return try JSON(string: self.message ?? "{}")
+            }
+        } catch { }
+        return JSON()
     }
 }

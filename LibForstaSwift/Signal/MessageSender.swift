@@ -108,7 +108,7 @@ public class MessageSender {
                     let _ = self.signalClient.store.sessionStore.deleteSession(for: address) // force an updateKeys on retry
                     return self.sendToDevice(address: address, paddedClearMessage: paddedClearMessage, retry: false)
                 } else if statusCode >= 300 {
-                    throw LibForstaError.requestRejected(why: json)
+                    throw ForstaError(.requestRejected, json)
                 }
                 return Promise<JSON>.value(json)
         }

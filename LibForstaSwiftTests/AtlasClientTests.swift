@@ -105,11 +105,11 @@ export JWT_PROXY_AUDIENCE='atlas'
                 }
             }
             .catch { error in
-                XCTFail("test org creation failed")
-                if let lre = error as? LibForstaError {
-                    print(lre.rejectedBecause)
+                if let ferr = error as? ForstaError {
+                    print(ferr)
                 }
-                testOrgReadyResolver.reject(LibForstaError.internalError(why: "can't create test org"))
+                XCTFail("test org creation failed")
+                testOrgReadyResolver.reject(ForstaError("can't create test org", cause: error))
             }
     }
 
@@ -185,8 +185,8 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("should have failed to find the user")
             }
             .catch { error in
-                if let lre = error as? LibForstaError {
-                    XCTAssert(lre.rejectedBecause["non_field_errors"].arrayValue.contains("unknown user"))
+                if let ferr = error as? ForstaError {
+                    XCTAssert(ferr.json["non_field_errors"].arrayValue.contains("unknown user"))
                 } else {
                     XCTFail("surprising error")
                 }
@@ -204,7 +204,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("should have failed to find the domain")
             }
             .catch { error in
-                XCTAssert((error as? LibForstaError)?.isRequestFailure ?? false)
+                XCTAssert(((error as? ForstaError)?.type ?? .unknown) == ForstaErrorType.requestFailure)
             }
             .finally {
                 expectation3.fulfill()
@@ -219,7 +219,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("should have failed to find the domain")
             }
             .catch { error in
-                XCTAssert((error as? LibForstaError)?.isRequestFailure ?? false)
+                XCTAssert(((error as? ForstaError)?.type ?? .unknown) == ForstaErrorType.requestFailure)
             }
             .finally {
                 expectation4.fulfill()
@@ -251,8 +251,8 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("password authentication should have failed")
             }
             .catch { error in
-                if let lre = error as? LibForstaError {
-                    XCTAssert(lre.rejectedBecause["password"].arrayValue.contains("invalid password"))
+                if let ferr = error as? ForstaError {
+                    XCTAssert(ferr.json["password"].arrayValue.contains("invalid password"))
                 } else {
                     XCTFail("surprising error")
                 }
@@ -267,8 +267,8 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("password authentication should have failed")
             }
             .catch { error in
-                if let lre = error as? LibForstaError {
-                    XCTAssert(lre.rejectedBecause["password"].arrayValue.contains("invalid password"))
+                if let ferr = error as? ForstaError {
+                    XCTAssert(ferr.json["password"].arrayValue.contains("invalid password"))
                 } else {
                     XCTFail("surprising error")
                 }
@@ -326,8 +326,8 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("invalid jwt-proxy authentication should have failed")
             }
             .catch { error in
-                if let lre = error as? LibForstaError {
-                    XCTAssert(lre.rejectedBecause["non_field_errors"].arrayValue.contains("invalid auth"))
+                if let ferr = error as? ForstaError {
+                    XCTAssert(ferr.json["non_field_errors"].arrayValue.contains("invalid auth"))
                 } else {
                     XCTFail("surprising error")
                 }
@@ -572,8 +572,8 @@ export JWT_PROXY_AUDIENCE='atlas'
             }
             .catch { error in
                 XCTFail("creation failed")
-                if let lre = error as? LibForstaError {
-                    print(lre.rejectedBecause)
+                if let ferr = error as? ForstaError {
+                    print(ferr)
                 }
             }
             .finally {
@@ -594,8 +594,8 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("creation should have failed")
             }
             .catch { error in
-                if let lre = error as? LibForstaError {
-                    XCTAssert(lre.rejectedBecause["org_slug"].arrayValue.contains("Already in use."))
+                if let ferr = error as? ForstaError {
+                    XCTAssert(ferr.json["org_slug"].arrayValue.contains("Already in use."))
                 } else {
                     XCTFail("surprising error")
                 }
@@ -618,8 +618,8 @@ export JWT_PROXY_AUDIENCE='atlas'
             }
             .catch { error in
                 XCTFail("creation failed")
-                if let lre = error as? LibForstaError {
-                    print(lre.rejectedBecause)
+                if let ferr = error as? ForstaError {
+                    print(ferr)
                 }
             }
             .finally {
@@ -637,8 +637,8 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("creation should have failed")
             }
             .catch { error in
-                if let lre = error as? LibForstaError {
-                    XCTAssert(lre.rejectedBecause["tag_slug"].arrayValue.contains("Already in use."))
+                if let ferr = error as? ForstaError {
+                    XCTAssert(ferr.json["tag_slug"].arrayValue.contains("Already in use."))
                 } else {
                     XCTFail("surprising error")
                 }
@@ -659,8 +659,8 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("creation should have failed")
             }
             .catch { error in
-                if let lre = error as? LibForstaError {
-                    XCTAssert(lre.rejectedBecause["non_field_errors"].arrayValue.contains("Invitation not found: deadbeef"))
+                if let ferr = error as? ForstaError {
+                    XCTAssert(ferr.json["non_field_errors"].arrayValue.contains("Invitation not found: deadbeef"))
                 } else {
                     XCTFail("surprising error")
                 }
@@ -694,8 +694,8 @@ export JWT_PROXY_AUDIENCE='atlas'
             }
             .catch { error in
                 XCTFail("creation failed")
-                if let lre = error as? LibForstaError {
-                    print(lre.rejectedBecause)
+                if let ferr = error as? ForstaError {
+                    print(ferr)
                 }
             }
             .finally {
@@ -714,8 +714,8 @@ export JWT_PROXY_AUDIENCE='atlas'
                 
             }
             .catch { error in
-                if let lre = error as? LibForstaError {
-                    print(lre.rejectedBecause)
+                if let ferr = error as? ForstaError {
+                    print(ferr)
                     XCTFail()
                 }
                 XCTFail("surprising error")
@@ -733,8 +733,8 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTAssert(result["id"].stringValue.count > 0)
             }
             .catch { error in
-                if let lre = error as? LibForstaError {
-                    print(lre.rejectedBecause)
+                if let ferr = error as? ForstaError {
+                    print(ferr)
                 }
                 XCTFail("surprising error")
             }
@@ -766,8 +766,8 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTAssert(pendingUserId.count > 0)
             }
             .catch { error in
-                if let lre = error as? LibForstaError {
-                    print(lre.rejectedBecause)
+                if let ferr = error as? ForstaError {
+                    print(ferr)
                 }
                 XCTFail("surprising error")
             }.finally {

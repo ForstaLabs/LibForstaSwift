@@ -41,7 +41,6 @@ public extension Notification.Name {
     static let signalQueueEmpty = Notification.Name("signalQueueEmpty")
 }
 
-
 extension NotificationCenter {
     ///
     /// Broadcast a notification on the main thread.
@@ -49,33 +48,6 @@ extension NotificationCenter {
     static func broadcast(_ name: Notification.Name, _ userInfo: [String: Any]? = nil) {
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: name, object: nil, userInfo: userInfo)
-        }
-    }
-}
-
-
-/// The various LibForsta errors.
-enum LibForstaError: Error {
-    case requestRejected(why: JSON)
-    case requestFailure(why: Error)
-    case internalError(why: String)
-}
-extension LibForstaError {
-    var isRequestFailure: Bool {
-        get {
-            switch self {
-            case .requestFailure(_): return true
-            default: return false
-            }
-        }
-    }
-    
-    var rejectedBecause: JSON {
-        get {
-            switch self {
-            case .requestRejected(let why): return why
-            default: return JSON([:])
-            }
         }
     }
 }
@@ -89,7 +61,7 @@ extension Request {
     }
 }
 
-extension Date {
+public extension Date {
     var millisecondsSince1970:UInt64 {
         return UInt64((self.timeIntervalSince1970 * 1000.0).rounded())
     }
@@ -101,7 +73,7 @@ extension Date {
     }
 }
 
-extension TimeInterval {
+public extension TimeInterval {
     var milliseconds:UInt64 {
         return UInt64((self * 1000.0).rounded())
     }
@@ -133,14 +105,14 @@ extension SignalAddress: CustomStringConvertible {
     }
 }
 
-extension JSON {
+public extension JSON {
     init(string: String) throws {
         let dataFromString = string.data(using: .utf8, allowLossyConversion: false)!
         try self.init(data: dataFromString)
     }
 }
 
-extension UUID {
+public extension UUID {
     var lcString: String {
         get {
             return self.uuidString.lowercased()
@@ -148,7 +120,7 @@ extension UUID {
     }
 }
 
-extension String {
+public extension String {
     func indentWith(_ prefix: String) -> String {
         return prefix + self.replacingOccurrences(of: "\n", with: "\n"+prefix)
     }

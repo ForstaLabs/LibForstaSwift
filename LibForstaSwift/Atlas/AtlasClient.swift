@@ -91,7 +91,7 @@ class AtlasClient {
                 } else if statusCode == 200 {
                     return .sms
                 } else {
-                    throw LibForstaError.requestRejected(why:json)
+                    throw ForstaError(.requestRejected, json)
                 }
                 
         }
@@ -189,10 +189,10 @@ class AtlasClient {
                     if self.setJwt(json["token"].stringValue) {
                         return user
                     } else {
-                        throw LibForstaError.internalError(why: "malformed or expired jwt")
+                        throw ForstaError(.invalidJWT)
                     }
                 } else {
-                    throw LibForstaError.requestRejected(why: json)
+                    throw ForstaError(.requestRejected, json)
                 }
         }
     }
@@ -214,10 +214,10 @@ class AtlasClient {
                     if let jwt = json["token"].string {
                         return jwt
                     } else {
-                        throw LibForstaError.internalError(why: "malformed refresh response")
+                        throw ForstaError(.malformedResponse, "missing JWT in refresh response")
                     }
                 } else {
-                    throw LibForstaError.requestRejected(why: json)
+                    throw ForstaError(.requestRejected, json)
                 }
         }
     }
@@ -242,7 +242,7 @@ class AtlasClient {
                 if statusCode == 201 {
                     return json
                 }
-                throw LibForstaError.requestRejected(why: json)
+                throw ForstaError(.requestRejected, json)
         }
     }
     
@@ -262,7 +262,7 @@ class AtlasClient {
                 if statusCode == 200 {
                     return json
                 }
-                throw LibForstaError.requestRejected(why: json)
+                throw ForstaError(.requestRejected, json)
         }
     }
 
@@ -286,7 +286,7 @@ class AtlasClient {
                 if statusCode == 200 {
                     return json
                 }
-                throw LibForstaError.requestRejected(why: json)
+                throw ForstaError(.requestRejected, json)
         }
     }
    
@@ -322,11 +322,11 @@ class AtlasClient {
                     let orgSlug = json["orgslug"].string,
                     let jwt = json["jwt"].string {
                     if (!self.setJwt(jwt)) {
-                        throw LibForstaError.internalError(why: "user creation succeeded but setJwt failed")
+                        throw ForstaError(.invalidJWT, "user creation succeeded but setJwt failed")
                     }
                     return ("@\(nameTag):\(orgSlug)", self.authenticatedUserId!)
                 }
-                throw LibForstaError.requestRejected(why: json)
+                throw ForstaError(.requestRejected, json)
         }
     }
     
@@ -352,7 +352,7 @@ class AtlasClient {
                 if statusCode == 200, let userId = json["invited_user_id"].string {
                     return userId
                 }
-                throw LibForstaError.requestRejected(why: json)
+                throw ForstaError(.requestRejected, json)
         }
     }
     
@@ -368,7 +368,7 @@ class AtlasClient {
             .map { result in
                 let (statusCode, json) = result
                 if statusCode == 204 { return () }
-                throw LibForstaError.requestRejected(why: json)
+                throw ForstaError(.requestRejected, json)
         }
     }
     
@@ -390,7 +390,7 @@ class AtlasClient {
                 if statusCode == 200 {
                     return json
                 }
-                throw LibForstaError.requestRejected(why: json)
+                throw ForstaError(.requestRejected, json)
         }
     }
     
@@ -411,7 +411,7 @@ class AtlasClient {
                 if res.count > 0 {
                     return res[0]
                 } else {
-                    throw LibForstaError.internalError(why: "malformed tagmath resolution response")
+                    throw ForstaError(.malformedResponse, "tagmath resolution with no result")
                 }
         }
     }
@@ -431,7 +431,7 @@ class AtlasClient {
                 if statusCode == 200 {
                     return json["results"]
                 } else {
-                    throw LibForstaError.requestRejected(why: json)
+                    throw ForstaError(.requestRejected, json)
                 }
         }
     }
@@ -456,7 +456,7 @@ class AtlasClient {
         return (onlyPublicDirectory ? Promise.value((200, JSON(["result": []]))) : request("/v1/user/?id_in=" + userIds.joined(separator: ",")))
             .map { result in
                 let (statusCode, json) = result
-                if (statusCode != 200) { throw LibForstaError.requestRejected(why: json) }
+                if (statusCode != 200) { throw ForstaError(.requestRejected, json) }
                 for user in json["results"].arrayValue {
                     users.append(user)
                     missing.remove(user["id"].stringValue)
@@ -468,7 +468,7 @@ class AtlasClient {
                     return self.request("/v1/directory/user/?id_in=" + Array(missing).joined(separator: ","))
                         .map { result in
                             let (statusCode, json) = result
-                            if (statusCode != 200) { throw LibForstaError.requestRejected(why: json) }
+                            if (statusCode != 200) { throw ForstaError(.requestRejected, json) }
                             for user in json["results"].arrayValue {
                                 users.append(user)
                             }
@@ -493,7 +493,7 @@ class AtlasClient {
                 if statusCode == 200 {
                     return json
                 } else {
-                    throw LibForstaError.requestRejected(why: json)
+                    throw ForstaError(.requestRejected, json)
                 }
         }
     }
@@ -510,7 +510,7 @@ class AtlasClient {
                 if statusCode == 200 {
                     return json
                 } else {
-                    throw LibForstaError.requestRejected(why: json)
+                    throw ForstaError(.requestRejected, json)
                 }
         }
     }
@@ -527,7 +527,7 @@ class AtlasClient {
                 if statusCode == 200 {
                     return json["devices"].arrayValue
                 } else {
-                    throw LibForstaError.requestRejected(why: json)
+                    throw ForstaError(.requestRejected, json)
                 }
         }
     }
@@ -565,7 +565,7 @@ class AtlasClient {
                         let json = JSON(data)
                         return seal.fulfill((statusCode, json))
                     case .failure(let error):
-                        return seal.reject(LibForstaError.requestFailure(why: error))
+                        return seal.reject(ForstaError(.requestFailure, cause: error))
                     }
             }
         }

@@ -80,8 +80,8 @@ class SignalClientTests: XCTestCase {
                     print(result)
                 }
                 .catch { error in
-                    if let lre = error as? LibForstaError {
-                        XCTFail(lre.rejectedBecause.rawString()!)
+                    if let ferr = error as? ForstaError {
+                        XCTFail(ferr.description)
                     } else {
                         XCTFail("surprising error")
                     }
@@ -120,8 +120,8 @@ class SignalClientTests: XCTestCase {
                     print(result)
                 }
                 .catch { error in
-                    if let lre = error as? LibForstaError {
-                        XCTFail(lre.rejectedBecause.rawString()!)
+                    if let ferr = error as? ForstaError {
+                        XCTFail(ferr.description)
                     } else {
                         XCTFail("surprising error")
                     }
@@ -250,8 +250,8 @@ class SignalClientTests: XCTestCase {
                     print(result)
                 }
                 .catch { error in
-                    if let lre = error as? LibForstaError {
-                        XCTFail(lre.rejectedBecause.rawString()!)
+                    if let ferr = error as? ForstaError {
+                        XCTFail(ferr.description)
                     } else {
                         XCTFail("surprising error")
                     }
