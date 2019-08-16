@@ -26,7 +26,7 @@
 		DB2B00BC22E12D6A00B9931A /* SignalClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00BA22E12D6A00B9931A /* SignalClient.swift */; };
 		DB2B00C022E12D7100B9931A /* ForstaStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00BE22E12D7100B9931A /* ForstaStore.swift */; };
 		DB2B00C122E12D7100B9931A /* KVStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00BF22E12D7100B9931A /* KVStorageProtocol.swift */; };
-		DB2B00C722E12D7800B9931A /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00C322E12D7800B9931A /* Utilities.swift */; };
+		DB2B00C722E12D7800B9931A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00C322E12D7800B9931A /* Extensions.swift */; };
 		DB2B00C822E12D7800B9931A /* SignalCommonCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00C422E12D7800B9931A /* SignalCommonCrypto.swift */; };
 		DB2B00C922E12D7800B9931A /* ForstaError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00C522E12D7800B9931A /* ForstaError.swift */; };
 		DB2B00CA22E12D7800B9931A /* SignalCryptoProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00C622E12D7800B9931A /* SignalCryptoProvider.swift */; };
@@ -111,7 +111,7 @@
 		DB2B00BA22E12D6A00B9931A /* SignalClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalClient.swift; sourceTree = "<group>"; };
 		DB2B00BE22E12D7100B9931A /* ForstaStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForstaStore.swift; sourceTree = "<group>"; };
 		DB2B00BF22E12D7100B9931A /* KVStorageProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KVStorageProtocol.swift; sourceTree = "<group>"; };
-		DB2B00C322E12D7800B9931A /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		DB2B00C322E12D7800B9931A /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		DB2B00C422E12D7800B9931A /* SignalCommonCrypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalCommonCrypto.swift; sourceTree = "<group>"; };
 		DB2B00C522E12D7800B9931A /* ForstaError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForstaError.swift; sourceTree = "<group>"; };
 		DB2B00C622E12D7800B9931A /* SignalCryptoProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalCryptoProvider.swift; sourceTree = "<group>"; };
@@ -213,7 +213,7 @@
 		DB2B00C222E12D7800B9931A /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				DB2B00C322E12D7800B9931A /* Utilities.swift */,
+				DB2B00C322E12D7800B9931A /* Extensions.swift */,
 				DB2B00C422E12D7800B9931A /* SignalCommonCrypto.swift */,
 				DB2B00C522E12D7800B9931A /* ForstaError.swift */,
 				DB2B00C622E12D7800B9931A /* SignalCryptoProvider.swift */,
@@ -423,7 +423,7 @@
 				DB2B00C122E12D7100B9931A /* KVStorageProtocol.swift in Sources */,
 				DBE3D57A22F89EB50016B800 /* MessageReceiver.swift in Sources */,
 				DBE3D57822F89E880016B800 /* MessageSender.swift in Sources */,
-				DB2B00C722E12D7800B9931A /* Utilities.swift in Sources */,
+				DB2B00C722E12D7800B9931A /* Extensions.swift in Sources */,
 				DB2B00B622E12D6100B9931A /* SubProtocol.pb.swift in Sources */,
 				DB2B00B522E12D6100B9931A /* DeviceMessages.pb.swift in Sources */,
 				DB2B00CA22E12D7800B9931A /* SignalCryptoProvider.swift in Sources */,
