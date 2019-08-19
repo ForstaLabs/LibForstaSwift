@@ -32,7 +32,7 @@ public class MessageSender {
             for recipient in message.recipients {
                 switch recipient {
                 case .device(let address): results.append(self.sendToDevice(address: address, paddedClearData: paddedClearData))
-                case .user: continue
+                case .user(let userId): results.append(self.sendToUser(userId: userId, paddedClearData: paddedClearData))
                 }
             }
             
@@ -41,40 +41,56 @@ public class MessageSender {
     }
     
     /// Fetch prekey bundle for address and process it
-    func updateKeysForAddr(_ addr: SignalAddress) -> Promise<Void> {
-        return self.updateKeysForAddr(addr: addr.name, deviceId: UInt32(addr.deviceId))
+    func updatePrekeysForUser(_ userId: UUID) -> Promise<Void> {
+        return self.updatePrekeysForUser(userId: userId.lcString)
+    }
+    
+    
+    /// Fetch prekey bundle for address and process it
+    func updatePrekeysForUser(_ addr: SignalAddress) -> Promise<Void> {
+        return self.updatePrekeysForUser(userId: addr.name, deviceId: UInt32(addr.deviceId))
     }
     
     /// Fetch prekey bundles for address (either all devices for the address, or only a specific device) and process them
-    func updateKeysForAddr(addr: String, deviceId: UInt32? = nil) -> Promise<Void> {
-        return self.signalClient.getKeysForAddr(addr: addr, deviceId: deviceId)
+    func updatePrekeysForUser(userId: String, deviceId: UInt32? = nil) -> Promise<Void> {
+        return self.signalClient.getKeysForAddr(addr: userId, deviceId: deviceId)
             .map { bundles in
                 for bundle in bundles {
-                    let addr = SignalAddress(name: addr, deviceId: bundle.deviceId)
+                    let addr = SignalAddress(name: userId, deviceId: bundle.deviceId)
                     try SessionBuilder(for: addr, in: self.signalClient.store).process(preKeyBundle: bundle)
                 }
         }
     }
     
     /// Encrypt padded clear data, accepting changed identity keys
-    /// Returns CiphertextMessage and remote registration id
-    func encryptWithKeyChangeRecovery(address: SignalAddress, paddedClearData: Data) -> Promise<(CiphertextMessage, UInt32)> {
+    /// Returns promise of CiphertextMessage and remote registration id
+    func encryptWithKeyChangeRecovery(address: SignalAddress, paddedClearData: Data) throws -> (CiphertextMessage, UInt32) {
         let cipher = SessionCipher(for: address, in: self.signalClient.store)
         var attempts = 0
         repeat {
             attempts += 1
             do {
                 let encryptedMessage = try cipher.encrypt(paddedClearData)
-                return Promise.value((encryptedMessage, try cipher.remoteRegistrationId()))
+                return (encryptedMessage, try cipher.remoteRegistrationId())
             } catch SignalError.untrustedIdentity {
                 NotificationCenter.broadcast(.signalIdentityKeyChanged, ["address": address])
                 let _ = self.signalClient.store.identityKeyStore.save(identity: nil, for: address)
             } catch let error {
-                return Promise.init(error: error)
+                throw ForstaError("internal error", cause: error)
             }
         } while attempts < 2
 
-        return Promise.init(error: SignalError.untrustedIdentity)
+        throw ForstaError(.untrustedIdentity, "untrusted identity key")
+    }
+    
+    func messageTransmissionBundle(deviceId: Int32, registrationId: UInt32, encryptedMessageData: Data) -> [String: Any] {
+        return [
+            "type": Signal_Envelope.TypeEnum.ciphertext.rawValue,
+            "content": encryptedMessageData.base64EncodedString(),
+            "destinationRegistrationId": registrationId,
+            "destinationDeviceId": deviceId,
+            "timestamp": Date().millisecondsSince1970
+        ]
     }
     
     /// Send a padded clear data to a specific device, fetching/updating keys as necessary
@@ -82,25 +98,21 @@ public class MessageSender {
         return firstly
             { () -> Promise<Void> in
                 if !self.signalClient.store.sessionStore.containsSession(for: address) {
-                    return self.updateKeysForAddr(address)
+                    return self.updatePrekeysForUser(address)
                 } else {
                     return Promise<Void>.value(())
                 }
             }
-            .then {
-                self.encryptWithKeyChangeRecovery(address: address, paddedClearData: paddedClearData)
+            .map {
+                try self.encryptWithKeyChangeRecovery(address: address, paddedClearData: paddedClearData)
             }
             .map { (encryptedMessage, remoteRegistrationId) -> [String: Any] in
-                [
-                    "type": Signal_Envelope.TypeEnum.ciphertext.rawValue,
-                    "content": encryptedMessage.data.base64EncodedString(),
-                    "destinationRegistrationId": remoteRegistrationId,
-                    "destinationDeviceId": address.deviceId,
-                    "timestamp": Date().millisecondsSince1970
-                ]
+                self.messageTransmissionBundle(deviceId: address.deviceId,
+                                               registrationId: remoteRegistrationId,
+                                               encryptedMessageData: encryptedMessage.message)
             }
             .then { bundle -> Promise<(Int, JSON)> in
-                self.signalClient.deliverToDevice(address: address, parameters: bundle)
+                self.signalClient.deliverToDevice(address: address, messageBundle: bundle)
             }
             .then { result -> Promise<JSON> in
                 let (statusCode, json) = result
@@ -114,51 +126,55 @@ public class MessageSender {
         }
     }
     
-    func sendToUser(userId: UUID, paddedClearData: Data) -> Promise<(Int, JSON)> {
-        return Promise.value((42, JSON(42)))
+    func sendToUser(userId: UUID, paddedClearData: Data, recurse: Bool = true) -> Promise<JSON> {
+        let deviceIds = self.signalClient.store.sessionStore.subDeviceSessions(for: userId) ?? []
+        var messageBundles: [[String: Any]]
+        do {
+            messageBundles = try deviceIds.map { id -> [String: Any] in
+                let (encryptedMessage, registrationId) =
+                    try encryptWithKeyChangeRecovery(address: SignalAddress(userId: userId, deviceId: id),
+                                                     paddedClearData: paddedClearData)
+                return self.messageTransmissionBundle(deviceId: id,
+                                                      registrationId: registrationId,
+                                                      encryptedMessageData: encryptedMessage.message)
+            }
+        } catch let error {
+            return Promise<JSON>(error: error)
+        }
+        return
+            self.signalClient.deliverToUser(userId: userId, messageBundles: messageBundles, timestamp: Date().millisecondsSince1970)
+            .then { result -> Promise<JSON> in
+                let (statusCode, json) = result
+                if statusCode < 300 {
+                    return Promise<JSON>.value(json)
+                } else if statusCode == 410 || statusCode == 409 {
+                    if (!recurse) {
+                        throw ForstaError(.transmissionFailure, "Hit retry limit attempting to reload device list")
+                    }
+                    if (statusCode == 409) {
+                        // remove device IDs for extra devices
+                        for extra in json["extraDevices"].arrayValue {
+                            let deviceId = extra.uInt32Value
+                            let _ = self.signalClient.store.sessionStore.deleteSession(for: SignalAddress(userId: userId, deviceId: deviceId))
+                        }
+                    } else {
+                        // close open sessions on stale devices
+                        for extra in json["staleDevices"].arrayValue {
+                            let deviceId = extra.uInt32Value
+                            let _ = self.signalClient.store.sessionStore.deleteSession(for: SignalAddress(userId: userId, deviceId: deviceId))
+                        }
+                    }
+                    
+                    // no optimization for now -- just update all of the device keys for the user
+                    return self.updatePrekeysForUser(userId).then {
+                        self.sendToUser(userId: userId, paddedClearData: paddedClearData, recurse: statusCode == 409)
+                    }
+                } else {
+                    throw ForstaError(.requestRejected, json)
+                }
+        }
     }
     
-    let x = """
-        async _sendToDevice(addr, deviceId, recurse) {
-            const protoAddr = new libsignal.ProtocolAddress(addr, deviceId);
-            const sessionCipher = new libsignal.SessionCipher(ns.store, protoAddr);
-            if (!(await sessionCipher.hasOpenSession())) {
-                await this.getKeysForAddr(addr, [deviceId]);
-            }
-            let encryptedMessage;
-            let attempts = 0;
-            do {
-                try {
-                    encryptedMessage = await sessionCipher.encrypt(this.getPaddedMessageBuffer());
-                } catch(e) {
-                    if (e instanceof libsignal.UntrustedIdentityKeyError) {
-                        await this._handleIdentityKeyError(e, {forceThrow: !!attempts});
-                    } else {
-                        this._emitError(addr, "Failed to create message", e);
-                        return;
-                    }
-                }
-            } while(!encryptedMessage && !attempts++);
-            const messageBundle = this.toJSON(protoAddr, encryptedMessage, this.timestamp);
-            let resp;
-            try {
-                resp = await this.signal.sendMessage(addr, deviceId, messageBundle);
-            } catch(e) {
-                if (e instanceof ns.ProtocolError && e.code === 410) {
-                    sessionCipher.closeOpenSession();  // Force getKeysForAddr on next call.
-                    return await this._sendToDevice(addr, deviceId, /*recurse*/ false);
-                } else if (e.code === 401 || e.code === 403) {
-                    throw e;
-                } else {
-                    this._emitError(addr, "Failed to send message", e);
-                    return;
-                }
-            }
-            this._emitSent(addr, resp.received);
-            return resp;
-        }
-"""
-
     /// Internal: Pad outgoing plaintext before encryption
     private func pad(_ plaintext: inout Data, partSize: Int = 160, terminator: UInt8 = 0x80) {
         var thePad = Data(count: partSize + 1 - ((plaintext.count + 1) % partSize))

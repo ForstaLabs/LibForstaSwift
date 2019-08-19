@@ -220,6 +220,15 @@ class ForstaSessionStore: SessionStore {
     }
 }
 
+extension SessionStore {
+    func subDeviceSessions(for userId: UUID) -> [Int32]? {
+        return self.subDeviceSessions(for: userId.lcString)
+    }
+    func deleteAllSessions(for userId: UUID) -> Int? {
+        return self.deleteAllSessions(for: userId.lcString)
+    }
+}
+
 class ForstaSignedPreKeyStore: SignedPreKeyStore {
     let kvstore: KVStorageProtocol
     let ns = "SignedPreKeys"

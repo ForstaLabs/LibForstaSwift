@@ -153,30 +153,20 @@ class SignalClient {
     
     
     /// Request delivery of an encrypted message to a specific device
-    ///
-    /// Expects parameters to include:
-    ///    - "type": Signal_Envelope.TypeEnum (int)
-    ///    - "content": encrypted message (base64 encoded)
-    ///    - "destinationRegistrationId": registration ID of destination (uint32)
-    ///    - "destinationDeviceId": device ID of destination (int32)
-    ///    - "timestamp": timestamp of the message (uint64, ms since 1970)
-    func deliverToDevice(address: SignalAddress, parameters: [String: Any]) -> Promise<(Int, JSON)> {
+    func deliverToDevice(address: SignalAddress, messageBundle: [String: Any]) -> Promise<(Int, JSON)> {
         return self.request(
             .messages,
             urlParameters: "/\(address.name)/\(address.deviceId)",
             method: .put,
-            parameters: parameters)
+            parameters: messageBundle)
     }
     
     /// Request delivery of an encrypted message to all of a user's devices
-    ///
-    /// Expects parameters to include:
-    ///    - "type": Signal_Envelope.TypeEnum (int)
-    ///    - "content": encrypted message (base64 encoded)
-    ///    - "destinationRegistrationId": registration ID of destination (uint32)
-    ///    - "destinationDeviceId": device ID of destination (int32)
-    ///    - "timestamp": timestamp of the message (uint64, ms since 1970)
-    func deliverToUser(userId: UUID, parameters: [String: Any]) -> Promise<(Int, JSON)> {
+    func deliverToUser(userId: UUID, messageBundles: [[String: Any]], timestamp: UInt64) -> Promise<(Int, JSON)> {
+        let parameters: [String: Any] = [
+            "messages": messageBundles,
+            "timestamp": timestamp
+        ]
         return self.request(
             .messages,
             urlParameters: "/\(userId.lcString)",

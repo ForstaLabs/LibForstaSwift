@@ -95,6 +95,9 @@ extension SignalAddress: CustomStringConvertible {
     convenience init(userId: UUID, deviceId: UInt32) {
         self.init(name: userId.lcString, deviceId: (Int32(deviceId)))
     }
+    convenience init(userId: UUID, deviceId: Int32) {
+        self.init(name: userId.lcString, deviceId: deviceId)
+    }
     var userId: UUID {
         get {
             return UUID(uuidString: self.name)!

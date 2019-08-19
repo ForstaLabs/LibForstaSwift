@@ -108,7 +108,7 @@ extension Sendable {
             if self.data != nil { body[0]["data"] = self.data! }
             if self.userAgent != nil { body[0]["userAgent"] = JSON(self.userAgent!) }
             if self.threadTitle != nil { body[0]["threadTitle"] = JSON(self.threadTitle!) }
-            if self.threadType != nil { body[0]["threadType"] = JSON(self.threadType!) }
+            if self.threadType != nil { body[0]["threadType"] = JSON(self.threadType!.rawValue) }
             if self.messageRef != nil { body[0]["messageRef"] = JSON(self.messageRef!.lcString) }
             
             var dm = Signal_DataMessage()

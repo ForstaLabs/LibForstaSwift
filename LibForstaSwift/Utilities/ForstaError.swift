@@ -95,6 +95,9 @@ public enum ForstaErrorType: String {
     
     /// A request response was malformed
     case configuration = "Configuration error"
+    
+    /// A transmission failed
+    case transmissionFailure = "Transmission failure"
 }
 
 /// All errors thrown by `LibForstaSwift` are `ForstaError` objects.

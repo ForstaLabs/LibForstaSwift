@@ -166,22 +166,24 @@ class SignalClientTests: XCTestCase {
                                    distributionExpression: inboundMessage!.body[0]["distribution"]["expression"].stringValue,
                                    data: TextMessageData(plain: "Hello, world!"),
                                    threadType: .conversation)
-
-            signalClient.getKeysForAddr(inboundMessage!.source)
-                .done { result in
-                    print("GET KEYS FOR PARTICULAR DEVICE", result)
-                }
-                .catch { error in
-                    print("ERROR", error)
-            }
             
-            signalClient.getKeysForAddr(addr: inboundMessage!.source.name)
-                .done { result in
-                    print("GET KEYS FOR ALL DEVICES", result)
-                }
-                .catch { error in
-                    print("ERROR", error)
-            }
+            /*
+             signalClient.getKeysForAddr(inboundMessage!.source)
+             .done { result in
+             print("GET KEYS FOR PARTICULAR DEVICE", result)
+             }
+             .catch { error in
+             print("ERROR", error)
+             }
+             
+             signalClient.getKeysForAddr(addr: inboundMessage!.source.name)
+             .done { result in
+             print("GET KEYS FOR ALL DEVICES", result)
+             }
+             .catch { error in
+             print("ERROR", error)
+             }
+             */
             
             
             response.recipients.append(.device(inboundMessage!.source))
@@ -293,8 +295,8 @@ class SignalClientTests: XCTestCase {
                                   senderDeviceId: myDeviceId ?? 0,
                                   distributionExpression: "(<2b53e98b-170f-4102-9d82-e43d5abb7998>+<e98bf10d-528f-44c4-99cd-c488385771cc>)",
                                   data: TextMessageData(plain: "Hello, world!"))
-            message.recipients.append(MessageRecipient.device(SignalAddress(userId: "bd1f7e2d-55f5-4a3b-933d-ab7cf51503ca", deviceId: 1)))
-
+            message.recipients.append(MessageRecipient.user(UUID(uuidString: "bd1f7e2d-55f5-4a3b-933d-ab7cf51503ca")!))
+            
             let receiptReceived = XCTestExpectation()
             let receiptObserver = NotificationCenter.default.addObserver(
                 forName: .signalDeliveryReceipt,
@@ -304,7 +306,7 @@ class SignalClientTests: XCTestCase {
                     receiptReceived.fulfill()
             }
             defer { NotificationCenter.default.removeObserver(receiptObserver) }
-
+            
             let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
             print("sending message", message)
             sender.send(message)
@@ -323,9 +325,83 @@ class SignalClientTests: XCTestCase {
                 .finally {
                     // theGoodPart.fulfill()
             }
-
+            
             wait(for: [theGoodPart], timeout: 2 * 60.0)
             wsr.disconnect()
+        } catch let error {
+            XCTFail("surprising error \(error)")
+        }
+    }
+    
+    func testBlah() {
+        do {
+            watchEverything()
+            let atlasClient = AtlasClient(kvstore: MemoryKVStore())
+            let signalClient = try SignalClient(atlasClient: atlasClient)
+            
+            let registrated = XCTestExpectation()
+            atlasClient.authenticateViaPassword(userTag: "@password:swift.test", password: "asdfasdf24")
+                .then { _ in
+                    signalClient.registerAccount(name: "testing")
+                }
+                .done { result in
+                    print(result)
+                }
+                .catch { error in
+                    if let ferr = error as? ForstaError {
+                        XCTFail(ferr.description)
+                    } else {
+                        XCTFail("surprising error")
+                    }
+                }
+                .finally {
+                    registrated.fulfill()
+            }
+            wait(for: [registrated], timeout: 10.0)
+            
+            while true {
+                let connectAndReceive = XCTestExpectation()
+                var inboundMessage: InboundMessage? = nil
+                let dataMessageObserver = NotificationCenter.default.addObserver(
+                    forName: .signalInboundMessage,
+                    object: nil,
+                    queue: nil) { notification in
+                        inboundMessage = notification.userInfo?["inboundMessage"] as? InboundMessage
+                        connectAndReceive.fulfill()
+                }
+                defer { NotificationCenter.default.removeObserver(dataMessageObserver) }
+                let wsr = WebSocketResource(signalClient: signalClient)
+                let _ = MessageReceiver(signalClient: signalClient, webSocketResource: wsr)
+                wsr.connect()
+                wait(for: [connectAndReceive], timeout: 5 * 60.0)
+                
+                let userId = atlasClient.kvstore.get(DNK.ssAddress) as UUID?
+                let deviceId = atlasClient.kvstore.get(DNK.ssDeviceId) as UInt32?
+                let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
+                let response = Message(senderUserId: userId ?? UUID(),
+                                       senderDeviceId: deviceId ?? 0,
+                                       threadId: UUID(uuidString: inboundMessage!.body[0]["threadId"].stringValue)!,
+                                       distributionExpression: inboundMessage!.body[0]["distribution"]["expression"].stringValue,
+                                       data: TextMessageData(plain: "Hello, world!"),
+                                       threadType: .conversation)
+                
+                
+                response.recipients.append(.device(inboundMessage!.source))
+                print(response)
+                let thenSend = XCTestExpectation()
+                sender.send(response)
+                    .done { result in
+                        print("SEND COMPLETE", result)
+                    }
+                    .catch { error in
+                        print("SEND ERROR", error)
+                    }
+                    .finally {
+                        thenSend.fulfill()
+                }
+                wait(for: [thenSend], timeout: 5 * 60.0)
+                wsr.disconnect()
+            }
         } catch let error {
             XCTFail("surprising error \(error)")
         }
