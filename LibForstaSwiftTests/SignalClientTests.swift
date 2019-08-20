@@ -294,8 +294,9 @@ class SignalClientTests: XCTestCase {
             let message = Message(senderUserId: myUserId ?? UUID(),
                                   senderDeviceId: myDeviceId ?? 0,
                                   distributionExpression: "(<2b53e98b-170f-4102-9d82-e43d5abb7998>+<e98bf10d-528f-44c4-99cd-c488385771cc>)",
-                                  data: TextMessageData(plain: "Hello, world!"))
-            message.recipients.append(MessageRecipient.user(UUID(uuidString: "bd1f7e2d-55f5-4a3b-933d-ab7cf51503ca")!))
+                                  data: TextMessageData(plain: "Hello, world!"),
+                                  threadType: .conversation)
+            message.recipients.append(MessageRecipient.user(UUID(uuidString: "14871866-c0b4-4d1a-ab36-2a930385baf0")!))
             
             let receiptReceived = XCTestExpectation()
             let receiptObserver = NotificationCenter.default.addObserver(

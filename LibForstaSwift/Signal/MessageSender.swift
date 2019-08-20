@@ -103,10 +103,15 @@ public class MessageSender {
     }
     
     // Build a message transmission bundle
-    func messageTransmissionBundle(deviceId: Int32, registrationId: UInt32, encryptedMessageData: Data, timestamp: Date) -> [String: Any] {
+    func messageTransmissionBundle(deviceId: Int32,
+                                   registrationId: UInt32,
+                                   encryptedMessage: CiphertextMessage,
+                                   timestamp: Date) -> [String: Any] {
         return [
-            "type": Signal_Envelope.TypeEnum.ciphertext.rawValue,
-            "content": encryptedMessageData.base64EncodedString(),
+            "type": encryptedMessage.type == .preKey
+                ? Signal_Envelope.TypeEnum.prekeyBundle.rawValue
+                : Signal_Envelope.TypeEnum.ciphertext.rawValue,
+            "content": encryptedMessage.message.base64EncodedString(),
             "destinationRegistrationId": registrationId,
             "destinationDeviceId": deviceId,
             "timestamp": timestamp.millisecondsSince1970
@@ -129,7 +134,7 @@ public class MessageSender {
             .map { (encryptedMessage, remoteRegistrationId) -> [String: Any] in
                 self.messageTransmissionBundle(deviceId: address.deviceId,
                                                registrationId: remoteRegistrationId,
-                                               encryptedMessageData: encryptedMessage.message, timestamp: timestamp)
+                                               encryptedMessage: encryptedMessage, timestamp: timestamp)
             }
             .then { bundle -> Promise<(Int, JSON)> in
                 self.signalClient.deliverToDevice(address: address, messageBundle: bundle)
@@ -155,7 +160,7 @@ public class MessageSender {
                                                      paddedClearData: paddedClearData)
                 return self.messageTransmissionBundle(deviceId: id,
                                                       registrationId: registrationId,
-                                                      encryptedMessageData: encryptedMessage.message,
+                                                      encryptedMessage: encryptedMessage,
                                                       timestamp: timestamp)
             }
         } catch let error {
