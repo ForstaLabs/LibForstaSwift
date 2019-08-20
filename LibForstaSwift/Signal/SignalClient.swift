@@ -183,8 +183,7 @@ class SignalClient {
     func getKeysForAddr(addr: String, deviceId: UInt32? = nil) -> Promise<[SessionPreKeyBundle]> {
         let deviceStr = deviceId == nil ? "*" : String(deviceId!)
         return self.request(.keys, urlParameters: "/\(addr)/\(deviceStr)")
-            .map { result in
-                let (statusCode, json) = result
+            .map { (statusCode, json) in
                 if statusCode == 200 {
                     guard
                         let devices = json["devices"].array,
@@ -250,7 +249,6 @@ class SignalClient {
         return Promise { seal in
             let headers = authHeader()
             Alamofire.request("\(serverUrl!)\(call.rawValue)\(urlParameters)", method: method, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
-                // .debugLog()
                 .responseJSON { response in
                     let statusCode = response.response?.statusCode ?? 500
                     switch response.result {

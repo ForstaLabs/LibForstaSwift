@@ -22,7 +22,7 @@ public class ReadSyncReceipt: CustomStringConvertible {
         self.timestamp = timestamp
     }
     public var description: String {
-        return "ReadSyncReceipt(\(self.sender) @ \(self.timestamp ))"
+        return "ReadSyncReceipt(\(self.sender) @ \(self.timestamp.millisecondsSince1970 ))"
     }
 }
 
@@ -35,7 +35,7 @@ public class DeliveryReceipt: CustomStringConvertible {
         self.timestamp = timestamp
     }
     public var description: String {
-        return "DeliveryReceipt(\(self.address) @ \(self.timestamp ))"
+        return "DeliveryReceipt(\(self.address) @ \(self.timestamp.millisecondsSince1970 ))"
     }
 }
 
@@ -78,7 +78,7 @@ public class InboundMessage: CustomStringConvertible {
     
     public var description: String {
         return """
-        InboundMessage from \(source) @ \(timestamp) good for \(expiration ?? -1)
+        InboundMessage from \(source) @ \(timestamp.millisecondsSince1970) good for \(expiration ?? -1)
         \((body.rawString() ?? "<malformed body>").indentWith(">>> "))
         """
     }

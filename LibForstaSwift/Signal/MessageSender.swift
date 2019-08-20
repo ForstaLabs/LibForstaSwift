@@ -22,21 +22,40 @@ public class MessageSender {
         self.wsr = webSocketResource ?? WebSocketResource(signalClient: signalClient)
     }
     
+    /// Information about a message transmission activity
+    public class TransmissionInfo: CustomStringConvertible {
+        let received: Date
+        let needsSync: Bool
+        let recipient: MessageRecipient
+        let deviceCount: Int
+        
+        init(recipient: MessageRecipient, deviceCount: Int, json: JSON) {
+            self.received = Date(millisecondsSince1970: json["received"].uInt64Value)
+            self.needsSync = json["needsSync"].boolValue
+            self.recipient = recipient
+            self.deviceCount = deviceCount
+        }
+        
+        public var description: String {
+            return "<<\(self.recipient) [\(self.deviceCount)] @ \(self.received.millisecondsSince1970), \(self.needsSync ? "needs sync" : "no sync needed")>>"
+        }
+    }
+    
     /// Transmit a Sendable (i.e., a message)
-    public func send(_ message: Sendable) -> Promise<JSON> {
-        return firstly { () -> Promise<JSON> in
-            var results: [Promise<JSON>] = []
+    public func send(_ message: Sendable) -> Promise<[TransmissionInfo]> {
+        return firstly { () -> Promise<[TransmissionInfo]> in
+            var results: [Promise<TransmissionInfo>] = []
             var paddedClearData = try message.contentProto.serializedData()
             pad(&paddedClearData)
             
             for recipient in message.recipients {
                 switch recipient {
-                case .device(let address): results.append(self.sendToDevice(address: address, paddedClearData: paddedClearData))
-                case .user(let userId): results.append(self.sendToUser(userId: userId, paddedClearData: paddedClearData))
+                case .device(let address): results.append(self.sendToDevice(address: address, paddedClearData: paddedClearData, timestamp: message.timestamp))
+                case .user(let userId): results.append(self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: message.timestamp))
                 }
             }
             
-            return results[0] // TODO: make this plural!
+            return when(fulfilled: results)
         }
     }
     
@@ -63,7 +82,7 @@ public class MessageSender {
     }
     
     /// Encrypt padded clear data, accepting changed identity keys
-    /// Returns promise of CiphertextMessage and remote registration id
+    /// Returns CiphertextMessage and remote registration id
     func encryptWithKeyChangeRecovery(address: SignalAddress, paddedClearData: Data) throws -> (CiphertextMessage, UInt32) {
         let cipher = SessionCipher(for: address, in: self.signalClient.store)
         var attempts = 0
@@ -83,18 +102,19 @@ public class MessageSender {
         throw ForstaError(.untrustedIdentity, "untrusted identity key")
     }
     
-    func messageTransmissionBundle(deviceId: Int32, registrationId: UInt32, encryptedMessageData: Data) -> [String: Any] {
+    // Build a message transmission bundle
+    func messageTransmissionBundle(deviceId: Int32, registrationId: UInt32, encryptedMessageData: Data, timestamp: Date) -> [String: Any] {
         return [
             "type": Signal_Envelope.TypeEnum.ciphertext.rawValue,
             "content": encryptedMessageData.base64EncodedString(),
             "destinationRegistrationId": registrationId,
             "destinationDeviceId": deviceId,
-            "timestamp": Date().millisecondsSince1970
+            "timestamp": timestamp.millisecondsSince1970
         ]
     }
     
     /// Send a padded clear data to a specific device, fetching/updating keys as necessary
-    func sendToDevice(address: SignalAddress, paddedClearData: Data, retry: Bool = true) -> Promise<JSON> {
+    func sendToDevice(address: SignalAddress, paddedClearData: Data, timestamp: Date, retry: Bool = true) -> Promise<TransmissionInfo> {
         return firstly
             { () -> Promise<Void> in
                 if !self.signalClient.store.sessionStore.containsSession(for: address) {
@@ -109,24 +129,23 @@ public class MessageSender {
             .map { (encryptedMessage, remoteRegistrationId) -> [String: Any] in
                 self.messageTransmissionBundle(deviceId: address.deviceId,
                                                registrationId: remoteRegistrationId,
-                                               encryptedMessageData: encryptedMessage.message)
+                                               encryptedMessageData: encryptedMessage.message, timestamp: timestamp)
             }
             .then { bundle -> Promise<(Int, JSON)> in
                 self.signalClient.deliverToDevice(address: address, messageBundle: bundle)
             }
-            .then { result -> Promise<JSON> in
-                let (statusCode, json) = result
+            .then { (statusCode, json) -> Promise<TransmissionInfo> in
                 if statusCode == 410 && retry {
                     let _ = self.signalClient.store.sessionStore.deleteSession(for: address) // force an updateKeys on retry
-                    return self.sendToDevice(address: address, paddedClearData: paddedClearData, retry: false)
+                    return self.sendToDevice(address: address, paddedClearData: paddedClearData, timestamp: timestamp, retry: false)
                 } else if statusCode >= 300 {
                     throw ForstaError(.requestRejected, json)
                 }
-                return Promise<JSON>.value(json)
+                return Promise<TransmissionInfo>.value(TransmissionInfo(recipient:.device(address), deviceCount: 1, json: json))
         }
     }
     
-    func sendToUser(userId: UUID, paddedClearData: Data, recurse: Bool = true) -> Promise<JSON> {
+    func sendToUser(userId: UUID, paddedClearData: Data, timestamp: Date, allowRetries: Bool = true) -> Promise<TransmissionInfo> {
         let deviceIds = self.signalClient.store.sessionStore.subDeviceSessions(for: userId) ?? []
         var messageBundles: [[String: Any]]
         do {
@@ -136,19 +155,19 @@ public class MessageSender {
                                                      paddedClearData: paddedClearData)
                 return self.messageTransmissionBundle(deviceId: id,
                                                       registrationId: registrationId,
-                                                      encryptedMessageData: encryptedMessage.message)
+                                                      encryptedMessageData: encryptedMessage.message,
+                                                      timestamp: timestamp)
             }
         } catch let error {
-            return Promise<JSON>(error: error)
+            return Promise<TransmissionInfo>(error: error)
         }
         return
             self.signalClient.deliverToUser(userId: userId, messageBundles: messageBundles, timestamp: Date().millisecondsSince1970)
-            .then { result -> Promise<JSON> in
-                let (statusCode, json) = result
+            .then { (statusCode, json) -> Promise<TransmissionInfo> in
                 if statusCode < 300 {
-                    return Promise<JSON>.value(json)
+                    return Promise<TransmissionInfo>.value(TransmissionInfo(recipient:.user(userId), deviceCount: messageBundles.count, json: json))
                 } else if statusCode == 410 || statusCode == 409 {
-                    if (!recurse) {
+                    if (!allowRetries) {
                         throw ForstaError(.transmissionFailure, "Hit retry limit attempting to reload device list")
                     }
                     if (statusCode == 409) {
@@ -167,7 +186,7 @@ public class MessageSender {
                     
                     // no optimization for now -- just update all of the device keys for the user
                     return self.updatePrekeysForUser(userId).then {
-                        self.sendToUser(userId: userId, paddedClearData: paddedClearData, recurse: statusCode == 409)
+                        self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: timestamp, allowRetries: statusCode == 409)
                     }
                 } else {
                     throw ForstaError(.requestRejected, json)

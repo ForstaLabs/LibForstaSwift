@@ -312,12 +312,14 @@ class SignalClientTests: XCTestCase {
             sender.send(message)
                 .map { response in
                     print("FIRST message sent:", response)
+                    message.data = TextMessageData(plain: "Hello again, world!")
+                    message.timestamp = Date()
                 }
                 .then {
                     sender.send(message)
                 }
-                .done { response in
-                    print("SECOND message sent:", response)
+                .done { result in
+                    print("SECOND message sent:", result)
                 }
                 .catch { error in
                     XCTFail("error \(error)")

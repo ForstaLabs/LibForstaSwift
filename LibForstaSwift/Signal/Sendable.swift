@@ -118,7 +118,7 @@ extension Sendable {
             if self.endSessionFlag { flags |= UInt32(Signal_DataMessage.Flags.endSession.rawValue) }
             if self.expirationTimerUpdateFlag { flags |= UInt32(Signal_DataMessage.Flags.expirationTimerUpdate.rawValue) }
             if flags != 0 { dm.flags = flags }
-            
+
             // TODO: set .attachments based on some sort of attachment pointers...
 
             var content = Signal_Content()
@@ -130,7 +130,7 @@ extension Sendable {
     
     public var description: String {
         return """
-        Sendable from \(senderUserId).\(senderDeviceId) @ \(timestamp)
+        Sendable from \(senderUserId).\(senderDeviceId) @ \(timestamp.millisecondsSince1970)
         >>> distribution: \(distributionExpression)
         >>> \(messageType) message \(messageId) in \(threadType?.rawValue ?? "<no type>") thread \(threadId) (\(threadTitle ?? "<no title>")) \
         \(messageRef != nil ? "\n>>> references message \(messageRef!)" : "")
