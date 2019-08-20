@@ -162,7 +162,7 @@ class SignalClientTests: XCTestCase {
             let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
             let response = Message(senderUserId: userId ?? UUID(),
                                    senderDeviceId: deviceId ?? 0,
-                                   threadId: UUID(uuidString: inboundMessage!.body[0]["threadId"].stringValue)!,
+                                   threadId: UUID(uuidString: inboundMessage!.payload.threadId)!,
                                    distributionExpression: inboundMessage!.body[0]["distribution"]["expression"].stringValue,
                                    data: TextMessageData(plain: "Hello, world!"),
                                    threadType: .conversation)
@@ -285,8 +285,7 @@ class SignalClientTests: XCTestCase {
             let _ = MessageReceiver(signalClient: signalClient, webSocketResource: wsr)
             wsr.connect()
             wait(for: [connectified], timeout: 2 * 60.0)
-            print("proceeding with send")
-            
+
             let theGoodPart = XCTestExpectation()
             
             let myUserId = atlasClient.kvstore.get(DNK.ssAddress) as UUID?
@@ -309,19 +308,21 @@ class SignalClientTests: XCTestCase {
             defer { NotificationCenter.default.removeObserver(receiptObserver) }
             
             let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
-            print("sending message", message)
+            print(message)
             sender.send(message)
                 .map { response in
-                    print("FIRST message sent:", response)
+                    print("send result:", response)
                     message.data = TextMessageData(plain: "Hello again, world!")
                     message.timestamp = Date()
                 }
+                /*
                 .then {
                     sender.send(message)
                 }
                 .done { result in
-                    print("SECOND message sent:", result)
+                    print("second send result:", result)
                 }
+                 */
                 .catch { error in
                     XCTFail("error \(error)")
                 }

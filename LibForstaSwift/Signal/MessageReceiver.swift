@@ -39,6 +39,89 @@ public class DeliveryReceipt: CustomStringConvertible {
     }
 }
 
+public class ForstaPayloadV1 {
+    var json: JSON
+    
+    init(_ payload: ForstaPayloadV1) {
+        self.json = payload.json
+    }
+    init(_ json: JSON) {
+        self.json = json
+    }
+    init(_ string: String? = nil) {
+        self.json = JSON([])
+        do {
+            json = try JSON(string: string ?? "[]")
+        } catch {
+            json = JSON([])
+        }
+        for item in json.arrayValue {
+            if item["version"].intValue == 1 {
+                json = item
+            }
+        }
+    }
+    
+    var jsonString: String {
+        return json.rawString([.castNilToNSNull: true]) ?? "<malformed JSON>"
+    }
+    
+    public var messageId: UUID? {
+        get {
+            return UUID(uuidString: json["messageId"].string ?? "")
+        }
+        set(value) {
+            if value == nil {
+                json.dictionaryObject?.removeValue(forKey: "messageId")
+            } else {
+                json["messageId"].string = value!.lcString
+            }
+        }
+    }
+    
+    public var messageRef: UUID? {
+        get {
+            return UUID(uuidString: json["messageRef"].string ?? "")
+        }
+        set(value) {
+            if value == nil {
+                json.dictionaryObject?.removeValue(forKey: "messageRef")
+            } else {
+                json["messageRef"].string = value!.lcString
+            }
+        }
+    }
+    
+    public var sender: SignalAddress? {
+        get {
+            guard
+                let userId = json["sender"]["userId"].string,
+                let deviceId = json["sender"]["device"].uInt32 else {
+                    return nil
+            }
+            return SignalAddress(userId: userId, deviceId: deviceId)
+        }
+        set(value) {
+            if value == nil {
+                json.dictionaryObject?.removeValue(forKey: "sender")
+            } else {
+                json["sender"]["userId"].string = value!.userId.lcString
+                json["sender"]["device"].int32 = value!.deviceId
+            }
+        }
+    }
+    
+    /*
+     getMessageType
+     getThreadExpression
+     getThreadId
+     getThreadTitle
+     getThreadType
+     getTimestamp
+     getUserAgent
+     */
+}
+
 public class InboundMessage: CustomStringConvertible {
     var source: SignalAddress
     var timestamp: Date
@@ -48,7 +131,8 @@ public class InboundMessage: CustomStringConvertible {
     var endSessionFlag: Bool
     var expirationTimerUpdateFlag: Bool
     
-    var body: JSON
+    var body: String
+    var payload: ForstaPayloadV1
     
     // specific to sync messages
     var expirationStart: Date?
@@ -61,7 +145,7 @@ public class InboundMessage: CustomStringConvertible {
          serverReceived: Date,
          endSessionFlag: Bool = false,
          expirationTimerUpdateFlag: Bool = false,
-         body: JSON,
+         body: String,
          expirationStart: Date? = nil,
          destination: String? = nil) {
         self.source = source
@@ -72,14 +156,16 @@ public class InboundMessage: CustomStringConvertible {
         self.endSessionFlag = endSessionFlag
         self.expirationTimerUpdateFlag = expirationTimerUpdateFlag
         self.body = body
+        self.payload = ForstaPayloadV1(body)
         self.expirationStart = expirationStart
         self.destination = destination
     }
     
+
     public var description: String {
         return """
         InboundMessage from \(source) @ \(timestamp.millisecondsSince1970) good for \(expiration ?? -1)
-        \((body.rawString() ?? "<malformed body>").indentWith(">>> "))
+        \((payload.jsonString).indentWith(">>> "))
         """
     }
 }
@@ -96,7 +182,7 @@ public class MessageReceiver {
     
     /// Handle an incoming websocket request (/queue/empty or /message)
     private func handleRequest(request: IncomingWSRequest) {
-        // print("Handling WS request \(request.verb) \(request.path)...")
+        print("Handling WS request \(request.verb) \(request.path)...")
         if request.path == WSRequest.Path.queueEmpty {
             NotificationCenter.broadcast(.signalQueueEmpty)
             let _ = request.respond(status: 200, message: "OK")
@@ -165,16 +251,17 @@ public class MessageReceiver {
         if dm != nil {
             let expirationTimerUpdateFlag = dm!.hasFlags && (dm!.flags & UInt32(Signal_DataMessage.Flags.expirationTimerUpdate.rawValue)) != 0
             let endSessionFlag = dm!.hasFlags && (dm!.flags & UInt32(Signal_DataMessage.Flags.endSession.rawValue)) != 0
+            // let bodyJson =  try JSON(string: dm!.body ?? "[]")
             let msg = InboundMessage(source: SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice),
                                      timestamp: Date(millisecondsSince1970: envelope.timestamp),
-                                     expiration: (dm?.hasExpireTimer ?? false)
+                                     expiration: dm!.hasExpireTimer
                                         ? TimeInterval(milliseconds: dm!.expireTimer)
                                         : nil,
                                      serverAge: TimeInterval(milliseconds: envelope.age),
                                      serverReceived: Date(millisecondsSince1970: envelope.received),
                                      endSessionFlag: endSessionFlag,
                                      expirationTimerUpdateFlag: expirationTimerUpdateFlag,
-                                     body: try JSON(string: dm?.body ?? "[]"),
+                                     body: dm!.hasBody ? dm!.body : "",
                                      expirationStart: (sent?.hasExpirationStartTimestamp ?? false)
                                         ? Date(millisecondsSince1970: sent!.expirationStartTimestamp)
                                         : nil,
