@@ -62,57 +62,214 @@ public protocol Sendable {
     var recipients: [MessageRecipient] { get }
     
     var timestamp: Date { get }
-    var senderUserId: UUID { get }
-    var senderDeviceId: UInt32 { get }
-    
-    var messageId: UUID { get }
-    var messageType: FLIMessageType { get }
-    var threadId: UUID { get }
-    var distributionExpression: String { get }
-    
+
     var expiration: TimeInterval? { get }
     var endSessionFlag: Bool { get }
     var expirationTimerUpdateFlag: Bool { get }
 
-    // optional body stuff
-    var data: JSON? { get }         // the literal data field of the message exchange payload
-    var userAgent: String? { get }
-    var threadTitle: String? { get }
-    var threadType: FLIThreadType? { get }
-    var messageRef: UUID? { get }
+    var payload: ForstaPayloadV1 { get }
 }
 
-func TextMessageData(plain: String, html: String? = nil) -> JSON {
-    var body = [["type": "text/plain", "value": plain]]
-    if html != nil { body.append(["type": "text/html", "value": html!]) }
-    return JSON(["body" : body])
+public class ForstaPayloadV1 {
+    var json: JSON
+    
+    init(_ payload: ForstaPayloadV1) {
+        self.json = payload.json
+    }
+    init(_ json: JSON) {
+        self.json = json
+    }
+    init(_ string: String? = nil) {
+        self.json = JSON([])
+        do {
+            json = try JSON(string: string ?? "[\"version\": 1]")
+        } catch {
+            json = JSON(["version": 1])
+        }
+        for item in json.arrayValue {
+            if item["version"].intValue == 1 {
+                json = item
+            }
+        }
+    }
+    
+    var jsonString: String {
+        return json.rawString([.castNilToNSNull: true]) ?? "<malformed JSON>"
+    }
+    
+    public var messageId: UUID? {
+        get {
+            return UUID(uuidString: json["messageId"].string ?? "")
+        }
+        set(value) {
+            if value == nil {
+                json.dictionaryObject?.removeValue(forKey: "messageId")
+            } else {
+                json["messageId"].string = value!.lcString
+            }
+        }
+    }
+    
+    public var messageRef: UUID? {
+        get {
+            return UUID(uuidString: json["messageRef"].string ?? "")
+        }
+        set(value) {
+            if value == nil {
+                json.dictionaryObject?.removeValue(forKey: "messageRef")
+            } else {
+                json["messageRef"].string = value!.lcString
+            }
+        }
+    }
+    
+    public var sender: SignalAddress? {
+        get {
+            guard
+                let userId = json["sender"]["userId"].string,
+                let deviceId = json["sender"]["device"].uInt32 else {
+                    return nil
+            }
+            return SignalAddress(userId: userId, deviceId: deviceId)
+        }
+        set(value) {
+            if value == nil {
+                json.dictionaryObject?.removeValue(forKey: "sender")
+            } else {
+                json["sender"] = ["userId": value!.name, "device": value!.deviceId]
+            }
+        }
+    }
+    
+    public var messageType: FLIMessageType? {
+        get {
+            return FLIMessageType(rawValue: json["messageType"].stringValue)
+        }
+        set(value) {
+            if value == nil {
+                json.dictionaryObject?.removeValue(forKey: "messageType")
+            } else {
+                json["messageType"].string = value!.rawValue
+            }
+        }
+    }
+    
+    public enum BodyItem: CustomStringConvertible {
+        case plain(_ value: String)
+        case html(_ value: String)
+        case unknown(_ value: String)
+        
+        public var description: String {
+            switch self {
+            case .plain(let str): return "\"\(str)\""
+            case .html(let str): return "\"\(str)\""
+            default: return "<bad item>"
+            }
+        }
+    }
+
+    public var body: [BodyItem]? {
+        get {
+            if !json["data"]["body"].exists() { return nil }
+            return json["data"]["body"].arrayValue.map {
+                switch $0["type"].stringValue {
+                case "text/plain": return .plain($0["value"].stringValue)
+                case "text/html": return .html($0["value"].stringValue)
+                default: return .unknown($0["value"].stringValue)
+                }
+            }
+        }
+        set(value) {
+            if value == nil {
+                json["data"].dictionaryObject?.removeValue(forKey: "body")
+            } else {
+                let ary:[[String: String]] = value!.map {
+                    switch $0 {
+                    case .plain(let value): return ["type": "text/plain", "value": value]
+                    case .html(let value): return ["type": "text/plain", "value": value]
+                    case .unknown(let value): return ["type": "text/unknown", "value": value]
+                    }
+                }
+                if !json["data"].exists() {
+                    json["data"] = [:]
+                }
+                json["data"]["body"] = JSON(ary)
+            }
+        }
+    }
+    
+    public var threadExpression: String? {
+        get {
+            return json["distribution"]["expression"].string
+        }
+        set(value) {
+            if value == nil {
+                json.dictionaryObject?.removeValue(forKey: "distribution")
+            } else {
+                json["distribution"] = ["expression": value!]
+            }
+        }
+    }
+    
+    public var threadId: UUID? {
+        get {
+            return UUID(uuidString: json["threadId"].string ?? "")
+        }
+        set(value) {
+            if value == nil {
+                json.dictionaryObject?.removeValue(forKey: "threadId")
+            } else {
+                json["threadId"].string = value!.lcString
+            }
+        }
+    }
+    
+    public var threadTitle: String? {
+        get {
+            return json["threadTitle"].string
+        }
+        set(value) {
+            if value == nil {
+                json.dictionaryObject?.removeValue(forKey: "threadTitle")
+            } else {
+                json["threadTitle"].string = value!
+            }
+        }
+    }
+    
+    public var threadType: FLIThreadType? {
+        get {
+            return FLIThreadType(rawValue: json["threadType"].stringValue)
+        }
+        set(value) {
+            if value == nil {
+                json.dictionaryObject?.removeValue(forKey: "threadType")
+            } else {
+                json["threadType"].string = value!.rawValue
+            }
+        }
+    }
+    
+    public var userAgent: String? {
+        get {
+            return json["userAgent"].string
+        }
+        set(value) {
+            if value == nil {
+                json.dictionaryObject?.removeValue(forKey: "userAgent")
+            } else {
+                json["userAgent"].string = value!
+            }
+        }
+    }
 }
+
 
 extension Sendable {
     var contentProto: Signal_Content {
         get {
-            var body = JSON([[
-                "version": 1,
-                "messageId": self.messageId.lcString,
-                "messageType": self.messageType.rawValue,
-                "threadId": self.threadId.lcString,
-                "sender": [
-                    "userId": self.senderUserId.lcString,
-                    "device": self.senderDeviceId,
-                ],
-                "distribution": [
-                    "expression": self.distributionExpression
-                ]
-                ]])
-            
-            if self.data != nil { body[0]["data"] = self.data! }
-            if self.userAgent != nil { body[0]["userAgent"] = JSON(self.userAgent!) }
-            if self.threadTitle != nil { body[0]["threadTitle"] = JSON(self.threadTitle!) }
-            if self.threadType != nil { body[0]["threadType"] = JSON(self.threadType!.rawValue) }
-            if self.messageRef != nil { body[0]["messageRef"] = JSON(self.messageRef!.lcString) }
-            
             var dm = Signal_DataMessage()
-            dm.body = body.rawString([.castNilToNSNull: true])!
+            dm.body = "[\(payload.jsonString)]"
             if self.expiration != nil { dm.expireTimer = UInt32(self.expiration!.milliseconds) }
             var flags: UInt32 = 0
             if self.endSessionFlag { flags |= UInt32(Signal_DataMessage.Flags.endSession.rawValue) }
@@ -130,11 +287,11 @@ extension Sendable {
     
     public var description: String {
         return """
-        Sendable from \(senderUserId).\(senderDeviceId) @ \(timestamp.millisecondsSince1970)
-        >>> distribution: \(distributionExpression)
-        >>> \(messageType) message \(messageId) in \(threadType?.rawValue ?? "<no type>") thread \(threadId) (\(threadTitle ?? "<no title>")) \
-        \(messageRef != nil ? "\n>>> references message \(messageRef!)" : "")
-        \((data != nil ? "data: \(data!.rawString() ?? "<malformed body>"))" : "").indentWith(">>> "))
+        Sendable @ \(timestamp.millisecondsSince1970)
+        >>> distribution: \(payload.threadExpression ?? "<no distribution expression>")
+        >>> \(payload.messageType?.rawValue ?? "<no message type>") message \(payload.messageId?.description ?? "<no message id>") in \(payload.threadType?.rawValue ?? "<no type>") thread \(payload.threadId?.description ?? "<no thread id>") (\(payload.threadTitle ?? "<no title>")) \
+        \(payload.messageRef != nil ? "\n>>> references message \(payload.messageRef!)" : "")
+        \((payload.body?.description ?? "<no body>").indentWith(">>> "))
         """
     }
 }

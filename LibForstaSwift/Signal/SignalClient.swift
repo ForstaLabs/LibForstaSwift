@@ -50,6 +50,14 @@ class SignalClient {
             senderKeyStore: nil)
     }
     
+    public func myAddress() -> SignalAddress? {
+        guard
+            let userId = self.kvstore.get(DNK.ssAddress) as UUID?,
+            let deviceId = self.kvstore.get(DNK.ssDeviceId) as UInt32? else {
+                return nil
+        }
+        return SignalAddress(userId: userId, deviceId: deviceId)
+    }
 
     func generatePassword() throws -> String {
         return try String(crypto.random(bytes: 16).base64EncodedString().dropLast(2))

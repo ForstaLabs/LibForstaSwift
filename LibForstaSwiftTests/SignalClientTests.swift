@@ -20,57 +20,49 @@ class Message: Sendable, CustomStringConvertible {
     public var recipients: [MessageRecipient]
     
     public var timestamp: Date
-    public var senderUserId: UUID
-    public var senderDeviceId: UInt32
-    
-    public var messageId: UUID
-    public var messageType: FLIMessageType
-    public var threadId: UUID
-    public var distributionExpression: String
-    
+
     public var expiration: TimeInterval?
     public var endSessionFlag: Bool
     public var expirationTimerUpdateFlag: Bool
     
-    public var data: JSON?
-    public var userAgent: String?
-    public var threadTitle: String?
-    public var threadType: FLIThreadType?
-    public var messageRef: UUID?
-    
+    public var payload = ForstaPayloadV1()
+
     init(recipients: [MessageRecipient] = [MessageRecipient](),
          timestamp: Date = Date(),
-         senderUserId: UUID,
-         senderDeviceId: UInt32,
+         sender: SignalAddress? = nil,
          messageId: UUID = UUID(),
          messageType: FLIMessageType = .content,
          threadId: UUID = UUID(),
-         distributionExpression: String,
+         threadExpression: String,
          expiration: TimeInterval? = nil,
          endSessionFlag: Bool = false,
          expirationTimerUpdateFlag: Bool = false,
-         data: JSON? = nil,
          userAgent: String = "LibSignalSwift Client",
          threadTitle: String? = nil,
          threadType: FLIThreadType? = nil,
-         messageRef: UUID? = nil
+         messageRef: UUID? = nil,
+         bodyPlain: String? = nil,
+         bodyHtml: String? = nil
         ) {
         self.recipients = recipients
         self.timestamp = timestamp
-        self.senderUserId = senderUserId
-        self.senderDeviceId = senderDeviceId
-        self.messageId = messageId
-        self.messageType = messageType
-        self.threadId = threadId
-        self.distributionExpression = distributionExpression
+        self.payload.sender = sender
+        self.payload.messageId = messageId
+        self.payload.messageType = messageType
+        self.payload.threadId = threadId
+        self.payload.threadExpression = threadExpression
         self.expiration = expiration
         self.endSessionFlag = endSessionFlag
         self.expirationTimerUpdateFlag = expirationTimerUpdateFlag
-        self.data = data
-        self.userAgent = userAgent
-        self.threadTitle = threadTitle
-        self.threadType = threadType
-        self.messageRef = messageRef
+        self.payload.userAgent = userAgent
+        self.payload.threadTitle = threadTitle
+        self.payload.threadType = threadType
+        self.payload.messageRef = messageRef
+        
+        var bodyItems = [ForstaPayloadV1.BodyItem]()
+        if bodyPlain != nil { bodyItems.append(.plain(bodyPlain!)) }
+        if bodyHtml != nil { bodyItems.append(.html(bodyHtml!)) }
+        if bodyItems.count > 0 { self.payload.body = bodyItems }
     }
 }
 
@@ -157,16 +149,12 @@ class SignalClientTests: XCTestCase {
             wait(for: [connectAndReceive], timeout: 2 * 60.0)
             let thenSend = XCTestExpectation()
             
-            let userId = atlasClient.kvstore.get(DNK.ssAddress) as UUID?
-            let deviceId = atlasClient.kvstore.get(DNK.ssDeviceId) as UInt32?
             let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
-            let response = Message(senderUserId: userId ?? UUID(),
-                                   senderDeviceId: deviceId ?? 0,
-                                   threadId: UUID(uuidString: inboundMessage!.payload.threadId)!,
-                                   distributionExpression: inboundMessage!.body[0]["distribution"]["expression"].stringValue,
-                                   data: TextMessageData(plain: "Hello, world!"),
-                                   threadType: .conversation)
-            
+            let response = Message(threadId: inboundMessage!.payload.threadId!,
+                                   threadExpression: inboundMessage!.payload.threadExpression!,
+                                   threadType: .conversation,
+                                   bodyPlain: "Hello, world!")
+
             /*
              signalClient.getKeysForAddr(inboundMessage!.source)
              .done { result in
@@ -246,7 +234,103 @@ class SignalClientTests: XCTestCase {
         }
     }
     
-    func testPreKeySend() {
+    func testPayload() {
+        let payload = ForstaPayloadV1()
+        
+        XCTAssert(payload.jsonString == "{\"version\": 1}")
+        
+        let messageId = UUID()
+        XCTAssert(payload.messageId == nil)
+        payload.messageId = messageId
+        XCTAssert(payload.messageId! == messageId)
+        
+        let messageRef = UUID()
+        XCTAssert(payload.messageRef == nil)
+        payload.messageRef = messageRef
+        XCTAssert(payload.messageRef! == messageRef)
+        
+        let sender = SignalAddress(userId: UUID(), deviceId: Int32(42))
+        XCTAssert(payload.sender == nil)
+        payload.sender = sender
+        XCTAssert(payload.sender! == sender)
+        
+        let messageType = FLIMessageType.content
+        XCTAssert(payload.messageType == nil)
+        payload.messageType = messageType
+        XCTAssert(payload.messageType! == messageType)
+        
+        let body: [ForstaPayloadV1.BodyItem] = [.plain("yo baby")]
+        XCTAssert(payload.body == nil)
+        payload.body = body
+        XCTAssert(payload.body != nil)
+        switch payload.body![0] {
+        case .plain(let string): XCTAssert(string == "yo baby")
+        default: XCTFail()
+        }
+
+        let threadExpression = "@foo + @bar"
+        XCTAssert(payload.threadExpression == nil)
+        payload.threadExpression = threadExpression
+        XCTAssert(payload.threadExpression! == threadExpression)
+        
+        let threadId = UUID()
+        XCTAssert(payload.threadId == nil)
+        payload.threadId = threadId
+        XCTAssert(payload.threadId! == threadId)
+        
+        let threadTitle = "my thread title"
+        XCTAssert(payload.threadTitle == nil)
+        payload.threadTitle = threadTitle
+        XCTAssert(payload.threadTitle! == threadTitle)
+        
+        let threadType = FLIThreadType.conversation
+        XCTAssert(payload.threadType == nil)
+        payload.threadType = threadType
+        XCTAssert(payload.threadType! == threadType)
+        
+        let userAgent = "muh useragent"
+        XCTAssert(payload.userAgent == nil)
+        payload.userAgent = userAgent
+        XCTAssert(payload.userAgent! == userAgent)
+
+        print("filled:", payload.jsonString)
+        
+        payload.messageId = nil
+        XCTAssert(payload.messageId == nil)
+        
+        payload.messageRef = nil
+        XCTAssert(payload.messageRef == nil)
+        
+        payload.sender = nil
+        XCTAssert(payload.sender == nil)
+        
+        payload.messageType = nil
+        XCTAssert(payload.messageType == nil)
+        
+        payload.body = nil
+        XCTAssert(payload.body == nil)
+        
+        payload.threadExpression = nil
+        XCTAssert(payload.threadExpression == nil)
+        
+        payload.threadId = nil
+        XCTAssert(payload.threadId == nil)
+        
+        payload.threadTitle = nil
+        XCTAssert(payload.threadTitle == nil)
+        
+        payload.threadType = nil
+        XCTAssert(payload.threadType == nil)
+        
+        payload.userAgent = nil
+        XCTAssert(payload.userAgent == nil)
+        
+        XCTAssert(payload.json["version"] == 1)
+        XCTAssert(payload.json["data"].exists())
+        XCTAssert(payload.json["data"].dictionary!.count == 0)
+    }
+    
+    func testPreKeySendAndReceive() {
         
         do {
             watchEverything()
@@ -288,13 +372,10 @@ class SignalClientTests: XCTestCase {
 
             let theGoodPart = XCTestExpectation()
             
-            let myUserId = atlasClient.kvstore.get(DNK.ssAddress) as UUID?
-            let myDeviceId = atlasClient.kvstore.get(DNK.ssDeviceId) as UInt32?
-            let message = Message(senderUserId: myUserId ?? UUID(),
-                                  senderDeviceId: myDeviceId ?? 0,
-                                  distributionExpression: "(<2b53e98b-170f-4102-9d82-e43d5abb7998>+<e98bf10d-528f-44c4-99cd-c488385771cc>)",
-                                  data: TextMessageData(plain: "Hello, world!"),
-                                  threadType: .conversation)
+            let message = Message(threadId: UUID(uuidString: "F12E22AA-8A63-49D7-B71A-2470F3469B3E")!,
+                                  threadExpression: "(<2b53e98b-170f-4102-9d82-e43d5abb7998>+<e4faa7e0-5670-4436-a1b5-afd673e58298>+<e98bf10d-528f-44c4-99cd-c488385771cc>)",
+                                  threadType: .conversation,
+                                  bodyPlain: "Hello, world!")
             message.recipients.append(MessageRecipient.user(UUID(uuidString: "14871866-c0b4-4d1a-ab36-2a930385baf0")!))
             
             let receiptReceived = XCTestExpectation()
@@ -312,7 +393,7 @@ class SignalClientTests: XCTestCase {
             sender.send(message)
                 .map { response in
                     print("send result:", response)
-                    message.data = TextMessageData(plain: "Hello again, world!")
+                    message.payload.body = [.plain("Hello again, world!")]
                     message.timestamp = Date()
                 }
                 /*
@@ -379,15 +460,11 @@ class SignalClientTests: XCTestCase {
                 wsr.connect()
                 wait(for: [connectAndReceive], timeout: 5 * 60.0)
                 
-                let userId = atlasClient.kvstore.get(DNK.ssAddress) as UUID?
-                let deviceId = atlasClient.kvstore.get(DNK.ssDeviceId) as UInt32?
                 let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
-                let response = Message(senderUserId: userId ?? UUID(),
-                                       senderDeviceId: deviceId ?? 0,
-                                       threadId: UUID(uuidString: inboundMessage!.body[0]["threadId"].stringValue)!,
-                                       distributionExpression: inboundMessage!.body[0]["distribution"]["expression"].stringValue,
-                                       data: TextMessageData(plain: "Hello, world!"),
-                                       threadType: .conversation)
+                let response = Message(threadId: inboundMessage!.payload.threadId!,
+                                       threadExpression: inboundMessage!.payload.threadExpression!,
+                                       threadType: inboundMessage!.payload.threadType,
+                                       bodyPlain: "Hello, world!")
                 
                 
                 response.recipients.append(.device(inboundMessage!.source))
