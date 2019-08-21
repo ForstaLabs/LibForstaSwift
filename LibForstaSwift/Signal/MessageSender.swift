@@ -41,17 +41,17 @@ public class MessageSender {
         }
     }
     
-    /// Transmit a Sendable (i.e., a message)
-    public func send(_ message: Sendable) -> Promise<[TransmissionInfo]> {
+    /// Transmit a Sendable (i.e., a message) to a list of MessageRecipients (specific devices and/or users' whole collections of devices)
+    public func send(_ sendable: Sendable, to recipients: [MessageRecipient]) -> Promise<[TransmissionInfo]> {
         return firstly { () -> Promise<[TransmissionInfo]> in
             var results: [Promise<TransmissionInfo>] = []
-            var paddedClearData = try message.contentProto.serializedData()
+            var paddedClearData = try sendable.contentProto.serializedData()
             pad(&paddedClearData)
             
-            for recipient in message.recipients {
+            for recipient in recipients {
                 switch recipient {
-                case .device(let address): results.append(self.sendToDevice(address: address, paddedClearData: paddedClearData, timestamp: message.timestamp))
-                case .user(let userId): results.append(self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: message.timestamp))
+                case .device(let address): results.append(self.sendToDevice(address: address, paddedClearData: paddedClearData, timestamp: sendable.timestamp))
+                case .user(let userId): results.append(self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: sendable.timestamp))
                 }
             }
             

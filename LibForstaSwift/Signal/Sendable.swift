@@ -59,8 +59,6 @@ public enum MessageRecipient {
 }
 
 public protocol Sendable {
-    var recipients: [MessageRecipient] { get }
-    
     var timestamp: Date { get }
 
     var expiration: TimeInterval? { get }
@@ -71,7 +69,7 @@ public protocol Sendable {
 }
 
 public class ForstaPayloadV1 {
-    var json: JSON
+    public var json: JSON
     
     init(_ payload: ForstaPayloadV1) {
         self.json = payload.json

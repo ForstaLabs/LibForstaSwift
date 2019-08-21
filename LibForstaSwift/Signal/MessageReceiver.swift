@@ -40,22 +40,22 @@ public class DeliveryReceipt: CustomStringConvertible {
 }
 
 public class InboundMessage: CustomStringConvertible {
-    var source: SignalAddress
-    var timestamp: Date
-    var expiration: TimeInterval?
-    var serverAge: TimeInterval
-    var serverReceived: Date
-    var endSessionFlag: Bool
-    var expirationTimerUpdateFlag: Bool
+    public var source: SignalAddress
+    public var timestamp: Date
+    public var expiration: TimeInterval?
+    public var serverAge: TimeInterval
+    public var serverReceived: Date
+    public var endSessionFlag: Bool
+    public var expirationTimerUpdateFlag: Bool
     
-    var body: String
-    var payload: ForstaPayloadV1
+    public var body: String
+    public var payload: ForstaPayloadV1
     
     // specific to sync messages
-    var expirationStart: Date?
-    var destination: String?
+    public var expirationStart: Date?
+    public var destination: String?
     
-    init(source: SignalAddress,
+    public init(source: SignalAddress,
          timestamp: Date,
          expiration: TimeInterval? = nil,
          serverAge: TimeInterval,

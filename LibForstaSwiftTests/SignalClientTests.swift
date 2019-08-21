@@ -173,10 +173,8 @@ class SignalClientTests: XCTestCase {
              }
              */
             
-            
-            response.recipients.append(.device(inboundMessage!.source))
             print(response)
-            sender.send(response)
+            sender.send(response, to: [.device(inboundMessage!.source)])
                 .done { result in
                     print("SEND COMPLETE", result)
                 }
@@ -372,12 +370,11 @@ class SignalClientTests: XCTestCase {
 
             let theGoodPart = XCTestExpectation()
             
-            let message = Message(threadId: UUID(uuidString: "F12E22AA-8A63-49D7-B71A-2470F3469B3E")!,
-                                  threadExpression: "(<2b53e98b-170f-4102-9d82-e43d5abb7998>+<e4faa7e0-5670-4436-a1b5-afd673e58298>+<e98bf10d-528f-44c4-99cd-c488385771cc>)",
+            let message = Message(threadId: UUID(uuidString: "2cfe708c-42a9-4a63-b215-ad841e1e2399")!,
+                                  threadExpression: "(<2b53e98b-170f-4102-9d82-e43d5abb7998>+<e4faa7e0-5670-4436-a1b5-afd673e58298>)",
                                   threadType: .conversation,
                                   bodyPlain: "Hello, world!")
-            message.recipients.append(MessageRecipient.user(UUID(uuidString: "14871866-c0b4-4d1a-ab36-2a930385baf0")!))
-            
+
             let receiptReceived = XCTestExpectation()
             let receiptObserver = NotificationCenter.default.addObserver(
                 forName: .signalDeliveryReceipt,
@@ -390,7 +387,7 @@ class SignalClientTests: XCTestCase {
             
             let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
             print(message)
-            sender.send(message)
+            sender.send(message, to: [.user(UUID(uuidString: "14871866-c0b4-4d1a-ab36-2a930385baf0")!)])
                 .map { response in
                     print("send result:", response)
                     message.payload.body = [.plain("Hello again, world!")]
@@ -467,10 +464,9 @@ class SignalClientTests: XCTestCase {
                                        bodyPlain: "Hello, world!")
                 
                 
-                response.recipients.append(.device(inboundMessage!.source))
                 print(response)
                 let thenSend = XCTestExpectation()
-                sender.send(response)
+                sender.send(response, to: [.device(inboundMessage!.source)])
                     .done { result in
                         print("SEND COMPLETE", result)
                     }
