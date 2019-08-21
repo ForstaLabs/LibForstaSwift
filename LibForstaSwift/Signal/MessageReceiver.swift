@@ -48,7 +48,7 @@ public class InboundMessage: CustomStringConvertible {
     public var endSessionFlag: Bool
     public var expirationTimerUpdateFlag: Bool
     
-    public var body: String
+    public var signalBody: String
     public var payload: ForstaPayloadV1
     
     // specific to sync messages
@@ -62,7 +62,7 @@ public class InboundMessage: CustomStringConvertible {
          serverReceived: Date,
          endSessionFlag: Bool = false,
          expirationTimerUpdateFlag: Bool = false,
-         body: String,
+         signalBody: String,
          expirationStart: Date? = nil,
          destination: String? = nil) {
         self.source = source
@@ -72,8 +72,8 @@ public class InboundMessage: CustomStringConvertible {
         self.serverReceived = serverReceived
         self.endSessionFlag = endSessionFlag
         self.expirationTimerUpdateFlag = expirationTimerUpdateFlag
-        self.body = body
-        self.payload = ForstaPayloadV1(body)
+        self.signalBody = signalBody
+        self.payload = ForstaPayloadV1(signalBody)
         self.expirationStart = expirationStart
         self.destination = destination
     }
@@ -82,7 +82,7 @@ public class InboundMessage: CustomStringConvertible {
     public var description: String {
         return """
         InboundMessage from \(source) @ \(timestamp.millisecondsSince1970) good for \(expiration ?? -1)
-        \((payload.jsonString).indentWith(">>> "))
+        \(payload.description.indentWith(">>> "))
         """
     }
 }
@@ -178,7 +178,7 @@ public class MessageReceiver {
                                      serverReceived: Date(millisecondsSince1970: envelope.received),
                                      endSessionFlag: endSessionFlag,
                                      expirationTimerUpdateFlag: expirationTimerUpdateFlag,
-                                     body: dm!.hasBody ? dm!.body : "",
+                                     signalBody: dm!.hasBody ? dm!.body : "",
                                      expirationStart: (sent?.hasExpirationStartTimestamp ?? false)
                                         ? Date(millisecondsSince1970: sent!.expirationStartTimestamp)
                                         : nil,

@@ -68,7 +68,8 @@ public protocol Sendable {
     var payload: ForstaPayloadV1 { get }
 }
 
-public class ForstaPayloadV1 {
+public class ForstaPayloadV1: CustomStringConvertible {
+
     public var json: JSON
     
     init(_ payload: ForstaPayloadV1) {
@@ -93,6 +94,10 @@ public class ForstaPayloadV1 {
     
     var jsonString: String {
         return json.rawString([.castNilToNSNull: true]) ?? "<malformed JSON>"
+    }
+    
+    public var description: String {
+        return json.description
     }
     
     public var messageId: UUID? {
@@ -158,9 +163,12 @@ public class ForstaPayloadV1 {
         case unknown(_ value: String)
         
         public var description: String {
+            return "\"\(self.raw)\""
+        }
+        public var raw: String {
             switch self {
-            case .plain(let str): return "\"\(str)\""
-            case .html(let str): return "\"\(str)\""
+            case .plain(let str): return str
+            case .html(let str): return str
             default: return "<bad item>"
             }
         }
@@ -285,11 +293,11 @@ extension Sendable {
     
     public var description: String {
         return """
-        Sendable @ \(timestamp.millisecondsSince1970)
-        >>> distribution: \(payload.threadExpression ?? "<no distribution expression>")
-        >>> \(payload.messageType?.rawValue ?? "<no message type>") message \(payload.messageId?.description ?? "<no message id>") in \(payload.threadType?.rawValue ?? "<no type>") thread \(payload.threadId?.description ?? "<no thread id>") (\(payload.threadTitle ?? "<no title>")) \
-        \(payload.messageRef != nil ? "\n>>> references message \(payload.messageRef!)" : "")
-        \((payload.body?.description ?? "<no body>").indentWith(">>> "))
+        Sendable @ \(timestamp.millisecondsSince1970) \
+        \(expiration != nil ? "EXPIRATION \(expiration!)": "") \
+        \(endSessionFlag ? "\n>>> END SESSION FLAG" : "") \
+        \(expirationTimerUpdateFlag ? "\n>>> EXPIRATION TIMER UPDATE FLAG" : "")
+        \(payload.description.indentWith(">>> "))
         """
     }
 }
