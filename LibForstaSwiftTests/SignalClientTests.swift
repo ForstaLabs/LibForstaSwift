@@ -87,6 +87,11 @@ class SignalClientTests: XCTestCase {
         payload.messageType = messageType
         XCTAssert(payload.messageType! == messageType)
         
+        let controlMessageType = FLIControlMessageType.callJoin
+        XCTAssert(payload.controlMessageType == nil)
+        payload.controlMessageType = controlMessageType
+        XCTAssert(payload.controlMessageType! == controlMessageType)
+        
         let body: [ForstaPayloadV1.BodyItem] = [.plain("yo baby")]
         XCTAssert(payload.body == nil)
         payload.body = body
@@ -134,6 +139,9 @@ class SignalClientTests: XCTestCase {
         
         payload.messageType = nil
         XCTAssert(payload.messageType == nil)
+        
+        payload.controlMessageType = nil
+        XCTAssert(payload.controlMessageType == nil)
         
         payload.body = nil
         XCTAssert(payload.body == nil)

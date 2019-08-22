@@ -204,6 +204,22 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
     }
     
+    public var controlMessageType: FLIControlMessageType? {
+        get {
+            return FLIControlMessageType(rawValue: json["data"]["control"].stringValue)
+        }
+        set(value) {
+            if value == nil {
+                json["data"].dictionaryObject?.removeValue(forKey: "control")
+            } else {
+                if !json["data"].exists() {
+                    json["data"] = [:]
+                }
+                json["data"]["control"].string = value!.rawValue
+            }
+        }
+    }
+    
     public var threadExpression: String? {
         get {
             return json["distribution"]["expression"].string
