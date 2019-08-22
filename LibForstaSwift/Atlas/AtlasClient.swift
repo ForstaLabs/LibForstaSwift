@@ -19,19 +19,19 @@ let defaultBaseUrl = "https://atlas-dev.forsta.io"
 
 // MARK:- Externally Visible Types
 
-enum AtlasAuthenticationMethod {
+public enum AtlasAuthenticationMethod {
     case sms          // by SMS code
     case password     // by password
     case passwordOtp  // by password + Authenticator code
 }
-typealias AuthenticatedAtlasUser = JSON
-typealias InvitedAtlasPendingUserId = String
+public typealias AuthenticatedAtlasUser = JSON
+public typealias InvitedAtlasPendingUserId = String
 
 
 ///
 ///  Interface for the Forsta Atlas server.  Atlas provides user and tag management.
 ///
-class AtlasClient {
+public class AtlasClient {
     var defaultOrg = defaultPublicOrg
     var baseUrl = defaultBaseUrl
     
@@ -44,18 +44,18 @@ class AtlasClient {
     var isAuthenticated: Bool {
         return self.authenticatedUserJwt != nil
     }
-
+    
     ///
     /// Initialize this Atlas client.
     /// This will continue maintaining an auth session if possible.
     ///
     /// - parameter kvstore: a persistent key-value store
     ///
-    init(kvstore: KVStorageProtocol) {
+    public init(kvstore: KVStorageProtocol) {
         self.kvstore = kvstore
         restore()
     }
-
+    
     /// Internal: Restore JWT and baseUrl from kvstore, if possible.
     private func restore() {
         self.baseUrl = kvstore.get(DNK.atlasUrl) ?? defaultBaseUrl
@@ -64,7 +64,7 @@ class AtlasClient {
             if !setJwt(jwt) { expireJwt() }
         }
     }
-
+    
     // MARK:- Authentication and JWT Maintenance
     
     ///
@@ -76,7 +76,7 @@ class AtlasClient {
     /// - returns: A promise that resolves to an AuthCompletionType indicating
     ///            how to complete authentiation.
     ///
-    func requestAuthentication(_ userTag: String) -> Promise<AtlasAuthenticationMethod> {
+    public func requestAuthentication(_ userTag: String) -> Promise<AtlasAuthenticationMethod> {
         let (user, org) = tagParts(userTag)
         
         return request("/v1/login/send/\(org)/\(user)")
@@ -105,7 +105,7 @@ class AtlasClient {
     /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
     ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
-    func authenticateViaCode(userTag: String, code: String) -> Promise<AuthenticatedAtlasUser> {
+    public func authenticateViaCode(userTag: String, code: String) -> Promise<AuthenticatedAtlasUser> {
         let (user, org) = tagParts(userTag);
         let creds = [
             "authtoken": "\(org):\(user):\(code)"
@@ -122,7 +122,7 @@ class AtlasClient {
     /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
     ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
-    func authenticateViaPassword(userTag: String, password: String) -> Promise<AuthenticatedAtlasUser> {
+    public func authenticateViaPassword(userTag: String, password: String) -> Promise<AuthenticatedAtlasUser> {
         let creds = [
             "fq_tag": userTag,
             "password": password
@@ -140,7 +140,7 @@ class AtlasClient {
     /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
     ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
-    func authenticateViaPasswordOtp(userTag: String, password: String, otp: String) -> Promise<AuthenticatedAtlasUser> {
+    public func authenticateViaPasswordOtp(userTag: String, password: String, otp: String) -> Promise<AuthenticatedAtlasUser> {
         let creds = [
             "fq_tag": userTag,
             "password": password,
@@ -156,7 +156,7 @@ class AtlasClient {
     /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
     ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
-    func authenticateViaUserAuthToken(token: String) -> Promise<AuthenticatedAtlasUser> {
+    public func authenticateViaUserAuthToken(token: String) -> Promise<AuthenticatedAtlasUser> {
         let creds = [
             "userauthtoken": token,
         ]
@@ -170,13 +170,13 @@ class AtlasClient {
     /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
     ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
-    func authenticateViaJwtProxy(jwt: String) -> Promise<AuthenticatedAtlasUser> {
+    public func authenticateViaJwtProxy(jwt: String) -> Promise<AuthenticatedAtlasUser> {
         let creds = [
             "jwtproxy": jwt,
         ]
         return authenticate(creds)
     }
-
+    
     /// Internal: Hit the Atlas authentication endpoing
     /// with appropriate credentials for a concrete authentication method.
     private func authenticate(_ credentials: [String: String]) -> Promise<AuthenticatedAtlasUser> {
@@ -232,7 +232,7 @@ class AtlasClient {
     ///
     /// - returns: `JSON` object of the new user
     ///
-    func createUser(_ fields: [String: Any]) -> Promise<JSON> {
+    public func createUser(_ fields: [String: Any]) -> Promise<JSON> {
         return request("/v1/user/", method: .post, parameters: fields)
             .map { (statusCode, json) in
                 if statusCode == 201 { return json }
@@ -249,14 +249,14 @@ class AtlasClient {
     ///
     /// - returns: `JSON` object of the updated user
     ///
-    func updateUser(_ id: String, _ fields: [String: Any]) -> Promise<JSON> {
+    public func updateUser(_ id: String, _ fields: [String: Any]) -> Promise<JSON> {
         return request("/v1/user/\(id)/", method: .patch, parameters: fields)
             .map { (statusCode, json) in
                 if statusCode == 200 { return json }
                 throw ForstaError(.requestRejected, json)
         }
     }
-
+    
     ///
     /// Request creation of a UserAuthToken
     ///
@@ -266,7 +266,7 @@ class AtlasClient {
     ///
     /// - returns: `JSON` object containing the UserAuthToken
     ///
-    func getUserAuthToken(userId: String? = nil, description: String? = nil) -> Promise<JSON> {
+    public func getUserAuthToken(userId: String? = nil, description: String? = nil) -> Promise<JSON> {
         var fields = [String:String]()
         if userId != nil { fields["userid"] = userId }
         if description != nil { fields["description"] = description }
@@ -277,7 +277,7 @@ class AtlasClient {
                 throw ForstaError(.requestRejected, json)
         }
     }
-   
+    
     ///
     /// Unauthenticated creation of an account (and an org for it, optionally).
     /// On success, this also sets the JWT for this `AtlasClient`.
@@ -300,8 +300,8 @@ class AtlasClient {
     ///
     /// - returns: The new user's fully-qualified tag and the userId GUID: `(tag, guid)`
     ///
-    func joinForsta(invitationToken: String? = nil,
-                    _ fields: [String: Any]) -> Promise<(String, UUID)> {
+    public func joinForsta(invitationToken: String? = nil,
+                           _ fields: [String: Any]) -> Promise<(String, UUID)> {
         return request("/v1/join/\(invitationToken ?? "")", method: .post, parameters: fields)
             .map { (statusCode, json) in
                 if statusCode == 200,
@@ -332,7 +332,7 @@ class AtlasClient {
     ///
     /// - returns: a Promise of the ID for the pending user who was sent an invitation
     ///
-    func sendInvitation(_ fields: [String: Any]) -> Promise<InvitedAtlasPendingUserId> {
+    public func sendInvitation(_ fields: [String: Any]) -> Promise<InvitedAtlasPendingUserId> {
         return request("/v1/invitation/", method: .post, parameters: fields)
             .map { (statusCode, json) in
                 if statusCode == 200, let userId = json["invited_user_id"].string {
@@ -349,7 +349,7 @@ class AtlasClient {
     ///
     /// - returns: a Promise of the JSON containing accumulated field values for the information  for the pending user who was sent an invitation
     ///
-    func revokeInvitation(_ pendingUserId: String) -> Promise<Void> {
+    public func revokeInvitation(_ pendingUserId: String) -> Promise<Void> {
         return request("/v1/invitation/\(pendingUserId)", method: .delete)
             .map { (statusCode, json) in
                 if statusCode == 204 { return () }
@@ -368,7 +368,7 @@ class AtlasClient {
     /// - returns: a Promise of the JSON containing accumulated field values
     ///            for prefilling a form leading to a `joinForsta()`
     ///
-    func getInvitationInfo(_ invitationToken: String) -> Promise<JSON> {
+    public func getInvitationInfo(_ invitationToken: String) -> Promise<JSON> {
         return request("/v1/invitation/\(invitationToken)", method: .get)
             .map { (statusCode, json) in
                 if statusCode == 200 { return json }
@@ -378,7 +378,7 @@ class AtlasClient {
     
     
     // MARK:- Tag and User Directory Services
-
+    
     ///
     /// Take a tag expression (i.e "@foo + @bar - (@joe + @sarah)") and resolve
     /// it to its current user membership.
@@ -386,7 +386,7 @@ class AtlasClient {
     /// - parameter expression: a `String` tag expression
     /// - returns: resolution structure containing cool stuff
     ///
-    func resolveTagExpression(_ expression: String) -> Promise<JSON> {
+    public func resolveTagExpression(_ expression: String) -> Promise<JSON> {
         return resolveTagExpressionBatch([expression])
             .map { result in
                 let res = result.arrayValue
@@ -406,7 +406,7 @@ class AtlasClient {
     /// - parameter expressions: the `[String]` of tag expressions
     /// - returns: array of resolutions of cool stuff
     ///
-    func resolveTagExpressionBatch(_ expressions: [String]) -> Promise<JSON> {
+    public func resolveTagExpressionBatch(_ expressions: [String]) -> Promise<JSON> {
         return request("/v1/tagmath/", method: .post, parameters: ["expressions": expressions])
             .map { (statusCode, json) in
                 if statusCode == 200 { return json["results"] }
@@ -427,7 +427,7 @@ class AtlasClient {
     ///
     /// - returns: Array of user `JSON` objects.
     ///
-    func getUsers(userIds: [String], onlyPublicDirectory: Bool = false) -> Promise<[JSON]> {
+    public func getUsers(userIds: [String], onlyPublicDirectory: Bool = false) -> Promise<[JSON]> {
         var missing = Set(userIds);
         var users: [JSON] = []
         
@@ -462,20 +462,20 @@ class AtlasClient {
     ///
     /// - returns: `Promise` resolving to an array of `JSON`.
     ///
-    func provisionDevice() -> Promise<JSON> {
+    public func provisionDevice() -> Promise<JSON> {
         return request("/v1/provision/request", method: .post)
             .map { (statusCode, json) in
                 if statusCode == 200 { return json }
                 throw ForstaError(.requestRejected, json)
         }
     }
-
+    
     ///
     /// Provision/refresh a new Signal Server account.
     ///
     /// - returns: `Promise` resolving to an array of `JSON`.
     ///
-    func provisionAccount(_ fields: [String: Any]) -> Promise<JSON> {
+    public func provisionAccount(_ fields: [String: Any]) -> Promise<JSON> {
         return request("/v1/provision/account", method: .put, parameters: fields)
             .map { (statusCode, json) in
                 if statusCode == 200 { return json }
@@ -488,14 +488,14 @@ class AtlasClient {
     ///
     /// - returns: `Promise` resolving to an array of `JSON` device info.
     ///
-    func getDevices() -> Promise<[JSON]> {
+    public func getDevices() -> Promise<[JSON]> {
         return request("/v1/provision/account")
             .map { (statusCode, json) in
                 if statusCode == 200 { return json["devices"].arrayValue }
                 throw ForstaError(.requestRejected, json)
         }
     }
-
+    
     // MARK:- Utility Routines
     
     ///
@@ -506,7 +506,7 @@ class AtlasClient {
     ///            trimmed, lowercased, @-stripped (also, a
     ///            missing org will default to `self.defaultOrg`)
     ///
-    func tagParts(_ tag: String) -> (String, String) {
+    public func tagParts(_ tag: String) -> (String, String) {
         let trimmables = CharacterSet(charactersIn: "@ \t\n")
         
         let parts = "\(tag):\(defaultOrg)"
@@ -545,7 +545,7 @@ class AtlasClient {
             
             self.kvstore.set(DNK.atlasCredential, jwt)
             self.kvstore.set(DNK.atlasUrl, self.baseUrl)
-
+            
             guard let id = decodedJwt.body["user_id"] as? String else {
                 print("warning: malformed jwt, missing user_id")
                 return false

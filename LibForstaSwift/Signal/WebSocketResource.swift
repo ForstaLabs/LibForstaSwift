@@ -105,7 +105,7 @@ class WebSocketResource: WebSocketDelegate {
         self.requestHandler = requestHandler != nil ? requestHandler! : fallbackRequestHandler
     }
     
-    func connect() {
+    public func connect() {
         guard signalClient.serverUrl != nil, signalClient.signalServerUsername != nil, signalClient.password != nil else {
             print("CANNOT CONNECT!")
             return
@@ -171,7 +171,7 @@ class WebSocketResource: WebSocketDelegate {
         }
     }
     
-    func disconnect() {
+    public func disconnect() {
         self.socket?.disconnect()
         self.socket = nil
     }

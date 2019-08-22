@@ -16,7 +16,7 @@ import SignalProtocol
 ///  Interface for the Signal server.  The signal server handles the exchange of
 ///  encrypted messages and the brokering of public keys.
 ///
-class SignalClient {
+public class SignalClient {
     let crypto = SignalCommonCrypto()
     var atlasClient: AtlasClient
     var store: SignalStore
@@ -36,7 +36,7 @@ class SignalClient {
     /// - parameters:
     ///     - atlasClient: the associated AtlasClient for this SignalClient
     ///
-    init(atlasClient: AtlasClient) throws {
+    public init(atlasClient: AtlasClient) throws {
         self.atlasClient = atlasClient
         let kv = atlasClient.kvstore
         self.serverUrl = kv.get(DNK.ssUrl)
@@ -59,15 +59,15 @@ class SignalClient {
         return SignalAddress(userId: userId, deviceId: deviceId)
     }
 
-    func generatePassword() throws -> String {
+    private func generatePassword() throws -> String {
         return try String(crypto.random(bytes: 16).base64EncodedString().dropLast(2))
     }
     
-    func generateSignalingKey() throws -> Data {
+    private func generateSignalingKey() throws -> Data {
         return try crypto.random(bytes: 32 + 20)
     }
     
-    func registerAccount(name: String) -> Promise<(Int, JSON)> {
+    public func registerAccount(name: String) -> Promise<(Int, JSON)> {
         var signalingKey: Data
         var signalServerPassword: String
         var registrationId: UInt32

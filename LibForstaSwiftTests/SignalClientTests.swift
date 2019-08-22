@@ -240,7 +240,7 @@ class SignalClientTests: XCTestCase {
             wait(for: [connectAndReceive], timeout: 2 * 60.0)
             let thenSend = XCTestExpectation()
             
-            let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
+            let sender = MessageSender(signalClient: signalClient)
             let response = Message(threadId: inboundMessage!.payload.threadId!,
                                    threadExpression: inboundMessage!.payload.threadExpression!,
                                    threadType: .conversation,
@@ -357,7 +357,7 @@ class SignalClientTests: XCTestCase {
             }
             defer { NotificationCenter.default.removeObserver(receiptObserver) }
             
-            let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
+            let sender = MessageSender(signalClient: signalClient)
             let message = Message(threadId: UUID(uuidString: "2cfe708c-42a9-4a63-b215-ad841e1e2399")!,
                                   threadExpression: "(<2b53e98b-170f-4102-9d82-e43d5abb7998>+<e4faa7e0-5670-4436-a1b5-afd673e58298>)",
                                   threadType: .conversation,
@@ -395,13 +395,12 @@ class SignalClientTests: XCTestCase {
     func testConversation() {
         do {
             watchEverything()
-            let atlasClient = AtlasClient(kvstore: MemoryKVStore())
-            let signalClient = try SignalClient(atlasClient: atlasClient)
-            
+            let forsta = try Forsta(MemoryKVStore())
+
             let registrated = XCTestExpectation()
-            atlasClient.authenticateViaPassword(userTag: "@password:swift.test", password: "asdfasdf24")
+            forsta.atlas.authenticateViaPassword(userTag: "@password:swift.test", password: "asdfasdf24")
                 .then { _ in
-                    signalClient.registerAccount(name: "testing")
+                    forsta.signal.registerAccount(name: "testing")
                 }
                 .done { result in
                     print(result)
@@ -426,10 +425,7 @@ class SignalClientTests: XCTestCase {
                     connectified.fulfill()
             }
             defer { NotificationCenter.default.removeObserver(dataMessageObserver) }
-            let wsr = WebSocketResource(signalClient: signalClient)
-            let _ = MessageReceiver(signalClient: signalClient, webSocketResource: wsr)
-            let sender = MessageSender(signalClient: signalClient, webSocketResource: wsr)
-            wsr.connect()
+            forsta.connect()
             wait(for: [connectified], timeout: 2 * 60.0)
             
             let theEnd = XCTestExpectation()
@@ -448,7 +444,7 @@ class SignalClientTests: XCTestCase {
                                                threadExpression: inbound!.payload.threadExpression!,
                                                bodyPlain: "That's \(words.count) character\(words.count == 1 ? "" : "s"), yo.")
                         print("\n>>>", outbound)
-                        sender.send(outbound, to: [.user(inbound!.source.userId)])
+                        forsta.send(outbound, to: [.user(inbound!.source.userId)])
                             .map { response in
                                 print("send result:", response)
                             }
@@ -460,7 +456,7 @@ class SignalClientTests: XCTestCase {
             defer { NotificationCenter.default.removeObserver(inboundObserver) }
             
             wait(for: [theEnd], timeout: 5 * 60.0)
-            wsr.disconnect()
+            forsta.disconnect()
         } catch let error {
             XCTFail("surprising error \(error)")
         }

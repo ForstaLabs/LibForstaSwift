@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB17A447230EF7F000AEEF73 /* Forsta.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB17A446230EF7F000AEEF73 /* Forsta.swift */; };
 		DB2B009F22E12CC000B9931A /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009822E12CC000B9931A /* SwiftyJSON.framework */; };
 		DB2B00A022E12CC000B9931A /* Starscream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009922E12CC000B9931A /* Starscream.framework */; };
 		DB2B00A122E12CC000B9931A /* PromiseKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009A22E12CC000B9931A /* PromiseKit.framework */; };
@@ -92,6 +93,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DB17A446230EF7F000AEEF73 /* Forsta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Forsta.swift; sourceTree = "<group>"; };
 		DB2B009822E12CC000B9931A /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/iOS/SwiftyJSON.framework; sourceTree = "<group>"; };
 		DB2B009922E12CC000B9931A /* Starscream.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Starscream.framework; path = Carthage/Build/iOS/Starscream.framework; sourceTree = "<group>"; };
 		DB2B009A22E12CC000B9931A /* PromiseKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PromiseKit.framework; path = Carthage/Build/iOS/PromiseKit.framework; sourceTree = "<group>"; };
@@ -250,6 +252,7 @@
 				DB2B00A622E12D4600B9931A /* Atlas */,
 				DBDB772A22E124610027EEB0 /* LibForstaSwift.h */,
 				DBDB772B22E124610027EEB0 /* Info.plist */,
+				DB17A446230EF7F000AEEF73 /* Forsta.swift */,
 			);
 			path = LibForstaSwift;
 			sourceTree = "<group>";
@@ -426,6 +429,7 @@
 				DB2B00C722E12D7800B9931A /* Extensions.swift in Sources */,
 				DB2B00B622E12D6100B9931A /* SubProtocol.pb.swift in Sources */,
 				DB2B00B522E12D6100B9931A /* DeviceMessages.pb.swift in Sources */,
+				DB17A447230EF7F000AEEF73 /* Forsta.swift in Sources */,
 				DB2B00CA22E12D7800B9931A /* SignalCryptoProvider.swift in Sources */,
 				DB2B00B422E12D6100B9931A /* SubProtocol.proto in Sources */,
 				DBE3D57622F87B750016B800 /* Sendable.swift in Sources */,

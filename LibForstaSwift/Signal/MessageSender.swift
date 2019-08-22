@@ -15,11 +15,9 @@ import SignalProtocol
 
 public class MessageSender {
     let signalClient: SignalClient
-    let wsr: WebSocketResource
-    
-    init(signalClient: SignalClient, webSocketResource: WebSocketResource? = nil) {
+
+    init(signalClient: SignalClient) {
         self.signalClient = signalClient
-        self.wsr = webSocketResource ?? WebSocketResource(signalClient: signalClient)
     }
     
     /// Information about a message transmission activity
