@@ -67,6 +67,13 @@ public class SignalClient {
         return try crypto.random(bytes: 32 + 20)
     }
     
+    /// Create a new identity key and create or replace the signal account.
+    /// Note that any existing devices asssociated with your account will be
+    /// purged as a result of this action.  This should only be used for new
+    /// accounts or when you need to start over.
+    ///
+    /// - parameter name: The public name to store in the Signal server.
+    /// - returns: A Promise to indicate completion or an error condition
     public func registerAccount(name: String) -> Promise<Void> {
         var signalingKey: Data
         var signalServerPassword: String
