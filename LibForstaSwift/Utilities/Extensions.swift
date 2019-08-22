@@ -39,6 +39,13 @@ public extension Notification.Name {
     /// Incoming queue is now empty
     /// -- includes no extra data
     static let signalQueueEmpty = Notification.Name("signalQueueEmpty")
+    
+    /// Websocket connection to the Signal Server established
+    static let signalConnected = Notification.Name("signalConnected")
+    
+    /// Websocket connection to the Signal Server ended
+    /// -- includes "error" of type Error if applicable
+    static let signalDisconnected = Notification.Name("signalDisconnected")
 }
 
 extension NotificationCenter {

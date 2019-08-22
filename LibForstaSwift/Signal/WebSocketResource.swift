@@ -107,7 +107,7 @@ class WebSocketResource: WebSocketDelegate {
     
     public func connect() {
         guard signalClient.serverUrl != nil, signalClient.signalServerUsername != nil, signalClient.password != nil else {
-            print("CANNOT CONNECT!")
+            print("CANNOT CONNECT (missing server url, username, or password)")
             return
         }
         let url = "\(signalClient.serverUrl!)/v1/websocket/?login=\(signalClient.signalServerUsername!)&password=\(signalClient.password!)"
@@ -117,15 +117,15 @@ class WebSocketResource: WebSocketDelegate {
     }
     
     func websocketDidConnect(socket: WebSocketClient) {
-        print("Socket connected!")
+        NotificationCenter.broadcast(.signalConnected)
     }
     
     func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
-        print("Socket disconnected!")
+        NotificationCenter.broadcast(.signalDisconnected, error != nil ? ["error": error!] : nil)
     }
     
     func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
-        print("Socket received message!")
+        print("Socket received message: \(text)")
     }
     
     func websocketDidReceiveData(socket: WebSocketClient, data: Data) {

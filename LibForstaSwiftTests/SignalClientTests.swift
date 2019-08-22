@@ -303,6 +303,21 @@ class SignalClientTests: XCTestCase {
                 let receipts = notification.userInfo?["readSyncReceipts"] as! [ReadSyncReceipt]
                 print("\n>>>", receipts)
         }
+        
+        let _ = NotificationCenter.default.addObserver(
+            forName: .signalConnected,
+            object: nil,
+            queue: nil) { _ in
+                print("\n>>> signal server websocket connected")
+        }
+        
+        let _ = NotificationCenter.default.addObserver(
+            forName: .signalDisconnected,
+            object: nil,
+            queue: nil) { notification in
+                let error = notification.userInfo?["error"] as? Error
+                print("\n>>> signal server websocked disconnected", error ?? "")
+        }
     }
     func testPreKeySendAndReceive() {
         
@@ -402,8 +417,9 @@ class SignalClientTests: XCTestCase {
                 .then { _ in
                     forsta.signal.registerAccount(name: "testing")
                 }
-                .done { result in
-                    print(result)
+                .done {
+                    print("registered account")
+                    registrated.fulfill()
                 }
                 .catch { error in
                     if let ferr = error as? ForstaError {
@@ -411,26 +427,22 @@ class SignalClientTests: XCTestCase {
                     } else {
                         XCTFail("surprising error")
                     }
-                }
-                .finally {
-                    registrated.fulfill()
             }
             wait(for: [registrated], timeout: 10.0)
             
             let connectified = XCTestExpectation()
-            let dataMessageObserver = NotificationCenter.default.addObserver(
-                forName: .signalQueueEmpty,
+            let _ = NotificationCenter.default.addObserver(
+                forName: .signalConnected,
                 object: nil,
                 queue: nil) { _ in
                     connectified.fulfill()
             }
-            defer { NotificationCenter.default.removeObserver(dataMessageObserver) }
             forsta.connect()
             wait(for: [connectified], timeout: 2 * 60.0)
-            
+
             let theEnd = XCTestExpectation()
             
-            let inboundObserver = NotificationCenter.default.addObserver(
+            let _ = NotificationCenter.default.addObserver(
                 forName: .signalInboundMessage,
                 object: nil,
                 queue: nil) { notification in
@@ -453,8 +465,7 @@ class SignalClientTests: XCTestCase {
                         }
                     }
             }
-            defer { NotificationCenter.default.removeObserver(inboundObserver) }
-            
+
             wait(for: [theEnd], timeout: 5 * 60.0)
             forsta.disconnect()
         } catch let error {

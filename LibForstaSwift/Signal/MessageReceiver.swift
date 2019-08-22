@@ -99,7 +99,7 @@ public class MessageReceiver {
     
     /// Handle an incoming websocket request (/queue/empty or /message)
     private func handleRequest(request: IncomingWSRequest) {
-        print("Handling WS request \(request.verb) \(request.path)...")
+        // print("Handling WS request \(request.verb) \(request.path)...")
         if request.path == WSRequest.Path.queueEmpty {
             NotificationCenter.broadcast(.signalQueueEmpty)
             let _ = request.respond(status: 200, message: "OK")

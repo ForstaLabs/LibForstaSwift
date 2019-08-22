@@ -67,7 +67,7 @@ public class SignalClient {
         return try crypto.random(bytes: 32 + 20)
     }
     
-    public func registerAccount(name: String) -> Promise<(Int, JSON)> {
+    public func registerAccount(name: String) -> Promise<Void> {
         var signalingKey: Data
         var signalServerPassword: String
         var registrationId: UInt32
@@ -125,6 +125,10 @@ public class SignalClient {
             }
             .then { bundle in
                 self.request(.keys, method: .put, parameters: bundle)
+            }
+            .map { (code, json) in
+                if code == 204 { return }
+                throw ForstaError(ForstaErrorType.requestFailure, "problem performing registerAccount: \(code), \(json)")
         }
     }
     
