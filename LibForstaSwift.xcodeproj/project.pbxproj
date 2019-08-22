@@ -94,6 +94,7 @@
 
 /* Begin PBXFileReference section */
 		DB17A446230EF7F000AEEF73 /* Forsta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Forsta.swift; sourceTree = "<group>"; };
+		DB17A448230F168000AEEF73 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		DB2B009822E12CC000B9931A /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/iOS/SwiftyJSON.framework; sourceTree = "<group>"; };
 		DB2B009922E12CC000B9931A /* Starscream.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Starscream.framework; path = Carthage/Build/iOS/Starscream.framework; sourceTree = "<group>"; };
 		DB2B009A22E12CC000B9931A /* PromiseKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PromiseKit.framework; path = Carthage/Build/iOS/PromiseKit.framework; sourceTree = "<group>"; };
@@ -245,6 +246,7 @@
 		DBDB772922E124610027EEB0 /* LibForstaSwift */ = {
 			isa = PBXGroup;
 			children = (
+				DB17A448230F168000AEEF73 /* README.md */,
 				DB2B00C222E12D7800B9931A /* Utilities */,
 				DB2B00BD22E12D7100B9931A /* Storage */,
 				DB2B00B822E12D6A00B9931A /* Signal */,
