@@ -72,16 +72,16 @@ public class ForstaPayloadV1: CustomStringConvertible {
 
     public var json: JSON
     
-    init(_ payload: ForstaPayloadV1) {
+    public init(_ payload: ForstaPayloadV1) {
         self.json = payload.json
     }
-    init(_ json: JSON) {
+    public init(_ json: JSON) {
         self.json = json
     }
-    init(_ string: String? = nil) {
+    public init(_ jsonString: String? = nil) {
         self.json = JSON([])
         do {
-            json = try JSON(string: string ?? "[\"version\": 1]")
+            json = try JSON(string: jsonString ?? "[\"version\": 1]")
         } catch {
             json = JSON(["version": 1])
         }
