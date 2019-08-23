@@ -16,7 +16,7 @@ import SignalProtocol
 public class MessageSender {
     let signalClient: SignalClient
 
-    init(signalClient: SignalClient) {
+    public init(signalClient: SignalClient) {
         self.signalClient = signalClient
     }
     

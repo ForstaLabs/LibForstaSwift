@@ -91,7 +91,7 @@ public class MessageReceiver {
     let signalClient: SignalClient
     let wsr: WebSocketResource
     
-    init(signalClient: SignalClient, webSocketResource: WebSocketResource? = nil) {
+    public init(signalClient: SignalClient, webSocketResource: WebSocketResource? = nil) {
         self.signalClient = signalClient
         self.wsr = webSocketResource ?? WebSocketResource(signalClient: signalClient)
         self.wsr.requestHandler = self.handleRequest

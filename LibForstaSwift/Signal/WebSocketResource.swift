@@ -13,11 +13,11 @@ import Starscream
 import SignalProtocol
 
 
-typealias WSResponseHandler = (_ request: OutgoingWSRequest, _ status: UInt32, _ message: String, _ body: Data?) -> Void
-typealias WSRequestHandler = (_ request: IncomingWSRequest) -> Void
+public typealias WSResponseHandler = (_ request: OutgoingWSRequest, _ status: UInt32, _ message: String, _ body: Data?) -> Void
+public typealias WSRequestHandler = (_ request: IncomingWSRequest) -> Void
 
-class WSRequest {
-    class Path {
+public class WSRequest {
+    public class Path {
         static let queueEmpty = "/api/v1/queue/empty"
         static let message = "/api/v1/message"
     }
@@ -28,7 +28,7 @@ class WSRequest {
     let path: String
     let body: Data?
     
-    init(wsr: WebSocketResource, id: UInt64? = nil, verb: String, path: String, body: Data? = nil) {
+    public init(wsr: WebSocketResource, id: UInt64? = nil, verb: String, path: String, body: Data? = nil) {
         self.wsr = wsr
         self.id = id ?? UInt64.random(in: UInt64.min...UInt64.max)
         self.verb = verb
@@ -37,8 +37,8 @@ class WSRequest {
     }
 }
 
-class IncomingWSRequest: WSRequest {
-    func respond(status: UInt32, message: String) -> Promise<Void> {
+public class IncomingWSRequest: WSRequest {
+    public func respond(status: UInt32, message: String) -> Promise<Void> {
         var msg = Signal_WebSocketMessage()
         msg.type = .response
         msg.response.id = self.id
@@ -49,11 +49,11 @@ class IncomingWSRequest: WSRequest {
     }
 }
 
-class OutgoingWSRequest: WSRequest {
+public class OutgoingWSRequest: WSRequest {
     var onSuccess: WSResponseHandler?
     var onError: WSResponseHandler?
     
-    init(wsr: WebSocketResource, id: UInt64? = nil, verb: String, path: String, body: Data? = nil, onSuccess: WSResponseHandler? = nil, onError: WSResponseHandler? = nil) {
+    public init(wsr: WebSocketResource, id: UInt64? = nil, verb: String, path: String, body: Data? = nil, onSuccess: WSResponseHandler? = nil, onError: WSResponseHandler? = nil) {
         self.onSuccess = onSuccess
         self.onError = onError
         super.init(wsr: wsr, id: id, verb: verb, path: path, body: body)
@@ -94,13 +94,13 @@ func fallbackRequestHandler(request: IncomingWSRequest) {
     let _ = request.respond(status: 404, message: "Not found")
 }
 
-class WebSocketResource: WebSocketDelegate {
+public class WebSocketResource: WebSocketDelegate {
     var socket: WebSocket?
     let signalClient: SignalClient
     var outgoingRequests = [UInt64 : OutgoingWSRequest]()
     var requestHandler: WSRequestHandler
     
-    init(signalClient: SignalClient, requestHandler: WSRequestHandler? = nil) {
+    public init(signalClient: SignalClient, requestHandler: WSRequestHandler? = nil) {
         self.signalClient = signalClient
         self.requestHandler = requestHandler != nil ? requestHandler! : fallbackRequestHandler
     }
@@ -116,19 +116,19 @@ class WebSocketResource: WebSocketDelegate {
         socket!.connect()
     }
     
-    func websocketDidConnect(socket: WebSocketClient) {
+    public func websocketDidConnect(socket: WebSocketClient) {
         NotificationCenter.broadcast(.signalConnected)
     }
     
-    func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
+    public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
         NotificationCenter.broadcast(.signalDisconnected, error != nil ? ["error": error!] : nil)
     }
     
-    func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
+    public func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
         print("Socket received message: \(text)")
     }
     
-    func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
+    public func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
         do {
             let x = try Signal_WebSocketMessage(serializedData: data)
             if x.hasRequest {
