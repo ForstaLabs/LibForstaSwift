@@ -5,7 +5,7 @@ SCHEME = LibForstaSwift
 XCODE_BUILD := xcrun xcodebuild -scheme LibForstaSwift
 DEPENDENCIES := .dependencies-built
 
-.PHONY: build test retest clean dependencies ci pristine
+.PHONY: build test retest clean dependencies ci pristine docs
 
 default: clean $(DEPENDENCIES) build
 
@@ -27,3 +27,18 @@ clean:
 
 pristine: clean
 	rm -f $(DEPENDENCIES)
+
+docs: 
+	jazzy \
+                --clean \
+                --author Forsta \
+                --author_url https://forsta.io \
+                --github_url https://github.com/ForstaLabs/LibForstaSwift \
+                --github-file-prefix https://github.com/ForstaLabs/LibForstaSwift/blob/master \
+                --module-version 0.1 \
+                --xcodebuild-arguments -scheme,LibForstaSwift \
+                --module LibForstaSwift \
+                --root-url https://forstalabs.github.io/LibForstaSwift/LATEST/index.html \
+                --output docs \
+                --theme fullwidth
+
