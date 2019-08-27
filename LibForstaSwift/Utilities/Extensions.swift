@@ -105,6 +105,22 @@ extension SignalAddress: CustomStringConvertible {
     convenience init(userId: UUID, deviceId: Int32) {
         self.init(name: userId.lcString, deviceId: deviceId)
     }
+    public convenience init?(string: String) {
+        guard let parts: [String] = string.components(separatedBy: ".") else {
+            return nil
+        }
+        guard parts.count == 2 else {
+            return nil
+        }
+        guard let userId = parts[0],
+            UUID(uuidString: userId) != nil else {
+            return nil
+        }
+        guard let deviceId = Int32(parts[1]) else {
+            return nil
+        }
+        self.init(name: userId, deviceId: deviceId)
+    }
     var userId: UUID {
         get {
             return UUID(uuidString: self.name)!
