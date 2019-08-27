@@ -13,6 +13,7 @@ import CommonCrypto
 import SignalProtocol
 
 
+/// Forsta's `Notification.Name`s
 public extension Notification.Name {
     /// Atlas credential has been set in the KV store.
     static let atlasCredentialSet = Notification.Name("atlasCredentialSet")
@@ -48,6 +49,7 @@ public extension Notification.Name {
     static let signalDisconnected = Notification.Name("signalDisconnected")
 }
 
+/// Utility extensions to `NotificationCenter`
 extension NotificationCenter {
     ///
     /// Broadcast a notification on the main thread.
@@ -59,6 +61,7 @@ extension NotificationCenter {
     }
 }
 
+/// Utility extensions to `Request`
 extension Request {
     public func debugLog() -> Self {
         #if DEBUG
@@ -68,6 +71,7 @@ extension Request {
     }
 }
 
+/// Utility extensions to `Date`
 public extension Date {
     var millisecondsSince1970:UInt64 {
         return UInt64((self.timeIntervalSince1970 * 1000.0).rounded())
@@ -80,6 +84,7 @@ public extension Date {
     }
 }
 
+/// Utility extensions to `TimeInterval`
 public extension TimeInterval {
     var milliseconds:UInt64 {
         return UInt64((self * 1000.0).rounded())
@@ -95,6 +100,7 @@ public extension TimeInterval {
     }
 }
 
+/// Utility extensions to `SignalAddress`
 extension SignalAddress: CustomStringConvertible {
     convenience init(userId: String, deviceId: UInt32) {
         self.init(name: userId, deviceId: (Int32(deviceId)))
@@ -105,32 +111,24 @@ extension SignalAddress: CustomStringConvertible {
     convenience init(userId: UUID, deviceId: Int32) {
         self.init(name: userId.lcString, deviceId: deviceId)
     }
-    public convenience init?(string: String) {
-        guard let parts: [String] = string.components(separatedBy: ".") else {
+    public convenience init?(description: String) {
+        let parts = description.components(separatedBy: ".")
+        guard parts.count == 2,
+            let userId = UUID(uuidString: parts[0]),
+            let deviceId = Int32(parts[1]) else {
             return nil
         }
-        guard parts.count == 2 else {
-            return nil
-        }
-        guard let userId = parts[0],
-            UUID(uuidString: userId) != nil else {
-            return nil
-        }
-        guard let deviceId = Int32(parts[1]) else {
-            return nil
-        }
-        self.init(name: userId, deviceId: deviceId)
+        self.init(userId: userId, deviceId: deviceId)
     }
     var userId: UUID {
-        get {
-            return UUID(uuidString: self.name)!
-        }
+        return UUID(uuidString: self.name)!
     }
     public var description: String {
-        return "\(self.name).\(self.deviceId )"
+        return "\(self.name).\(self.deviceId)"
     }
 }
 
+/// Utility extensions to `JSON`
 public extension JSON {
     init(string: String) throws {
         let dataFromString = string.data(using: .utf8, allowLossyConversion: false)!
@@ -138,6 +136,7 @@ public extension JSON {
     }
 }
 
+/// Utility extensions to `UUID`
 public extension UUID {
     var lcString: String {
         get {
@@ -146,6 +145,7 @@ public extension UUID {
     }
 }
 
+/// Utility extensions to `String`
 public extension String {
     func indentWith(_ prefix: String) -> String {
         return prefix + self.replacingOccurrences(of: "\n", with: "\n"+prefix)

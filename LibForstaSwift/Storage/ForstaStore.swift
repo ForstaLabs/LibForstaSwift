@@ -10,24 +10,41 @@ import Foundation
 import SignalProtocol
 
 /// Default namespace storage keys
-enum DNK: String {
+enum DNK: String, CustomStringConvertible {
     // Atlas server store keys
+    /// The current JWT for authorizing Atlas calls
     case atlasCredential = "atlasCredential"
+    /// The URL of the Atlas server we are authenticated against
     case atlasUrl = "atlasUrl"
     
     // Signal Server store keys
+    /// URL that Atlas gave us to use to reach our Signal server
     case ssUrl = "signalServerUrl"
+    /// The user ID (UUID) that we provided to to Signal server
     case ssAddress = "signalServerAddress"
+    /// The device ID we were assigned by Signal server
     case ssDeviceId = "signalServerDeviceId"
+    /// The descriptive name we gave Signal server for this device registration
     case ssName = "signalServerName"
+    /// The userId.deviceId username Signal server knows us as
     case ssUsername = "signalServerUsername"
+    /// The random password we gave to Signal to authenticate future API calls
     case ssPassword = "signalServerPassword"
+    /// The random secret we shared with Signal server for encrypting websocket traffic
     case ssSignalingKey = "signalServerSignalingKey"
     
     // Other
+    /// Our private identity key
     case myPrivateIdentityKey = "myPrivateIdentityKey"
+    /// Our public identity key
     case myPublicIdentityKey = "myPublicIdentityKey"
+    /// The random registration ID we gave to the Signal server during registration
     case myRegistrationId = "myRegistrationId"
+    
+    /// Automatic conversion to String
+    var description: String {
+        return self.rawValue
+    }
 }
 
 extension SignalStore {
@@ -188,9 +205,10 @@ class ForstaSessionStore: SessionStore {
     }
     
     func subDeviceSessions(for name: String) -> [Int32]? {
-        return (kvstore.keys(ns: sessionNs) as! [SignalAddress])
-            .filter { $0.name == name }
-            .map { $0.deviceId }
+        return kvstore.keys(ns: sessionNs)
+            .map { SignalAddress(description: $0) }
+            .filter { $0?.name == name }
+            .map { $0!.deviceId }
     }
     
     func store(session: Data, for address: SignalAddress, userRecord: Data?) -> Bool {
@@ -213,9 +231,10 @@ class ForstaSessionStore: SessionStore {
     }
     
     func deleteAllSessions(for name: String) -> Int? {
-        return (kvstore.keys(ns: sessionNs) as! [SignalAddress])
-            .filter { $0.name == name }
-            .map { return deleteSession(for: $0) }
+        return kvstore.keys(ns: sessionNs)
+            .map { SignalAddress(description: $0) }
+            .filter { $0?.name == name }
+            .map { return deleteSession(for: $0!) }
             .count
     }
 }
@@ -257,7 +276,12 @@ class ForstaSignedPreKeyStore: SignedPreKeyStore {
     }
     
     func allIds() throws -> [UInt32] {
-        return kvstore.keys(ns: ns) as! [UInt32]
+        return try kvstore.keys(ns: ns).map({
+            guard let key = UInt32($0) else {
+                throw ForstaError(.storageError, "uint32 key could not be parsed")
+            }
+            return key
+        })
     }
     
     var lastId: UInt32 {

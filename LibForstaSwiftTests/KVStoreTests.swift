@@ -12,31 +12,31 @@ import SwiftyJSON
 import LibForstaSwift
 
 class MemoryKVStore: KVStorageProtocol {
-    var data = [String: [AnyHashable: Data]]()
+    var data = [String: [String: Data]]()
     
-    func set(ns: String, key: AnyHashable, value: Data) {
-        if var namespace = data[ns] {
-            namespace[key] = value
-            data[ns] = namespace    // why the hell is this line required??
+    func set(ns: CustomStringConvertible, key: CustomStringConvertible, value: Data) {
+        if var namespace = data[ns.description] {
+            namespace[key.description] = value
+            data[ns.description] = namespace    // why the hell is this line required??
         } else {
-            data[ns] = [key: value]
+            data[ns.description] = [key.description: value]
         }
     }
     
-    func get(ns: String, key: AnyHashable) -> Data? {
-        return (data[ns] ?? [:])[key]
+    func get(ns: CustomStringConvertible, key: CustomStringConvertible) -> Data? {
+        return (data[ns.description] ?? [:])[key.description]
     }
     
-    func remove(ns: String, key: AnyHashable) {
-        data[ns]?.removeValue(forKey: key)
+    func remove(ns: CustomStringConvertible, key: CustomStringConvertible) {
+        data[ns.description]?.removeValue(forKey: key.description)
     }
     
-    func has(ns: String, key: AnyHashable) -> Bool {
-        return (data[ns] ?? [:])[key] != nil
+    func has(ns: CustomStringConvertible, key: CustomStringConvertible) -> Bool {
+        return (data[ns.description] ?? [:])[key.description] != nil
     }
     
-    func keys(ns: String) -> [AnyHashable] {
-        return [AnyHashable]((data[ns] ?? [:]).keys)
+    func keys(ns: CustomStringConvertible) -> [String] {
+        return [String]((data[ns.description] ?? [:]).keys)
     }
 }
 

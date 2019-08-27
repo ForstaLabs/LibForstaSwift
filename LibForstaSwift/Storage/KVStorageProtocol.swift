@@ -16,38 +16,38 @@ public protocol KVStorageProtocol {
     ///
     /// sets the value for a key in a namespace
     ///
-    func set(ns: String, key: AnyHashable, value: Data)
+    func set(ns: CustomStringConvertible, key: CustomStringConvertible, value: Data)
 
     ///
     /// gets value for a key in a namespace
     ///
-    func get(ns: String, key: AnyHashable) -> Data?
+    func get(ns: CustomStringConvertible, key: CustomStringConvertible) -> Data?
     
     ///
     /// removes a key from a namespace
     ///
-    func remove(ns: String, key: AnyHashable)
+    func remove(ns: CustomStringConvertible, key: CustomStringConvertible)
     
     ///
     /// test for whether a namespace has a key
     ///
-    func has(ns: String, key: AnyHashable) -> Bool
+    func has(ns: CustomStringConvertible, key: CustomStringConvertible) -> Bool
     
     ///
     /// gets all keys in a namespace
     ///
-    func keys(ns: String) -> [AnyHashable]
+    func keys(ns: CustomStringConvertible) -> [String]
 }
 
 public extension KVStorageProtocol {
     // MARK:- Derived helpers for saving/restoring various useful types
     
-    func set<T: Numeric>(ns: String, key: AnyHashable, value: T) {
+    func set<T: Numeric>(ns: CustomStringConvertible, key: CustomStringConvertible, value: T) {
         let data = withUnsafeBytes(of: value) { Data($0) }
         set(ns: ns, key: key, value: data)
     }
     
-    func get<T: Numeric>(ns: String, key: AnyHashable) -> T? {
+    func get<T: Numeric>(ns: CustomStringConvertible, key: CustomStringConvertible) -> T? {
         if let data = get(ns: ns, key: key) {
             var value: T = 0
             assert(data.count == MemoryLayout.size(ofValue: value))
@@ -58,7 +58,7 @@ public extension KVStorageProtocol {
         return nil
     }
     
-    func set<T: ToFromData>(ns: String, key: AnyHashable, value: T) {
+    func set<T: ToFromData>(ns: CustomStringConvertible, key: CustomStringConvertible, value: T) {
         do {
             set(ns: ns, key: key, value: try value.toData())
         } catch let error {
@@ -66,7 +66,7 @@ public extension KVStorageProtocol {
         }
     }
     
-    func get<T: ToFromData>(ns: String, key: AnyHashable) -> T? {
+    func get<T: ToFromData>(ns: CustomStringConvertible, key: CustomStringConvertible) -> T? {
         if let val = get(ns: ns, key: key) {
             do {
                 return try T.fromData(val)
@@ -82,31 +82,31 @@ public extension KVStorageProtocol {
     
     var defaultNamespace: String { return "The Default State Namespace" }
 
-    func set(_ key: AnyHashable, _ value: Data) {
+    func set(_ key: CustomStringConvertible, _ value: Data) {
         set(ns: defaultNamespace, key: key, value: value)
     }
     
-    func get(_ key: AnyHashable) -> Data? {
+    func get(_ key: CustomStringConvertible) -> Data? {
         return get(ns: defaultNamespace, key: key)
     }
     
-    func remove(_ key: AnyHashable) {
+    func remove(_ key: CustomStringConvertible) {
         remove(ns: defaultNamespace, key: key)
     }
     
-    func set<T: Numeric>(_ key: AnyHashable, _ value: T) {
+    func set<T: Numeric>(_ key: CustomStringConvertible, _ value: T) {
         set(ns: defaultNamespace, key: key, value: value)
     }
     
-    func get<T: Numeric>(_ key: AnyHashable) -> T? {
+    func get<T: Numeric>(_ key: CustomStringConvertible) -> T? {
         return get(ns: defaultNamespace, key: key)
     }
     
-    func set<T: ToFromData>(_ key: AnyHashable, _ value: T) {
+    func set<T: ToFromData>(_ key: CustomStringConvertible, _ value: T) {
         set(ns: defaultNamespace, key: key, value: value)
     }
     
-    func get<T: ToFromData>(_ key: AnyHashable) -> T? {
+    func get<T: ToFromData>(_ key: CustomStringConvertible) -> T? {
         return get(ns: defaultNamespace, key: key)
     }
 }

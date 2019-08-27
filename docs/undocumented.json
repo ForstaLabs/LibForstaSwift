@@ -849,77 +849,84 @@
     },
     {
       "file": "/Users/gregperk/scm/forsta2/LibForstaSwift/LibForstaSwift/Utilities/Extensions.swift",
-      "line": 63,
+      "line": 66,
       "symbol": "Request.debugLog()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/gregperk/scm/forsta2/LibForstaSwift/LibForstaSwift/Utilities/Extensions.swift",
-      "line": 72,
+      "line": 76,
       "symbol": "Date.millisecondsSince1970",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/gregperk/scm/forsta2/LibForstaSwift/LibForstaSwift/Utilities/Extensions.swift",
-      "line": 75,
+      "line": 79,
       "symbol": "Date.init(millisecondsSince1970:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/gregperk/scm/forsta2/LibForstaSwift/LibForstaSwift/Utilities/Extensions.swift",
-      "line": 78,
+      "line": 82,
       "symbol": "Date.init(millisecondsSince1970:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/gregperk/scm/forsta2/LibForstaSwift/LibForstaSwift/Utilities/Extensions.swift",
-      "line": 84,
+      "line": 89,
       "symbol": "TimeInterval.milliseconds",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/gregperk/scm/forsta2/LibForstaSwift/LibForstaSwift/Utilities/Extensions.swift",
-      "line": 87,
+      "line": 92,
       "symbol": "TimeInterval.init(milliseconds:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/gregperk/scm/forsta2/LibForstaSwift/LibForstaSwift/Utilities/Extensions.swift",
-      "line": 90,
+      "line": 95,
       "symbol": "TimeInterval.init(milliseconds:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/gregperk/scm/forsta2/LibForstaSwift/LibForstaSwift/Utilities/Extensions.swift",
-      "line": 93,
+      "line": 98,
       "symbol": "TimeInterval.init(milliseconds:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/gregperk/scm/forsta2/LibForstaSwift/LibForstaSwift/Utilities/Extensions.swift",
-      "line": 119,
+      "line": 114,
+      "symbol": "SignalAddress.init(description:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/gregperk/scm/forsta2/LibForstaSwift/LibForstaSwift/Utilities/Extensions.swift",
+      "line": 133,
       "symbol": "JSON.init(string:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/gregperk/scm/forsta2/LibForstaSwift/LibForstaSwift/Utilities/Extensions.swift",
-      "line": 126,
+      "line": 141,
       "symbol": "UUID.lcString",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/gregperk/scm/forsta2/LibForstaSwift/LibForstaSwift/Utilities/Extensions.swift",
-      "line": 134,
+      "line": 150,
       "symbol": "String.indentWith(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
