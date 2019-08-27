@@ -13,20 +13,28 @@ import Starscream
 import SignalProtocol
 
 
+/// Manage sending messages
 public class MessageSender {
+    /// the `SignalClient` that is being used by this sender
     let signalClient: SignalClient
 
+    /// init with a `SignalClient`
     public init(signalClient: SignalClient) {
         self.signalClient = signalClient
     }
     
-    /// Information about a message transmission activity
+    /// Information from the Signal server about a message transmission activity
     public class TransmissionInfo: CustomStringConvertible {
+        /// time it was received
         let received: Date
+        /// whether it needs sync
         let needsSync: Bool
+        /// the recipient it was sent to
         let recipient: MessageRecipient
+        /// the number of devices involved (useful when the recipient was a `.user`)
         let deviceCount: Int
         
+        /// init with recipient, device count, and Signal server response JSON
         init(recipient: MessageRecipient, deviceCount: Int, json: JSON) {
             self.received = Date(millisecondsSince1970: json["received"].uInt64Value)
             self.needsSync = json["needsSync"].boolValue
@@ -34,6 +42,7 @@ public class MessageSender {
             self.deviceCount = deviceCount
         }
         
+        /// human-readable rendering of the info
         public var description: String {
             return "<<\(self.recipient) [\(self.deviceCount)] @ \(self.received.millisecondsSince1970), \(self.needsSync ? "needs sync" : "no sync needed")>>"
         }

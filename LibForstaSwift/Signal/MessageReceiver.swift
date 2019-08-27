@@ -13,48 +13,72 @@ import Starscream
 import SignalProtocol
 
 
+/// Read-receipt sync message from another of our devices
 public class ReadSyncReceipt: CustomStringConvertible {
+    /// the read message's sender's userId
     let sender: UUID
+    /// the read message's timestamp (used to identify messages in Signal)
     let timestamp: Date
     
+    /// init with sender and timestamp
     init(_ sender: UUID, _ timestamp: Date) {
         self.sender = sender
         self.timestamp = timestamp
     }
+    
+    /// human-readable string for this receipt
     public var description: String {
         return "ReadSyncReceipt(\(self.sender) @ \(self.timestamp.millisecondsSince1970 ))"
     }
 }
 
+/// Signal server delivery receipt for a message being received by a recipient's device
 public class DeliveryReceipt: CustomStringConvertible {
+    /// the device that retrieved a sent message
     let address: SignalAddress
+    /// the timestamp of the sent message (used to identify messages in Signal)
     let timestamp: Date
     
+    /// init with address and timestamp
     init(_ address: SignalAddress, _ timestamp: Date) {
         self.address = address
         self.timestamp = timestamp
     }
+    
+    /// human-readable string for this receipt
     public var description: String {
         return "DeliveryReceipt(\(self.address) @ \(self.timestamp.millisecondsSince1970 ))"
     }
 }
 
+/// An inbound message (whether from another user or as a sync message from self)
 public class InboundMessage: CustomStringConvertible {
+    /// Device that send the message (note that this would be one of ours if it is a sync message)
     public var source: SignalAddress
+    /// Timestamp of the sent message
     public var timestamp: Date
+    /// Expiration of the message in seconds, if provided
     public var expiration: TimeInterval?
+    /// How long the message was retained by the Signal server before it was received here
     public var serverAge: TimeInterval
+    /// Timestamp for when the Signal server received the message (useful for correcting clock skew)
     public var serverReceived: Date
+    /// Whether the end-session flag was set in the envelope
     public var endSessionFlag: Bool
+    /// Whether the expiration-timer-update flag was set in the envelope
     public var expirationTimerUpdateFlag: Bool
     
+    /// The Signal envelope body (for Forsta messages, this will be the Forsta message exchange payload JSON string)
     public var signalBody: String
+    /// A `ForstaPayloadV1` initialized with the signalBody (finding and expressing the v1 payload if available)
     public var payload: ForstaPayloadV1
     
-    // specific to sync messages
+    /// Expiration start-time (if there was an expiration and this is a sync message from another of our devices)
     public var expirationStart: Date?
+    /// The "destination" set in the sync message container (in Forsta, this is usually the threadId for the message)
     public var destination: String?
     
+    /// Create an `InboundMessage` to be broadcast to interested parties
     public init(source: SignalAddress,
          timestamp: Date,
          expiration: TimeInterval? = nil,
@@ -78,7 +102,7 @@ public class InboundMessage: CustomStringConvertible {
         self.destination = destination
     }
     
-
+    /// human-readable string to get the gist of this `InboundMessage`
     public var description: String {
         return """
         InboundMessage from \(source) @ \(timestamp.millisecondsSince1970) good for \(expiration ?? -1)
@@ -87,17 +111,22 @@ public class InboundMessage: CustomStringConvertible {
     }
 }
 
+
+/// Manage receiving and decrypting Forsta messages destined for this device
 public class MessageReceiver {
+    /// The `SignalClient` to use
     let signalClient: SignalClient
+    /// The `WebSocketResource` to listen to
     let wsr: WebSocketResource
     
+    /// Init with `SignalClient` and an optional `WebSocketResource` to use (it will make its own if not provided)
     public init(signalClient: SignalClient, webSocketResource: WebSocketResource? = nil) {
         self.signalClient = signalClient
         self.wsr = webSocketResource ?? WebSocketResource(signalClient: signalClient)
         self.wsr.requestHandler = self.handleRequest
     }
     
-    /// Handle an incoming websocket request (/queue/empty or /message)
+    /// Handle an incoming websocket request (/queue/empty or /message), decoding and decrypting for this device
     private func handleRequest(request: IncomingWSRequest) {
         // print("Handling WS request \(request.verb) \(request.path)...")
         if request.path == WSRequest.Path.queueEmpty {
@@ -137,7 +166,7 @@ public class MessageReceiver {
         }
     }
     
-    /// Internal: Handle a "Content" message, extracting incoming messages, sync messages, sync read-receipts
+    /// Internal: Handle a "Content" message, extracting and decrypting incoming messages, sync messages, sync read-receipts
     private func handleContentMessage(_ envelope: Signal_Envelope) throws {
         let plainText = try self.decrypt(envelope, envelope.content);
         let content = try Signal_Content(serializedData: plainText)
@@ -192,7 +221,7 @@ public class MessageReceiver {
         }
     }
     
-    /// Internal: Axolotl-decrypt an incoming envelope's content
+    /// Internal: Signal-Axolotl-decrypt an incoming envelope's content
     private func decrypt(_ envelope: Signal_Envelope, _ cyphertext: Data) throws -> Data {
         let addr = SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice)
         let sessionCipher = SessionCipher(for: addr, in: self.signalClient.store)
@@ -220,6 +249,7 @@ public class MessageReceiver {
         throw ForstaError(.decryptionError, "Padding with no content.")
     }
     
+    /// Internal: verify the message MAC
     private func verifyWSMessageMAC(data: Data, key: Data, expectedMAC: Data) throws {
         let calculatedMAC = signalClient.crypto.hmacSHA256(for: data, with: key)
         if calculatedMAC[..<expectedMAC.count] != expectedMAC {
@@ -227,6 +257,7 @@ public class MessageReceiver {
         }
     }
     
+    /// Internal: decrypt the inbound message (encrypted by the Signal server for us)
     private func decryptWebSocketMessage(message: Data, signalingKey: Data) throws -> Data {
         guard signalingKey.count == 52 else {
             throw ForstaError(.invalidKey, "Invalid signaling key length.")

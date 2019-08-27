@@ -244,13 +244,8 @@ public final class ForstaError: CustomStringConvertible, Error {
         return description
     }
     
-    /// The error's message converted to JSON (i.e., for .requestRejected)
+    /// The error's message converted to JSON (i.e., for .requestRejected), if possible
     public var json: JSON {
-        do {
-            if self.message != nil {
-                return try JSON(string: self.message ?? "{}")
-            }
-        } catch { }
-        return JSON()
+        return JSON(string: self.message ?? "{\"message\": \"<empty>\"}") ?? JSON(["message": self.message ?? "<empty>"])
     }
 }

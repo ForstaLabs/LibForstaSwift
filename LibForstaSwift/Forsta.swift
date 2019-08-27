@@ -25,6 +25,7 @@ public class Forsta {
     private let receiver: MessageReceiver
     private let sender: MessageSender
     
+    /// Initialize with a `KVStorageProtocol`
     public init(_ kvstore: KVStorageProtocol) throws {
         self.atlas = AtlasClient(kvstore: kvstore)
         self.signal = try SignalClient(atlasClient: atlas)

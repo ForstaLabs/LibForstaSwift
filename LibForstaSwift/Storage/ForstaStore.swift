@@ -20,13 +20,11 @@ enum DNK: String, CustomStringConvertible {
     // Signal Server store keys
     /// URL that Atlas gave us to use to reach our Signal server
     case ssUrl = "signalServerUrl"
-    /// The user ID (UUID) that we provided to to Signal server
-    case ssAddress = "signalServerAddress"
-    /// The device ID we were assigned by Signal server
-    case ssDeviceId = "signalServerDeviceId"
+    /// The `SignalAddress` we have for our device on the Signal server
+    case ssSignalAddress = "signalServerSignalAddress"
     /// The descriptive name we gave Signal server for this device registration
     case ssName = "signalServerName"
-    /// The userId.deviceId username Signal server knows us as
+    /// The username that Signal server knows us as (currently it is the `.description` string of our `SignalAddress`)
     case ssUsername = "signalServerUsername"
     /// The random password we gave to Signal to authenticate future API calls
     case ssPassword = "signalServerPassword"

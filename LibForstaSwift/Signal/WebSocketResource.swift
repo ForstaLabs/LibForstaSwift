@@ -13,10 +13,14 @@ import Starscream
 import SignalProtocol
 
 
+/// the type signature of a websocket response handler
 public typealias WSResponseHandler = (_ request: OutgoingWSRequest, _ status: UInt32, _ message: String, _ body: Data?) -> Void
+/// the type signature of a websocket request handler
 public typealias WSRequestHandler = (_ request: IncomingWSRequest) -> Void
 
+/// Base class for managing a websocket request
 public class WSRequest {
+    /// possible paths for endpoints on our Signal server
     public class Path {
         static let queueEmpty = "/api/v1/queue/empty"
         static let message = "/api/v1/message"
@@ -28,6 +32,7 @@ public class WSRequest {
     let path: String
     let body: Data?
     
+    /// construct a websocket request for our Signal server
     public init(wsr: WebSocketResource, id: UInt64? = nil, verb: String, path: String, body: Data? = nil) {
         self.wsr = wsr
         self.id = id ?? UInt64.random(in: UInt64.min...UInt64.max)
@@ -37,7 +42,9 @@ public class WSRequest {
     }
 }
 
+/// an incoming websocket request
 public class IncomingWSRequest: WSRequest {
+    /// respond to this incoming request
     public func respond(status: UInt32, message: String) -> Promise<Void> {
         var msg = Signal_WebSocketMessage()
         msg.type = .response
@@ -49,16 +56,21 @@ public class IncomingWSRequest: WSRequest {
     }
 }
 
+/// an outgoing websocket request
 public class OutgoingWSRequest: WSRequest {
+    /// optional onSuccess handler
     var onSuccess: WSResponseHandler?
+    /// optional onError handler
     var onError: WSResponseHandler?
     
+    /// construct an outgoing request
     public init(wsr: WebSocketResource, id: UInt64? = nil, verb: String, path: String, body: Data? = nil, onSuccess: WSResponseHandler? = nil, onError: WSResponseHandler? = nil) {
         self.onSuccess = onSuccess
         self.onError = onError
         super.init(wsr: wsr, id: id, verb: verb, path: path, body: body)
     }
     
+    /// actually send the outgoing request
     func send() -> Promise<JSON> {
         var msg = Signal_WebSocketMessage()
         msg.type = .request
@@ -89,22 +101,26 @@ public class OutgoingWSRequest: WSRequest {
     }
 }
 
+/// The fallback request handler we use if one is not provided (it immediately rejects all requests)
 func fallbackRequestHandler(request: IncomingWSRequest) {
     print("sending fallback response of 404 Not found to request: \(request.verb) \(request.path)")
     let _ = request.respond(status: 404, message: "Not found")
 }
 
+/// Manage a websocket, reporting dis/connection, routing incoming requests to handlers, and sending websocket requests on demand
 public class WebSocketResource: WebSocketDelegate {
     var socket: WebSocket?
     let signalClient: SignalClient
     var outgoingRequests = [UInt64 : OutgoingWSRequest]()
     var requestHandler: WSRequestHandler
     
+    /// init with a `SignalClient` and an optional requestHandler (falls back to our default that rejects all requests)
     public init(signalClient: SignalClient, requestHandler: WSRequestHandler? = nil) {
         self.signalClient = signalClient
         self.requestHandler = requestHandler != nil ? requestHandler! : fallbackRequestHandler
     }
     
+    /// connect with our Atlas-designated Signal server using our pre-negotiated credentials
     public func connect() {
         guard signalClient.serverUrl != nil, signalClient.signalServerUsername != nil, signalClient.password != nil else {
             print("CANNOT CONNECT (missing server url, username, or password)")
@@ -116,18 +132,22 @@ public class WebSocketResource: WebSocketDelegate {
         socket!.connect()
     }
     
+    /// broadcast notification of connecting
     public func websocketDidConnect(socket: WebSocketClient) {
         NotificationCenter.broadcast(.signalConnected)
     }
     
+    /// broadcast notification of a disconnect
     public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
         NotificationCenter.broadcast(.signalDisconnected, error != nil ? ["error": error!] : nil)
     }
     
+    /// absorb receiving a text message
     public func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
         print("Socket received message: \(text)")
     }
     
+    /// handle incoming data (responses to outgoing requests, routing to a requestHandler on incoming requests)
     public func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
         do {
             let x = try Signal_WebSocketMessage(serializedData: data)
@@ -158,6 +178,7 @@ public class WebSocketResource: WebSocketDelegate {
         }
     }
     
+    /// send a `Signal_WebSocketMessage` out
     func send(_ message: Signal_WebSocketMessage) -> Promise<Void> {
         return Promise { seal in
             var data: Data
@@ -171,6 +192,7 @@ public class WebSocketResource: WebSocketDelegate {
         }
     }
     
+    /// disconnect the socket and free its resources
     public func disconnect() {
         self.socket?.disconnect()
         self.socket = nil

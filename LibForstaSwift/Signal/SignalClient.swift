@@ -50,13 +50,12 @@ public class SignalClient {
             senderKeyStore: nil)
     }
     
+    /// Retrieve my address from the kvstore (or return nil if not available)
     public func myAddress() -> SignalAddress? {
-        guard
-            let userId = self.kvstore.get(DNK.ssAddress) as UUID?,
-            let deviceId = self.kvstore.get(DNK.ssDeviceId) as UInt32? else {
-                return nil
+        guard let address = self.kvstore.get(DNK.ssSignalAddress) as SignalAddress? else {
+            return nil
         }
-        return SignalAddress(userId: userId, deviceId: deviceId)
+        return address
     }
 
     private func generatePassword() throws -> String {
@@ -66,6 +65,37 @@ public class SignalClient {
     private func generateSignalingKey() throws -> Data {
         return try crypto.random(bytes: 32 + 20)
     }
+    
+    private class ProvisioningCipher {
+        var keyPair: KeyPair?
+        
+        func getPublicKey() throws -> Data {
+            if keyPair == nil { self.keyPair = try Signal.generateIdentityKeyPair() }
+            return self.keyPair!.publicKey
+        }
+    }
+    
+    /*
+    public func registerDevice() -> Promise<Void> {
+        let provisioningCipher = ProvisioningCipher()
+        var pubKey: String? = nil
+        
+        return firstly {
+            pubKey = (try provisioningCipher.getPublicKey()).base64EncodedString()
+            return self.atlasClient.getDevices()
+        }
+            .map { devices in
+                if devices.count == 0 {
+                    throw ForstaError(.requestRejected, JSON(["error": "No existing devices, use registerAccount()."]))
+                }
+                return try provisioningCipher.getPublicKey()
+            }
+            .done { pubKey in
+                return pubKey
+        }
+        return Promise<Void>(error: ForstaError(.unknown, "wut"))
+    }
+ */
     
     /// Create a new identity key and create or replace the signal account.
     /// Note that any existing devices asssociated with your account will be
@@ -106,7 +136,7 @@ public class SignalClient {
                         throw ForstaError(.malformedResponse, "unexpected result from provisionAccount")
                 }
                 
-                let signalServerUsername = "\(userId.lcString).\(deviceId)"
+                let mySignalAddress = SignalAddress(userId: userId, deviceId: deviceId)
                 
                 let identity = try Signal.generateIdentityKeyPair()
                 self.store.forstaIdentityKeyStore.setIdentityKeyPair(identity: identity)
@@ -117,13 +147,12 @@ public class SignalClient {
 
                 self.kvstore.set(DNK.ssUrl, serverUrl)
                 self.serverUrl = serverUrl
-                self.kvstore.set(DNK.ssUsername, signalServerUsername)
-                self.signalServerUsername = signalServerUsername
+                self.kvstore.set(DNK.ssUsername, mySignalAddress.description)
+                self.signalServerUsername = mySignalAddress.description
                 self.kvstore.set(DNK.ssPassword, signalServerPassword)
                 self.password = signalServerPassword
                 
-                self.kvstore.set(DNK.ssAddress, userId)
-                self.kvstore.set(DNK.ssDeviceId, deviceId)
+                self.kvstore.set(DNK.ssSignalAddress, mySignalAddress)
                 self.kvstore.set(DNK.ssName, name)
                 self.kvstore.set(DNK.ssSignalingKey, signalingKey)
             }

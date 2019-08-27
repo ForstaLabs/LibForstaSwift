@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
           LibForstaSwift 0.1 Docs
         </a>
-         (50% documented)
+         (100% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -221,12 +221,11 @@
             <h1>SignalAddress</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">SignalAddress</span><span class="p">:</span> <span class="kt">CustomStringConvertible</span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">SignalAddress</span><span class="p">:</span> <span class="kt"><a href="../Protocols/ToFromData.html">ToFromData</a></span></code></pre>
 
                 </div>
               </div>
-            <p>Utility extensions to <code>SignalAddress</code></p>
-
+            
           </div>
         </section>
 
@@ -234,6 +233,160 @@
           <div class="section-content">
             <div class="task-group">
               <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14SignalProtocol0A7AddressC14LibForstaSwiftE6toData10Foundation0H0VyKF"></a>
+                    <a name="//apple_ref/swift/Method/toData()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14SignalProtocol0A7AddressC14LibForstaSwiftE6toData10Foundation0H0VyKF">toData()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Serialize a <code>SignalAddress</code> to <code>Data</code></p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">toData</span><span class="p">()</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Storage/KVStorageProtocol.swift#L180-L182">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14SignalProtocol0A7AddressC14LibForstaSwiftE8fromDatayAC10Foundation0H0VKFZ"></a>
+                    <a name="//apple_ref/swift/Method/fromData(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14SignalProtocol0A7AddressC14LibForstaSwiftE8fromDatayAC10Foundation0H0VKFZ">fromData(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Deserialize a <code>SignalAddress</code> from <code>Data</code></p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">fromData</span><span class="p">(</span><span class="n">_</span> <span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">SignalAddress</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Storage/KVStorageProtocol.swift#L185-L190">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14SignalProtocol0A7AddressC14LibForstaSwiftE6userId06deviceH0ACSS_s6UInt32Vtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(userId:deviceId:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14SignalProtocol0A7AddressC14LibForstaSwiftE6userId06deviceH0ACSS_s6UInt32Vtcfc">init(userId:deviceId:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>convenience init using clearer <code><a href="../Extensions/SignalAddress.html#/s:14SignalProtocol0A7AddressC14LibForstaSwiftE6userId10Foundation4UUIDVvp">userId</a></code> label for the string</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">userId</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">deviceId</span><span class="p">:</span> <span class="kt">UInt32</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/Extensions.swift#L106-L108">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14SignalProtocol0A7AddressC14LibForstaSwiftE6userId06deviceH0AC10Foundation4UUIDV_s6UInt32Vtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(userId:deviceId:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14SignalProtocol0A7AddressC14LibForstaSwiftE6userId06deviceH0AC10Foundation4UUIDV_s6UInt32Vtcfc">init(userId:deviceId:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>convenience init using safer <code>UUID</code> for <code><a href="../Extensions/SignalAddress.html#/s:14SignalProtocol0A7AddressC14LibForstaSwiftE6userId10Foundation4UUIDVvp">userId</a></code></p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">userId</span><span class="p">:</span> <span class="kt">UUID</span><span class="p">,</span> <span class="nv">deviceId</span><span class="p">:</span> <span class="kt">UInt32</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/Extensions.swift#L110-L112">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14SignalProtocol0A7AddressC14LibForstaSwiftE6userId06deviceH0AC10Foundation4UUIDV_s5Int32Vtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(userId:deviceId:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14SignalProtocol0A7AddressC14LibForstaSwiftE6userId06deviceH0AC10Foundation4UUIDV_s5Int32Vtcfc">init(userId:deviceId:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>convenience init using safer <code>UUID</code> for <code><a href="../Extensions/SignalAddress.html#/s:14SignalProtocol0A7AddressC14LibForstaSwiftE6userId10Foundation4UUIDVvp">userId</a></code></p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">userId</span><span class="p">:</span> <span class="kt">UUID</span><span class="p">,</span> <span class="nv">deviceId</span><span class="p">:</span> <span class="kt">Int32</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/Extensions.swift#L114-L116">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
                 <li class="item">
                   <div>
                     <code>
@@ -247,7 +400,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>deserialize from a <code><a href="../Extensions/SignalAddress.html#/s:14SignalProtocol0A7AddressC14LibForstaSwiftE11descriptionSSvp">description</a></code> string</p>
 
                       </div>
                       <div class="declaration">
@@ -259,7 +412,7 @@
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/Extensions.swift#L114-L122">Show on GitHub</a>
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/Extensions.swift#L118-L126">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -267,9 +420,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:s23CustomStringConvertibleP11descriptionSSvp"></a>
-                    <a name="//apple_ref/swift/Property/description" class="dashAnchor"></a>
-                    <a class="token" href="#/s:s23CustomStringConvertibleP11descriptionSSvp">description</a>
+                    <a name="/s:14SignalProtocol0A7AddressC14LibForstaSwiftE6userId10Foundation4UUIDVvp"></a>
+                    <a name="//apple_ref/swift/Property/userId" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14SignalProtocol0A7AddressC14LibForstaSwiftE6userId10Foundation4UUIDVvp">userId</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -277,7 +430,38 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        
+                        <p>accessor for the address&rsquo; <code>name</code> as a <code>UUID</code></p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">userId</span><span class="p">:</span> <span class="kt">UUID</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/Extensions.swift#L128-L130">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14SignalProtocol0A7AddressC14LibForstaSwiftE11descriptionSSvp"></a>
+                    <a name="//apple_ref/swift/Property/description" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14SignalProtocol0A7AddressC14LibForstaSwiftE11descriptionSSvp">description</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>serialize as a <q>userId.deviceId</q> string</p>
+
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
@@ -288,7 +472,7 @@
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/Extensions.swift#L126-L128">Show on GitHub</a>
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/Extensions.swift#L132-L134">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -301,7 +485,7 @@
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2019 <a class="link" href="https://forsta.io" target="_blank" rel="external">Forsta</a>. All rights reserved. (Last updated: 2019-08-27)</p>
+      <p>&copy; 2019 <a class="link" href="https://forsta.io" target="_blank" rel="external">Forsta</a>. All rights reserved. (Last updated: 2019-08-28)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.10.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>

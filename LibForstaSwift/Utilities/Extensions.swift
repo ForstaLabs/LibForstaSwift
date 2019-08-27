@@ -13,7 +13,6 @@ import CommonCrypto
 import SignalProtocol
 
 
-/// Forsta's `Notification.Name`s
 public extension Notification.Name {
     /// Atlas credential has been set in the KV store.
     static let atlasCredentialSet = Notification.Name("atlasCredentialSet")
@@ -49,11 +48,8 @@ public extension Notification.Name {
     static let signalDisconnected = Notification.Name("signalDisconnected")
 }
 
-/// Utility extensions to `NotificationCenter`
 extension NotificationCenter {
-    ///
     /// Broadcast a notification on the main thread.
-    ///
     static func broadcast(_ name: Notification.Name, _ userInfo: [String: Any]? = nil) {
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: name, object: nil, userInfo: userInfo)
@@ -61,8 +57,8 @@ extension NotificationCenter {
     }
 }
 
-/// Utility extensions to `Request`
 extension Request {
+    /// An AlamoFire `Request` debug log-emitter
     public func debugLog() -> Self {
         #if DEBUG
         debugPrint(self)
@@ -71,46 +67,54 @@ extension Request {
     }
 }
 
-/// Utility extensions to `Date`
 public extension Date {
+    /// Date expressed in int milliseconds since 1970 (UInt64)
     var millisecondsSince1970:UInt64 {
         return UInt64((self.timeIntervalSince1970 * 1000.0).rounded())
     }
+    /// Date initialized with int milliseconds since 1970 (Int64)
     init(millisecondsSince1970:Int64) {
         self.init(timeIntervalSince1970: TimeInterval(milliseconds: millisecondsSince1970))
     }
+    /// Date initialized with int milliseconds since 1970 (UInt64)
     init(millisecondsSince1970:UInt64) {
         self.init(timeIntervalSince1970: TimeInterval(milliseconds: millisecondsSince1970))
     }
 }
 
-/// Utility extensions to `TimeInterval`
 public extension TimeInterval {
+    /// Time interval expressed in int milliseconds (UInt64)
     var milliseconds:UInt64 {
         return UInt64((self * 1000.0).rounded())
     }
+    /// Init a time interval using milliseconds (UInt64)
     init(milliseconds:UInt64) {
         self.init(milliseconds / 1000)
     }
+    /// Time interval expressed in int milliseconds (UInt32)
     init(milliseconds:UInt32) {
         self.init(milliseconds / 1000)
     }
+    /// Time interval expressed in int milliseconds (Int64)
     init(milliseconds:Int64) {
         self.init(milliseconds / 1000)
     }
 }
 
-/// Utility extensions to `SignalAddress`
 extension SignalAddress: CustomStringConvertible {
-    convenience init(userId: String, deviceId: UInt32) {
+    /// convenience init using clearer `userId` label for the string
+    public convenience init(userId: String, deviceId: UInt32) {
         self.init(name: userId, deviceId: (Int32(deviceId)))
     }
-    convenience init(userId: UUID, deviceId: UInt32) {
+    /// convenience init using safer `UUID` for `userId`
+    public convenience init(userId: UUID, deviceId: UInt32) {
         self.init(name: userId.lcString, deviceId: (Int32(deviceId)))
     }
-    convenience init(userId: UUID, deviceId: Int32) {
+    /// convenience init using safer `UUID` for `userId`
+    public convenience init(userId: UUID, deviceId: Int32) {
         self.init(name: userId.lcString, deviceId: deviceId)
     }
+    /// deserialize from a `description` string
     public convenience init?(description: String) {
         let parts = description.components(separatedBy: ".")
         guard parts.count == 2,
@@ -120,24 +124,31 @@ extension SignalAddress: CustomStringConvertible {
         }
         self.init(userId: userId, deviceId: deviceId)
     }
-    var userId: UUID {
+    /// accessor for the address' `name` as a `UUID`
+    public var userId: UUID {
         return UUID(uuidString: self.name)!
     }
+    /// serialize as a "userId.deviceId" string
     public var description: String {
         return "\(self.name).\(self.deviceId)"
     }
 }
 
-/// Utility extensions to `JSON`
 public extension JSON {
-    init(string: String) throws {
+    /// init a `JSON` object from a JSON-encoded string
+    init?(string: String) {
         let dataFromString = string.data(using: .utf8, allowLossyConversion: false)!
-        try self.init(data: dataFromString)
+        do {
+            try self.init(data: dataFromString)
+        } catch {
+            return nil
+        }
     }
 }
 
-/// Utility extensions to `UUID`
 public extension UUID {
+    /// the lowercased string form of this `UUID`
+    /// (Forsta uses the lowercase string exclusively in message payloads and user addresses)
     var lcString: String {
         get {
             return self.uuidString.lowercased()
@@ -145,9 +156,9 @@ public extension UUID {
     }
 }
 
-/// Utility extensions to `String`
 public extension String {
+    /// utility for prefixing every line in a `String` with some string
     func indentWith(_ prefix: String) -> String {
-        return prefix + self.replacingOccurrences(of: "\n", with: "\n"+prefix)
+        return prefix + self.replacingOccurrences(of: "\n", with: "\n" + prefix)
     }
 }
