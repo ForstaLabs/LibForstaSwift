@@ -19,13 +19,23 @@ let defaultBaseUrl = "https://atlas-dev.forsta.io"
 
 // MARK:- Externally Visible Types
 
+/// A user's current method of interactive authentication
 public enum AtlasAuthenticationMethod {
-    case sms          // by SMS code
-    case password     // by password
-    case passwordOtp  // by password + Authenticator code
+    /// Authenticate by providing a code that has sent by SMS: `authenticateViaCode()`
+    case sms
+    
+    /// Authenticate by providing a password: `authenticateViaPassword()`
+    case password
+    
+    /// Authenticate by providing a password and an authenticator code: `authenticateViaPasswordOtp()`
+    case passwordOtp
 }
+
+/// The JSON blob detailing an authenticated user on Atlas
 public typealias AuthenticatedAtlasUser = JSON
-public typealias InvitedAtlasPendingUserId = String
+
+/// The UUID of a pending, invited Atlas user
+public typealias InvitedAtlasPendingUserId = UUID
 
 
 ///
@@ -73,7 +83,7 @@ public class AtlasClient {
     ///
     /// - parameter userTag: Tag for the user to authenticate as.
     ///                      It takes the form [@]user[:org].
-    /// - returns: A promise that resolves to an AuthCompletionType indicating
+    /// - returns: A promise that resolves to an AtlasAuthenticationMethod indicating
     ///            how to complete authentiation.
     ///
     public func requestAuthentication(_ userTag: String) -> Promise<AtlasAuthenticationMethod> {
@@ -102,8 +112,7 @@ public class AtlasClient {
     /// - parameters:
     ///     - userTag: Tag for the user. It takes the form [@]user[:org].
     ///     -    code: SMS code that was sent to the user when `requestAuthentication` was called.
-    /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
-    ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
+    /// - returns: A `Promise` that resolves to  an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
     public func authenticateViaCode(userTag: String, code: String) -> Promise<AuthenticatedAtlasUser> {
         let (user, org) = tagParts(userTag);
@@ -119,8 +128,7 @@ public class AtlasClient {
     /// - parameters:
     ///     -  userTag: Tag for the user. It takes the form [@]user[:org].
     ///     - password: The user's password.
-    /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
-    ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
+    /// - returns: A `Promise` that resolves to an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
     public func authenticateViaPassword(userTag: String, password: String) -> Promise<AuthenticatedAtlasUser> {
         let creds = [
@@ -137,8 +145,7 @@ public class AtlasClient {
     ///     -  userTag: Tag for the user. It takes the form [@]user[:org].
     ///     - password: The user's password.
     ///     -      otp: The current Authenticator code for the user.
-    /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
-    ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
+    /// - returns: A `Promise` that resolves to an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
     public func authenticateViaPasswordOtp(userTag: String, password: String, otp: String) -> Promise<AuthenticatedAtlasUser> {
         let creds = [
@@ -150,11 +157,10 @@ public class AtlasClient {
     }
     
     ///
-    /// Authentication via UserAuthToken
+    /// Authentication via a `UserAuthToken`
     ///
-    /// - parameter token: A UserAuthToken for the authenticating user.
-    /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
-    ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
+    /// - parameter token: A `UserAuthToken` for the authenticating user.
+    /// - returns: A `Promise` that resolves to an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
     public func authenticateViaUserAuthToken(token: String) -> Promise<AuthenticatedAtlasUser> {
         let creds = [
@@ -167,8 +173,7 @@ public class AtlasClient {
     /// Authentication via UserAuthToken
     ///
     /// - parameter jwt: A JWT proxy for the authenticating user.
-    /// - returns: A `Promise` that either fails with a `LibForstaError` or succeeds
-    ///            with an `AuthenticatedAtlasUser` `JSON` blob for the user
+    /// - returns: A `Promise` that resolves to an `AuthenticatedAtlasUser` `JSON` blob for the user
     ///
     public func authenticateViaJwtProxy(jwt: String) -> Promise<AuthenticatedAtlasUser> {
         let creds = [
@@ -230,7 +235,7 @@ public class AtlasClient {
     ///
     /// - parameter fields: dictionary of optional and required fields for the new user
     ///
-    /// - returns: `JSON` object of the new user
+    /// - returns: A `Promise` that resolves to a `JSON` blob of the new user
     ///
     public func createUser(_ fields: [String: Any]) -> Promise<JSON> {
         return request("/v1/user/", method: .post, parameters: fields)
@@ -247,7 +252,7 @@ public class AtlasClient {
     ///     - id: the user's UUID
     ///     - fields: dictionary of (only) the fields to update in the user
     ///
-    /// - returns: `JSON` object of the updated user
+    /// - returns: A `Promise` that resolves to a `JSON` blob of the updated user
     ///
     public func updateUser(_ id: String, _ fields: [String: Any]) -> Promise<JSON> {
         return request("/v1/user/\(id)/", method: .patch, parameters: fields)
@@ -258,17 +263,17 @@ public class AtlasClient {
     }
     
     ///
-    /// Request creation of a UserAuthToken
+    /// Request creation of a `UserAuthToken`
     ///
     /// - parameters:
     ///     - id: optional user ID (set this if caller is an admin getting a token for another user)
     ///     - description: optional description for this token
     ///
-    /// - returns: `JSON` object containing the UserAuthToken
+    /// - returns: A `Promise` that resolves to a `JSON` blob containing the `UserAuthToken`
     ///
-    public func getUserAuthToken(userId: String? = nil, description: String? = nil) -> Promise<JSON> {
+    public func getUserAuthToken(userId: UUID? = nil, description: String? = nil) -> Promise<JSON> {
         var fields = [String:String]()
-        if userId != nil { fields["userid"] = userId }
+        if userId != nil { fields["userid"] = userId!.lcString }
         if description != nil { fields["description"] = description }
         
         return request("/v1/userauthtoken/", method: .post, parameters: fields)
@@ -298,7 +303,7 @@ public class AtlasClient {
     ///     - invitationToken: Optional invitation token that was obtained from /v1/invitation
     ///     - fields: dictionary of the fields to define the new user and possibly org
     ///
-    /// - returns: The new user's fully-qualified tag and the userId GUID: `(tag, guid)`
+    /// - returns: A `Promise` that resolves to the new user's fully-qualified tag string and userId GUID: `(tag, guid)`
     ///
     public func joinForsta(invitationToken: String? = nil,
                            _ fields: [String: Any]) -> Promise<(String, UUID)> {
@@ -330,12 +335,15 @@ public class AtlasClient {
     /// - "last_name": The new user's last name (optional)
     /// - "message": Supplementary message for invitation (optional)
     ///
-    /// - returns: a Promise of the ID for the pending user who was sent an invitation
+    /// - returns: a `Promise` that resolves to the userId GUID for
+    ///            the pending user who was sent an invitation
     ///
     public func sendInvitation(_ fields: [String: Any]) -> Promise<InvitedAtlasPendingUserId> {
         return request("/v1/invitation/", method: .post, parameters: fields)
             .map { (statusCode, json) in
-                if statusCode == 200, let userId = json["invited_user_id"].string {
+                if statusCode == 200,
+                    let userIdStr = json["invited_user_id"].string,
+                    let userId = UUID(uuidString: userIdStr) {
                     return userId
                 }
                 throw ForstaError(.requestRejected, json)
@@ -347,10 +355,10 @@ public class AtlasClient {
     ///
     /// - parameter pendingUserId: the user ID of the pending invited user
     ///
-    /// - returns: a Promise of the JSON containing accumulated field values for the information  for the pending user who was sent an invitation
+    /// - returns: a Promise that resolves upon completion of the task
     ///
-    public func revokeInvitation(_ pendingUserId: String) -> Promise<Void> {
-        return request("/v1/invitation/\(pendingUserId)", method: .delete)
+    public func revokeInvitation(_ pendingUserId: UUID) -> Promise<Void> {
+        return request("/v1/invitation/\(pendingUserId.lcString)", method: .delete)
             .map { (statusCode, json) in
                 if statusCode == 204 { return () }
                 throw ForstaError(.requestRejected, json)
@@ -365,8 +373,8 @@ public class AtlasClient {
     ///
     /// - parameter invitationToken: the token for the invitation
     ///
-    /// - returns: a Promise of the JSON containing accumulated field values
-    ///            for prefilling a form leading to a `joinForsta()`
+    /// - returns: a Promise that resolves to `JSON` containing accumulated field
+    ///            values for prefilling a form leading to a `joinForsta()`
     ///
     public func getInvitationInfo(_ invitationToken: String) -> Promise<JSON> {
         return request("/v1/invitation/\(invitationToken)", method: .get)
@@ -384,7 +392,7 @@ public class AtlasClient {
     /// it to its current user membership.
     ///
     /// - parameter expression: a `String` tag expression
-    /// - returns: resolution structure containing cool stuff
+    /// - returns: a `Promise` resolving to a `JSON` blob with the results of the tag math evaluation
     ///
     public func resolveTagExpression(_ expression: String) -> Promise<JSON> {
         return resolveTagExpressionBatch([expression])
@@ -405,6 +413,7 @@ public class AtlasClient {
     ///
     /// - parameter expressions: the `[String]` of tag expressions
     /// - returns: array of resolutions of cool stuff
+    /// - returns: a `Promise` resolving to a `[JSON]` with the results of the tag math evaluations
     ///
     public func resolveTagExpressionBatch(_ expressions: [String]) -> Promise<JSON> {
         return request("/v1/tagmath/", method: .post, parameters: ["expressions": expressions])
@@ -421,28 +430,32 @@ public class AtlasClient {
     /// `/directory/user` public directory for those in other orgs.
     ///
     /// - parameters:
-    ///    - userIds: Array of user ID `Strings` to look up.
+    ///    - userIds: Array of user ID `UUID`s to look up.
     ///    - onlyPublicDirectory: Optional boolean to only use the
     ///      Forsta public directory. E.g. only return lightweight user objects.
     ///
-    /// - returns: Array of user `JSON` objects.
+    /// - returns: A `Promise` resolving to a `JSON` array of the users' information
     ///
-    public func getUsers(userIds: [String], onlyPublicDirectory: Bool = false) -> Promise<[JSON]> {
+    public func getUsers(userIds: [UUID], onlyPublicDirectory: Bool = false) -> Promise<[JSON]> {
         var missing = Set(userIds);
         var users: [JSON] = []
         
-        return (onlyPublicDirectory ? Promise.value((200, JSON(["result": []]))) : request("/v1/user/?id_in=" + userIds.joined(separator: ",")))
+        let idList = userIds.map({ $0.lcString }).joined(separator: ",")
+        
+        return (onlyPublicDirectory ? Promise.value((200, JSON(["result": []]))) : request("/v1/user/?id_in=" + idList))
             .map { (statusCode, json) in
                 if (statusCode != 200) { throw ForstaError(.requestRejected, json) }
                 for user in json["results"].arrayValue {
                     users.append(user)
-                    missing.remove(user["id"].stringValue)
+                    if let id = UUID(uuidString: user["id"].stringValue) {
+                        missing.remove(id)
+                    }
                 }
             }.then { () -> Promise<[JSON]> in
                 if missing.count == 0 {
                     return Promise.value(users)
                 } else {
-                    return self.request("/v1/directory/user/?id_in=" + Array(missing).joined(separator: ","))
+                    return self.request("/v1/directory/user/?id_in=" + Array(missing).map({ $0.lcString }).joined(separator: ","))
                         .map { (statusCode, json) in
                             if (statusCode != 200) { throw ForstaError(.requestRejected, json) }
                             for user in json["results"].arrayValue {
@@ -460,7 +473,7 @@ public class AtlasClient {
     ///
     /// Request provisioning assistance from any existing devices.
     ///
-    /// - returns: `Promise` resolving to an array of `JSON`.
+    /// - returns: `Promise` resolving to results bundled in a `JSON`.
     ///
     public func provisionDevice() -> Promise<JSON> {
         return request("/v1/provision/request", method: .post)
@@ -473,7 +486,7 @@ public class AtlasClient {
     ///
     /// Provision/refresh a new Signal Server account.
     ///
-    /// - returns: `Promise` resolving to an array of `JSON`.
+    /// - returns: `Promise` resolving to results bundled in a `JSON`.
     ///
     public func provisionAccount(_ fields: [String: Any]) -> Promise<JSON> {
         return request("/v1/provision/account", method: .put, parameters: fields)
@@ -486,7 +499,7 @@ public class AtlasClient {
     ///
     /// The current set of known devices for the authenticated account.
     ///
-    /// - returns: `Promise` resolving to an array of `JSON` device info.
+    /// - returns: `Promise` resolving to an `JSON` array of device(s) info.
     ///
     public func getDevices() -> Promise<[JSON]> {
         return request("/v1/provision/account")

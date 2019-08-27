@@ -78,7 +78,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 atlas.createUser(["first_name": "Password", "tag_slug": "password", "password": "asdfasdf24"])
             }
             .then { passUser in
-                atlas.getUserAuthToken(userId: passUser["id"].stringValue)
+                atlas.getUserAuthToken(userId: UUID(uuidString: passUser["id"].stringValue)!)
             }
             .map { tokenInfo in
                 passwordUserAuthToken = tokenInfo["token"].stringValue
@@ -478,10 +478,10 @@ export JWT_PROXY_AUDIENCE='atlas'
         wait(for: [expectAuth], timeout: 5.0)
         
         let expectTags = XCTestExpectation(description: "resolve tag expression")
-        var userIds: [String] = []
+        var userIds: [UUID] = []
         atlas.resolveTagExpression("@sms + @twofactor + @password")
             .done { result in
-                userIds = result["userids"].arrayValue.map { s in s.stringValue }
+                userIds = result["userids"].arrayValue.map { UUID(uuidString: $0.stringValue)! }
                 XCTAssert(userIds.count == 3, "should have three users")
             }.catch { error in
                 XCTFail("resolve tag expression failed \(error)")
@@ -763,7 +763,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 atlas.sendInvitation(["phone":dummyTwilioNumber, "first_name": "Baz", "last_name": "Foo"])
             }
             .done { pendingUserId in
-                XCTAssert(pendingUserId.count > 0)
+                XCTAssert(pendingUserId.lcString.count > 0)
             }
             .catch { error in
                 if let ferr = error as? ForstaError {
