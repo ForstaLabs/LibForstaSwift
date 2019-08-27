@@ -28,7 +28,7 @@ clean:
 pristine: clean
 	rm -f $(DEPENDENCIES)
 
-docs: 
+docs: $(DEPENDENCIES)
 	jazzy \
                 --clean \
                 --author Forsta \
