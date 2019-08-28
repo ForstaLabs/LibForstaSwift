@@ -1,0 +1,26 @@
+name: Refresh API Docs
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Refresh Docs
+    runs-on: macOS-latest
+    
+    steps:
+    - name: get the code
+      uses: actions/checkout@master
+    - name: install the jazzy gem
+      run: gem install jazzy
+    - name: install dependencies and build docs
+      run: make docs
+    - name: push to gh-pages
+      if: success()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        PUBLISH_BRANCH: gh-pages
+        PUBLISH_DIR: ./docs
+      run: ./.github/bin/gh-pages-push.sh
+
