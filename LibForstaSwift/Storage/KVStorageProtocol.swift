@@ -129,7 +129,7 @@ public extension KVStorageProtocol {
 /// A simple protocol for things that we want
 /// to be able to serialize-to and reconstitute-from `Data`
 public protocol ToFromData {
-    /// Serialize to `Data`
+    /// Serialize self to `Data`
     func toData() throws -> Data
     
     /// Deserialize from `Data`

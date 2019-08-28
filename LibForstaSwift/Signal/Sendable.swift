@@ -286,6 +286,36 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
     }
     
+    /// directly manipulate the (presumed singular) `.plain` entry in the `body` array
+    public var bodyPlain: String? {
+        get {
+            let ary = (body ?? []).filter({ switch $0 { case .plain: return true; default: return false }})
+            return ary.count > 0 ? ary[0].raw : nil
+        }
+        set(value) {
+            var ary = (body ?? []).filter({ switch $0 { case .plain: return false; default: return true }})
+            if value != nil {
+                ary.append(.html(value!))
+            }
+            body = ary.count > 0 ? ary : nil
+        }
+    }
+    
+    /// directly manipulate the (presumed singular) `.html` entry in the `body` array
+    public var bodyHtml: String? {
+        get {
+            let ary = (body ?? []).filter({ switch $0 { case .html: return true; default: return false }})
+            return ary.count > 0 ? ary[0].raw : nil
+        }
+        set(value) {
+            var ary = (body ?? []).filter({ switch $0 { case .html: return false; default: return true }})
+            if value != nil {
+                ary.append(.html(value!))
+            }
+            body = ary.count > 0 ? ary : nil
+        }
+    }
+    
     /// Control message type (meaningful only for `.control` messages)
     public var controlMessageType: FLIControlMessageType? {
         get {

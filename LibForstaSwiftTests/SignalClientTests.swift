@@ -94,12 +94,17 @@ class SignalClientTests: XCTestCase {
         
         let body: [ForstaPayloadV1.BodyItem] = [.plain("yo baby")]
         XCTAssert(payload.body == nil)
+        XCTAssert(payload.bodyPlain == nil)
+        XCTAssert(payload.bodyHtml == nil)
         payload.body = body
         XCTAssert(payload.body != nil)
+        XCTAssert(payload.bodyPlain != nil)
+        XCTAssert(payload.bodyHtml == nil)
         switch payload.body![0] {
         case .plain(let string): XCTAssert(string == "yo baby")
         default: XCTFail()
         }
+        XCTAssert(payload.bodyPlain == "yo baby")
         
         let threadExpression = "@foo + @bar"
         XCTAssert(payload.threadExpression == nil)
@@ -145,6 +150,8 @@ class SignalClientTests: XCTestCase {
         
         payload.body = nil
         XCTAssert(payload.body == nil)
+        XCTAssert(payload.bodyPlain == nil)
+        XCTAssert(payload.bodyHtml == nil)
         
         payload.threadExpression = nil
         XCTAssert(payload.threadExpression == nil)
