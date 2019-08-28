@@ -52,11 +52,8 @@ class Message: Sendable, CustomStringConvertible {
         self.payload.threadTitle = threadTitle
         self.payload.threadType = threadType
         self.payload.messageRef = messageRef
-        
-        var bodyItems = [ForstaPayloadV1.BodyItem]()
-        if bodyPlain != nil { bodyItems.append(.plain(bodyPlain!)) }
-        if bodyHtml != nil { bodyItems.append(.html(bodyHtml!)) }
-        if bodyItems.count > 0 { self.payload.body = bodyItems }
+        self.payload.bodyPlain = bodyPlain
+        self.payload.bodyHtml = bodyHtml
     }
 }
 

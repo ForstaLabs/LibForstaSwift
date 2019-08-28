@@ -26,13 +26,13 @@ public class MessageSender {
     /// Information from the Signal server about a message transmission activity
     public class TransmissionInfo: CustomStringConvertible {
         /// time it was received
-        let received: Date
+        public let received: Date
         /// whether it needs sync
-        let needsSync: Bool
+        public let needsSync: Bool
         /// the recipient it was sent to
-        let recipient: MessageRecipient
+        public let recipient: MessageRecipient
         /// the number of devices involved (useful when the recipient was a `.user`)
-        let deviceCount: Int
+        public let deviceCount: Int
         
         /// init with recipient, device count, and Signal server response JSON
         init(recipient: MessageRecipient, deviceCount: Int, json: JSON) {
