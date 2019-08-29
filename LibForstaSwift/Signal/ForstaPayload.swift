@@ -108,29 +108,6 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
     }
     
-    /// For a `.content` message, it has a body consisting of an array of these
-    public enum BodyItem: CustomStringConvertible {
-        /// Plain text version of the `.content` message (required)
-        case plain(_ value: String)
-        /// Html version of the `.content` message (optional)
-        case html(_ value: String)
-        /// Unknown body element
-        case unknown(_ value: String)
-        
-        /// String encoding of the item
-        public var description: String {
-            return "\"\(self.raw)\""
-        }
-        /// Raw data for the item
-        public var raw: String {
-            switch self {
-            case .plain(let str): return str
-            case .html(let str): return str
-            default: return "<bad item>"
-            }
-        }
-    }
-    
     /// Array of message `BodyItem`, required for `.content` message types
     public var body: [BodyItem]? {
         get {
@@ -278,9 +255,98 @@ public class ForstaPayloadV1: CustomStringConvertible {
             }
         }
     }
+
+    /// readMark timestamp (only relevant for `.control` messages of type `.readMark`)
+    public var readMark: Date? {
+        get {
+            guard let timestamp = json["data"]["readMark"].uInt64 else {
+                return nil
+            }
+            return Date(millisecondsSince1970: timestamp)
+        }
+        set(value) {
+            if value == nil {
+                json["data"].dictionaryObject?.removeValue(forKey: "readMark")
+            } else {
+                if !json["data"].exists() {
+                    json["data"] = [:]
+                }
+                json["data"]["readMark"].uInt64 = value!.millisecondsSince1970
+            }
+        }
+    }
     
+    /// threadUpdate.threadTitle (only relevant for `.control` messages of type `.threadUpdate`)
+    public var threadUpdateTitle: String? {
+        get {
+            return json["data"]["threadUpdate"]["threadTitle"].string
+        }
+        set(value) {
+            if value == nil {
+                json["data"]["threadUpdate"].dictionaryObject?.removeValue(forKey: "threadTitle")
+                if json["data"]["threadUpdate"].dictionaryValue.count == 0 {
+                    json["data"].dictionaryObject?.removeValue(forKey: "threadUpdate")
+                }
+            } else {
+                if !json["data"].exists() {
+                    json["data"] = [:]
+                }
+                if !json["data"]["threadUpdate"].exists() {
+                    json["data"]["threadUpdate"] = [:]
+                }
+                json["data"]["threadUpdate"]["threadTitle"].string = value!
+            }
+        }
+    }
+    
+    /// threadUpdate.expression (only relevant for `.control` messages of type `.threadUpdate`)
+    public var threadUpdateExpression: String? {
+        get {
+            return json["data"]["threadUpdate"]["expression"].string
+        }
+        set(value) {
+            if value == nil {
+                json["data"]["threadUpdate"].dictionaryObject?.removeValue(forKey: "expression")
+                if json["data"]["threadUpdate"].dictionaryValue.count == 0 {
+                    json["data"].dictionaryObject?.removeValue(forKey: "threadUpdate")
+                }
+            } else {
+                if !json["data"].exists() {
+                    json["data"] = [:]
+                }
+                if !json["data"]["threadUpdate"].exists() {
+                    json["data"]["threadUpdate"] = [:]
+                }
+                json["data"]["threadUpdate"]["expression"].string = value!
+            }
+        }
+    }
+
     // - MARK: Related Enums
     
+    /// A `.content` message's `body` is represented by an array of `BodyItem`
+    public enum BodyItem: CustomStringConvertible {
+        /// Plain text version of the `.content` message (required)
+        case plain(_ value: String)
+        /// Html version of the `.content` message (optional)
+        case html(_ value: String)
+        /// Unknown body element
+        case unknown(_ value: String)
+        
+        /// String encoding of the item
+        public var description: String {
+            return "\"\(self.raw)\""
+        }
+        /// Raw data for the item
+        public var raw: String {
+            switch self {
+            case .plain(let str): return str
+            case .html(let str): return str
+            default: return "<bad item>"
+            }
+        }
+    }
+
     /// Forsta message types
     public enum MessageType: String {
         /// A control message -- see `ControlType`

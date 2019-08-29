@@ -60,7 +60,7 @@ class Message: Sendable, CustomStringConvertible {
 class SignalClientTests: XCTestCase {
     
     func testPayload() {
-        let payload = ForstaPayloadV1()
+        var payload = ForstaPayloadV1()
         
         XCTAssert(payload.jsonString == "{\"version\": 1}")
         
@@ -168,6 +168,26 @@ class SignalClientTests: XCTestCase {
         XCTAssert(payload.json["version"] == 1)
         XCTAssert(payload.json["data"].exists())
         XCTAssert(payload.json["data"].dictionary!.count == 0)
+        
+        payload = ForstaPayloadV1()
+        XCTAssert(payload.threadUpdateExpression == nil)
+        payload.threadUpdateExpression = "@a + @b"
+        XCTAssert(payload.threadUpdateExpression == "@a + @b")
+        payload.threadUpdateExpression = nil
+        XCTAssert(payload.threadUpdateExpression == nil)
+        
+        XCTAssert(payload.threadUpdateTitle == nil)
+        payload.threadUpdateTitle = "a title"
+        XCTAssert(payload.threadUpdateTitle == "a title")
+        payload.threadUpdateTitle = nil
+        XCTAssert(payload.threadUpdateTitle == nil)
+        
+        let now = Date()
+        XCTAssert(payload.readMark == nil)
+        payload.readMark = now
+        XCTAssert(payload.readMark == now)
+        payload.readMark = nil
+        XCTAssert(payload.readMark == nil)
     }
     
     
