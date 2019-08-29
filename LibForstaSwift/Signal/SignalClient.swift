@@ -164,7 +164,7 @@ public class SignalClient {
             }
             .map { (code, json) in
                 if code == 204 { return }
-                throw ForstaError(ForstaErrorType.requestFailure, "problem performing registerAccount: \(code), \(json)")
+                throw ForstaError(.requestFailure, "problem performing registerAccount: \(code), \(json)")
         }
     }
     

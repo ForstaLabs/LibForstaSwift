@@ -13,98 +13,12 @@
 import Foundation
 import SwiftyJSON
 
-/// The different types of errors that can occur using the LibForstaSwift library.
-public enum ForstaErrorType: String {
-    /// Unknown errors should only be thrown of no other, more descriptive error type exists
-    case unknown = "Unknown"
-
-    /// The local storage implementation produced an error
-    case storageError = "Storage"
-
-    /// A message was received that was previously decrypted, or is too old
-    case duplicateMessage = "Duplicate message"
-
-    /// The message type does not match
-    case invalidType = "Invalid type"
-
-    /// An invalid key produced an error
-    case invalidKey = "Invalid key"
-    
-    /// The initialization vector has the wrong length
-    case invalidIV = "Invalid iv"
-
-    /// The (key) id is invalid
-    case invalidId = "Invalid Id"
-
-    /// The authentication failed
-    case invalidMac = "Invalid mac"
-
-    /// The message structure is invalid
-    case invalidMessage = "Invalid message"
-
-    /// The length of a message or stored object is incorrect
-    case invalidLength = "Invalid length"
-
-    /// A message from an older implementation of the protocol is received
-    case legacyMessage = "Legacy message"
-
-    /// No valid session exists for the address
-    case noSession = "No session"
-
-    /// The identity of the recipient is untrusted
-    case untrustedIdentity = "Untrusted identity"
-
-    /// The signature of the message is invalid
-    case invalidSignature = "Invalid signature"
-
-    /// A serialized record or message is not in valid protocol buffer format
-    case invalidProtoBuf = "Invalid protoBuf"
-
-    /// The identity of two fingerprints is not equal
-    case fPIdentityMismatch = "Fingerprint identity mismatch"
-
-    /// There is no crypto provider set
-    case noCryptoProvider = "No crpyto provider"
-
-    /// Random bytes could not be created
-    case noRandomBytes = "No random bytes"
-
-    /// There was an error calculating the HMAC of a message
-    case hmacError = "HMAC error"
-
-    /// There was an error calculating a digest
-    case digestError = "Digest error"
-
-    /// An error occured during encryption
-    case encryptionError = "Encryption error"
-
-    /// An error occured during decryption
-    case decryptionError = "Decryption error"
-
-    /// A JWT was malformed or expired
-    case invalidJWT = "Invalid JWT"
-    
-    /// Request failure
-    case requestFailure = "Request failure"
-    
-    /// Request rejected
-    case requestRejected = "Request rejected"
-
-    /// A request response was malformed
-    case malformedResponse = "Malformed response"
-    
-    /// A request response was malformed
-    case configuration = "Configuration error"
-    
-    /// A transmission failed
-    case transmissionFailure = "Transmission failure"
-}
 
 /// All errors thrown by `LibForstaSwift` are `ForstaError` objects.
 public final class ForstaError: CustomStringConvertible, Error {
 
     /// The error type
-    public let type: ForstaErrorType
+    public let type: ErrorType
 
     /// A decribing message accompaning the error
     public let message: String?
@@ -126,7 +40,7 @@ public final class ForstaError: CustomStringConvertible, Error {
      - parameter file: A String describing the file where the error occured
      - parameter function: A String describing the function where the error occured
     */
-    public init(_ type: ForstaErrorType,
+    public init(_ type: ErrorType,
          _ message: String? = nil,
          cause: ForstaError? = nil,
          file: String = #file,
@@ -163,7 +77,7 @@ public final class ForstaError: CustomStringConvertible, Error {
      - parameter file: A String describing the file where the error occured
      - parameter function: A String describing the function where the error occured
      */
-    public convenience init(_ type: ForstaErrorType,
+    public convenience init(_ type: ErrorType,
          cause: Error,
          file: String = #file,
          function: String = #function) {
@@ -177,7 +91,7 @@ public final class ForstaError: CustomStringConvertible, Error {
      - parameter file: A String describing the file where the error occured
      - parameter function: A String describing the function where the error occured
      */
-    public convenience init(_ type: ForstaErrorType,
+    public convenience init(_ type: ErrorType,
                             _ message: JSON,
                             file: String = #file,
                             function: String = #function) {
@@ -247,5 +161,94 @@ public final class ForstaError: CustomStringConvertible, Error {
     /// The error's message converted to JSON (i.e., for .requestRejected), if possible
     public var json: JSON {
         return JSON(string: self.message ?? "{\"message\": \"<empty>\"}") ?? JSON(["message": self.message ?? "<empty>"])
+    }
+    
+    //-MARK: Related Types
+    
+    /// The different types of errors that can occur using the LibForstaSwift library.
+    public enum ErrorType: String {
+        /// Unknown errors should only be thrown of no other, more descriptive error type exists
+        case unknown = "Unknown"
+        
+        /// The local storage implementation produced an error
+        case storageError = "Storage"
+        
+        /// A message was received that was previously decrypted, or is too old
+        case duplicateMessage = "Duplicate message"
+        
+        /// The message type does not match
+        case invalidType = "Invalid type"
+        
+        /// An invalid key produced an error
+        case invalidKey = "Invalid key"
+        
+        /// The initialization vector has the wrong length
+        case invalidIV = "Invalid iv"
+        
+        /// The (key) id is invalid
+        case invalidId = "Invalid Id"
+        
+        /// The authentication failed
+        case invalidMac = "Invalid mac"
+        
+        /// The message structure is invalid
+        case invalidMessage = "Invalid message"
+        
+        /// The length of a message or stored object is incorrect
+        case invalidLength = "Invalid length"
+        
+        /// A message from an older implementation of the protocol is received
+        case legacyMessage = "Legacy message"
+        
+        /// No valid session exists for the address
+        case noSession = "No session"
+        
+        /// The identity of the recipient is untrusted
+        case untrustedIdentity = "Untrusted identity"
+        
+        /// The signature of the message is invalid
+        case invalidSignature = "Invalid signature"
+        
+        /// A serialized record or message is not in valid protocol buffer format
+        case invalidProtoBuf = "Invalid protoBuf"
+        
+        /// The identity of two fingerprints is not equal
+        case fPIdentityMismatch = "Fingerprint identity mismatch"
+        
+        /// There is no crypto provider set
+        case noCryptoProvider = "No crpyto provider"
+        
+        /// Random bytes could not be created
+        case noRandomBytes = "No random bytes"
+        
+        /// There was an error calculating the HMAC of a message
+        case hmacError = "HMAC error"
+        
+        /// There was an error calculating a digest
+        case digestError = "Digest error"
+        
+        /// An error occured during encryption
+        case encryptionError = "Encryption error"
+        
+        /// An error occured during decryption
+        case decryptionError = "Decryption error"
+        
+        /// A JWT was malformed or expired
+        case invalidJWT = "Invalid JWT"
+        
+        /// Request failure
+        case requestFailure = "Request failure"
+        
+        /// Request rejected
+        case requestRejected = "Request rejected"
+        
+        /// A request response was malformed
+        case malformedResponse = "Malformed response"
+        
+        /// A request response was malformed
+        case configuration = "Configuration error"
+        
+        /// A transmission failed
+        case transmissionFailure = "Transmission failure"
     }
 }

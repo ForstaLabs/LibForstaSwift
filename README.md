@@ -1,6 +1,6 @@
 LibForstaSwift: Forsta Messaging in Swift
 ========
-Signal-based Swift library for end-to-end encrypted messaging on the [Forsta](https://forsta.io) platform.
+A Swift library for end-to-end encrypted messaging using the [Forsta](https://forsta.io) platform.
 
 
 [![License](https://img.shields.io/npm/l/librelay.svg)](https://github.com/ForstaLabs/LibForstaSwift)
@@ -10,11 +10,21 @@ Signal-based Swift library for end-to-end encrypted messaging on the [Forsta](ht
 
 About
 --------
-This is a Swift library used to communicate with the Forsta messaging
-platform.  The underlying protocol is based on the Signal end-to-end
-crypto system.  The primary differences surround how device provisioning 
-is accomplished and the [custom JSON messaging payload]( <https://goo.gl/eX7gyC>).
+This is a Swift library for communicating using the [Forsta](<https://forsta.io>) 
+messaging platform.  The underlying protocol is based on the Signal end-to-end
+crypto system.  The primary differences between Signal and Forsta surround how 
+users are addressed, how device provisioning is accomplished, and the 
+[custom JSON messaging payload]( <https://goo.gl/eX7gyC>) Forsta uses to support
+a richer set of messaging functionality.
 
+*Note that this library is used for sending and receiving end-to-end encrypted messages, 
+and for communicating with Forsta's Atlas server about users and the tags used to refer to them. 
+It does NOT persist messages, or cache user or tag information, or present any user interfaces 
+(those would be important aspects of a server-based bot client or a full messaging app that are
+outside the scope of this library).*
+
+Please visit the [current API documentation online](https://forstalabs.github.io/LibForstaSwift/index.html)
+for more details.
 
 Storage
 --------
@@ -50,13 +60,13 @@ forsta.atlas.authenticateViaPassword(userTag: "@fred:acme", password: "password4
 Message Receiving
 -------
 
-tbd
+*Example coming soon.*
 
 
 Message Sending
 -------
 
-tbd
+*Example coming soon.*
 
 
 Cryptography Notice
@@ -83,4 +93,4 @@ License
 Licensed under the GPLv3: http://www.gnu.org/licenses/gpl-3.0.html
 
 * Copyright 2014-2016 Open Whisper Systems
-* Copyright 2017-2019 Forsta Inc.
+* Copyright 2017-2019 Forsta, Inc.

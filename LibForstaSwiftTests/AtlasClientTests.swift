@@ -156,9 +156,9 @@ export JWT_PROXY_AUDIENCE='atlas'
         var expectations:[XCTestExpectation] = []
 
         let goodCases = [
-            "@sms:\(testOrgSlug)" : AtlasAuthenticationMethod.sms,
-            "@password:\(testOrgSlug)" : AtlasAuthenticationMethod.password,
-            "@twofactor:\(testOrgSlug)" : AtlasAuthenticationMethod.passwordOtp
+            "@sms:\(testOrgSlug)" : AtlasClient.AuthenticationMethod.sms,
+            "@password:\(testOrgSlug)" : AtlasClient.AuthenticationMethod.password,
+            "@twofactor:\(testOrgSlug)" : AtlasClient.AuthenticationMethod.passwordOtp
         ]
 
         for (userTag, expectedResult) in goodCases {
@@ -204,7 +204,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("should have failed to find the domain")
             }
             .catch { error in
-                XCTAssert(((error as? ForstaError)?.type ?? .unknown) == ForstaErrorType.requestFailure)
+                XCTAssert(((error as? ForstaError)?.type ?? .unknown) == .requestFailure)
             }
             .finally {
                 expectation3.fulfill()
@@ -219,7 +219,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTFail("should have failed to find the domain")
             }
             .catch { error in
-                XCTAssert(((error as? ForstaError)?.type ?? .unknown) == ForstaErrorType.requestFailure)
+                XCTAssert(((error as? ForstaError)?.type ?? .unknown) == .requestFailure)
             }
             .finally {
                 expectation4.fulfill()
@@ -291,7 +291,7 @@ export JWT_PROXY_AUDIENCE='atlas'
         
         let expectation5 = XCTestExpectation(description: "auth via full password+totp")
         atlas.requestAuthentication("@twofactor:\(testOrgSlug)")
-            .then { authMethod -> Promise<AuthenticatedAtlasUser> in
+            .then { authMethod -> Promise<AtlasClient.AuthenticatedUser> in
                 XCTAssert(authMethod == .passwordOtp)
                 let otpString = totpGenerator?.currentPassword ?? "ugh"
                 return atlas.authenticateViaPasswordOtp(userTag: "@twofactor:\(testOrgSlug)", password: "asdfasdf24", otp: otpString)

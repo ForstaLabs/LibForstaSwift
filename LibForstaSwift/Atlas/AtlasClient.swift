@@ -12,38 +12,26 @@ import PromiseKit
 import SwiftyJSON
 import JWTDecode
 
-// MARK: Global Constants
-
-let defaultPublicOrg = "forsta"
-let defaultBaseUrl = "https://atlas-dev.forsta.io"
-
-// MARK:- Externally Visible Types
-
-/// A user's current method of interactive authentication
-public enum AtlasAuthenticationMethod {
-    /// Authenticate by providing a code that has sent by SMS: `authenticateViaCode()`
-    case sms
-    
-    /// Authenticate by providing a password: `authenticateViaPassword()`
-    case password
-    
-    /// Authenticate by providing a password and an authenticator code: `authenticateViaPasswordOtp()`
-    case passwordOtp
-}
-
-/// The JSON blob detailing an authenticated user on Atlas
-public typealias AuthenticatedAtlasUser = JSON
-
-/// The UUID of a pending, invited Atlas user
-public typealias InvitedAtlasPendingUserId = UUID
-
 
 ///
-///  Interface for the Forsta Atlas server.  Atlas provides user and tag management.
+/// Central class for interacting for the Forsta Atlas server.
+///
+/// You'll use this for Atlas authentication, user creation and manipulation,
+/// tag creation and manipulation, and tag-math evaluation to resolve message
+/// distributions.
+///
+/// It requires an object conforming to `KVStorageProtocol` so it can maintain
+/// login sessions across invocations, etc.
 ///
 public class AtlasClient {
-    var defaultOrg = defaultPublicOrg
-    var baseUrl = defaultBaseUrl
+    static let defaultPublicOrg = "forsta"
+    static let defaultBaseUrl = "https://atlas-dev.forsta.io"
+    
+    /// The default public organization name
+    public var defaultOrg = defaultPublicOrg
+    /// The URL of the Atlas server we are dealing with
+    /// (this will be persisted and restored if there is an active login session)
+    public var baseUrl = defaultBaseUrl
     
     var kvstore: KVStorageProtocol
     
@@ -51,7 +39,7 @@ public class AtlasClient {
     var authenticatedUserId: UUID?
     
     /// predicate for whether this Atlas client is currently authenticated
-    var isAuthenticated: Bool {
+    public var isAuthenticated: Bool {
         return self.authenticatedUserJwt != nil
     }
     
@@ -66,15 +54,24 @@ public class AtlasClient {
         restore()
     }
     
-    /// Internal: Restore JWT and baseUrl from kvstore, if possible.
-    private func restore() {
-        self.baseUrl = kvstore.get(DNK.atlasUrl) ?? defaultBaseUrl
+    // MARK:- Public types for dealing with AtlasClient
+    
+    /// A user's current method of interactive authentication
+    public enum AuthenticationMethod {
+        /// Authenticate by providing a code that has sent by SMS: `authenticateViaCode()`
+        case sms
         
-        if let jwt: String = kvstore.get(DNK.atlasCredential) {
-            if !setJwt(jwt) { expireJwt() }
-        }
+        /// Authenticate by providing a password: `authenticateViaPassword()`
+        case password
+        
+        /// Authenticate by providing a password and an authenticator code: `authenticateViaPasswordOtp()`
+        case passwordOtp
     }
     
+    /// The JSON blob detailing an authenticated user on Atlas
+    public typealias AuthenticatedUser = JSON
+    
+
     // MARK:- Authentication and JWT Maintenance
     
     ///
@@ -83,10 +80,10 @@ public class AtlasClient {
     ///
     /// - parameter userTag: Tag for the user to authenticate as.
     ///                      It takes the form [@]user[:org].
-    /// - returns: A promise that resolves to an AtlasAuthenticationMethod indicating
-    ///            how to complete authentiation.
+    /// - returns: A `Promise` that resolves to an `AuthenticationMethod`
+    ///            indicating how to complete authentiation.
     ///
-    public func requestAuthentication(_ userTag: String) -> Promise<AtlasAuthenticationMethod> {
+    public func requestAuthentication(_ userTag: String) -> Promise<AuthenticationMethod> {
         let (user, org) = tagParts(userTag)
         
         return request("/v1/login/send/\(org)/\(user)")
@@ -112,9 +109,9 @@ public class AtlasClient {
     /// - parameters:
     ///     - userTag: Tag for the user. It takes the form [@]user[:org].
     ///     -    code: SMS code that was sent to the user when `requestAuthentication` was called.
-    /// - returns: A `Promise` that resolves to  an `AuthenticatedAtlasUser` `JSON` blob for the user
+    /// - returns: A `Promise` that resolves to  an `AuthenticatedUser` `JSON` blob for the user
     ///
-    public func authenticateViaCode(userTag: String, code: String) -> Promise<AuthenticatedAtlasUser> {
+    public func authenticateViaCode(userTag: String, code: String) -> Promise<AuthenticatedUser> {
         let (user, org) = tagParts(userTag);
         let creds = [
             "authtoken": "\(org):\(user):\(code)"
@@ -128,9 +125,9 @@ public class AtlasClient {
     /// - parameters:
     ///     -  userTag: Tag for the user. It takes the form [@]user[:org].
     ///     - password: The user's password.
-    /// - returns: A `Promise` that resolves to an `AuthenticatedAtlasUser` `JSON` blob for the user
+    /// - returns: A `Promise` that resolves to an `AuthenticatedUser` `JSON` blob for the user
     ///
-    public func authenticateViaPassword(userTag: String, password: String) -> Promise<AuthenticatedAtlasUser> {
+    public func authenticateViaPassword(userTag: String, password: String) -> Promise<AuthenticatedUser> {
         let creds = [
             "fq_tag": userTag,
             "password": password
@@ -145,9 +142,9 @@ public class AtlasClient {
     ///     -  userTag: Tag for the user. It takes the form [@]user[:org].
     ///     - password: The user's password.
     ///     -      otp: The current Authenticator code for the user.
-    /// - returns: A `Promise` that resolves to an `AuthenticatedAtlasUser` `JSON` blob for the user
+    /// - returns: A `Promise` that resolves to an `AuthenticatedUser` `JSON` blob for the user
     ///
-    public func authenticateViaPasswordOtp(userTag: String, password: String, otp: String) -> Promise<AuthenticatedAtlasUser> {
+    public func authenticateViaPasswordOtp(userTag: String, password: String, otp: String) -> Promise<AuthenticatedUser> {
         let creds = [
             "fq_tag": userTag,
             "password": password,
@@ -160,9 +157,9 @@ public class AtlasClient {
     /// Authentication via a `UserAuthToken`
     ///
     /// - parameter token: A `UserAuthToken` for the authenticating user.
-    /// - returns: A `Promise` that resolves to an `AuthenticatedAtlasUser` `JSON` blob for the user
+    /// - returns: A `Promise` that resolves to an `AuthenticatedUser` `JSON` blob for the user
     ///
-    public func authenticateViaUserAuthToken(token: String) -> Promise<AuthenticatedAtlasUser> {
+    public func authenticateViaUserAuthToken(token: String) -> Promise<AuthenticatedUser> {
         let creds = [
             "userauthtoken": token,
         ]
@@ -173,9 +170,9 @@ public class AtlasClient {
     /// Authentication via UserAuthToken
     ///
     /// - parameter jwt: A JWT proxy for the authenticating user.
-    /// - returns: A `Promise` that resolves to an `AuthenticatedAtlasUser` `JSON` blob for the user
+    /// - returns: A `Promise` that resolves to an `AuthenticatedUser` `JSON` blob for the user
     ///
-    public func authenticateViaJwtProxy(jwt: String) -> Promise<AuthenticatedAtlasUser> {
+    public func authenticateViaJwtProxy(jwt: String) -> Promise<AuthenticatedUser> {
         let creds = [
             "jwtproxy": jwt,
         ]
@@ -184,7 +181,7 @@ public class AtlasClient {
     
     /// Internal: Hit the Atlas authentication endpoing
     /// with appropriate credentials for a concrete authentication method.
-    private func authenticate(_ credentials: [String: String]) -> Promise<AuthenticatedAtlasUser> {
+    private func authenticate(_ credentials: [String: String]) -> Promise<AuthenticatedUser> {
         return request("/v1/login/", method: .post, parameters: credentials)
             .map { (statusCode, json) in
                 if statusCode == 200 {
@@ -335,10 +332,10 @@ public class AtlasClient {
     /// - "last_name": The new user's last name (optional)
     /// - "message": Supplementary message for invitation (optional)
     ///
-    /// - returns: a `Promise` that resolves to the userId GUID for
+    /// - returns: a `Promise` that resolves to the `UUID` of
     ///            the pending user who was sent an invitation
     ///
-    public func sendInvitation(_ fields: [String: Any]) -> Promise<InvitedAtlasPendingUserId> {
+    public func sendInvitation(_ fields: [String: Any]) -> Promise<UUID> {
         return request("/v1/invitation/", method: .post, parameters: fields)
             .map { (statusCode, json) in
                 if statusCode == 200,
@@ -583,5 +580,14 @@ public class AtlasClient {
         self.authenticatedUserId = nil
         self.kvstore.remove(DNK.atlasCredential)
         NotificationCenter.broadcast(.atlasCredentialExpired, nil)
+    }
+    
+    /// Internal: Restore JWT and baseUrl from kvstore, if possible.
+    private func restore() {
+        self.baseUrl = kvstore.get(DNK.atlasUrl) ?? AtlasClient.defaultBaseUrl
+        
+        if let jwt: String = kvstore.get(DNK.atlasCredential) {
+            if !setJwt(jwt) { expireJwt() }
+        }
     }
 }

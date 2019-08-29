@@ -9,15 +9,13 @@
 import Foundation
 import SignalProtocol
 
-/// Default namespace storage keys
+/// All of the Default Namespace keys we use
 enum DNK: String, CustomStringConvertible {
-    // Atlas server store keys
     /// The current JWT for authorizing Atlas calls
     case atlasCredential = "atlasCredential"
     /// The URL of the Atlas server we are authenticated against
     case atlasUrl = "atlasUrl"
     
-    // Signal Server store keys
     /// URL that Atlas gave us to use to reach our Signal server
     case ssUrl = "signalServerUrl"
     /// The `SignalAddress` we have for our device on the Signal server
@@ -31,7 +29,6 @@ enum DNK: String, CustomStringConvertible {
     /// The random secret we shared with Signal server for encrypting websocket traffic
     case ssSignalingKey = "signalServerSignalingKey"
     
-    // Other
     /// Our private identity key
     case myPrivateIdentityKey = "myPrivateIdentityKey"
     /// Our public identity key

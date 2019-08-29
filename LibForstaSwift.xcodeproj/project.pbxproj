@@ -17,12 +17,9 @@
 		DB2B00A522E12CC000B9931A /* JWTDecode.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009E22E12CC000B9931A /* JWTDecode.framework */; };
 		DB2B00A822E12D4600B9931A /* AtlasClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00A722E12D4600B9931A /* AtlasClient.swift */; };
 		DB2B00B122E12D6100B9931A /* the-Makefile in Resources */ = {isa = PBXBuildFile; fileRef = DB2B00AA22E12D6100B9931A /* the-Makefile */; };
-		DB2B00B222E12D6100B9931A /* DeviceMessages.proto in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00AB22E12D6100B9931A /* DeviceMessages.proto */; };
 		DB2B00B322E12D6100B9931A /* IncomingPushMessageSignal.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00AC22E12D6100B9931A /* IncomingPushMessageSignal.pb.swift */; };
-		DB2B00B422E12D6100B9931A /* SubProtocol.proto in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00AD22E12D6100B9931A /* SubProtocol.proto */; };
 		DB2B00B522E12D6100B9931A /* DeviceMessages.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00AE22E12D6100B9931A /* DeviceMessages.pb.swift */; };
 		DB2B00B622E12D6100B9931A /* SubProtocol.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00AF22E12D6100B9931A /* SubProtocol.pb.swift */; };
-		DB2B00B722E12D6100B9931A /* IncomingPushMessageSignal.proto in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00B022E12D6100B9931A /* IncomingPushMessageSignal.proto */; };
 		DB2B00BB22E12D6A00B9931A /* WebSocketResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00B922E12D6A00B9931A /* WebSocketResource.swift */; };
 		DB2B00BC22E12D6A00B9931A /* SignalClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00BA22E12D6A00B9931A /* SignalClient.swift */; };
 		DB2B00C022E12D7100B9931A /* ForstaStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00BE22E12D7100B9931A /* ForstaStore.swift */; };
@@ -59,6 +56,7 @@
 		DBE3D57622F87B750016B800 /* Sendable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57522F87B750016B800 /* Sendable.swift */; };
 		DBE3D57822F89E880016B800 /* MessageSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57722F89E880016B800 /* MessageSender.swift */; };
 		DBE3D57A22F89EB50016B800 /* MessageReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57922F89EB50016B800 /* MessageReceiver.swift */; };
+		DBF5B6EE23182CDD004765FA /* ForstaPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF5B6ED23182CDD004765FA /* ForstaPayload.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -131,6 +129,7 @@
 		DBE3D57522F87B750016B800 /* Sendable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sendable.swift; sourceTree = "<group>"; };
 		DBE3D57722F89E880016B800 /* MessageSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSender.swift; sourceTree = "<group>"; };
 		DBE3D57922F89EB50016B800 /* MessageReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageReceiver.swift; sourceTree = "<group>"; };
+		DBF5B6ED23182CDD004765FA /* ForstaPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForstaPayload.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,6 +199,7 @@
 				DB2B00BA22E12D6A00B9931A /* SignalClient.swift */,
 				DBE3D57722F89E880016B800 /* MessageSender.swift */,
 				DBE3D57922F89EB50016B800 /* MessageReceiver.swift */,
+				DBF5B6ED23182CDD004765FA /* ForstaPayload.swift */,
 			);
 			path = Signal;
 			sourceTree = "<group>";
@@ -362,6 +362,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = DBDB771D22E124610027EEB0;
 			productRefGroup = DBDB772822E124610027EEB0 /* Products */;
@@ -410,6 +411,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/usr/local/bin/carthage copy-frameworks\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -418,13 +420,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB2B00B222E12D6100B9931A /* DeviceMessages.proto in Sources */,
 				DB2B00C022E12D7100B9931A /* ForstaStore.swift in Sources */,
 				DB2B00C922E12D7800B9931A /* ForstaError.swift in Sources */,
 				DB2B00BB22E12D6A00B9931A /* WebSocketResource.swift in Sources */,
 				DB2B00A822E12D4600B9931A /* AtlasClient.swift in Sources */,
 				DB2B00C822E12D7800B9931A /* SignalCommonCrypto.swift in Sources */,
 				DB2B00B322E12D6100B9931A /* IncomingPushMessageSignal.pb.swift in Sources */,
+				DBF5B6EE23182CDD004765FA /* ForstaPayload.swift in Sources */,
 				DB2B00C122E12D7100B9931A /* KVStorageProtocol.swift in Sources */,
 				DBE3D57A22F89EB50016B800 /* MessageReceiver.swift in Sources */,
 				DBE3D57822F89E880016B800 /* MessageSender.swift in Sources */,
@@ -433,10 +435,8 @@
 				DB2B00B522E12D6100B9931A /* DeviceMessages.pb.swift in Sources */,
 				DB17A447230EF7F000AEEF73 /* Forsta.swift in Sources */,
 				DB2B00CA22E12D7800B9931A /* SignalCryptoProvider.swift in Sources */,
-				DB2B00B422E12D6100B9931A /* SubProtocol.proto in Sources */,
 				DBE3D57622F87B750016B800 /* Sendable.swift in Sources */,
 				DB2B00BC22E12D6A00B9931A /* SignalClient.swift in Sources */,
-				DB2B00B722E12D6100B9931A /* IncomingPushMessageSignal.proto in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

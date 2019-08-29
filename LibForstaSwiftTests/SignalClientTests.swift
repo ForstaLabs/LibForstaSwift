@@ -27,7 +27,7 @@ class Message: Sendable, CustomStringConvertible {
 
     init(timestamp: Date = Date(),
          messageId: UUID = UUID(),
-         messageType: FLIMessageType = .content,
+         messageType: ForstaPayloadV1.MessageType = .content,
          threadId: UUID = UUID(),
          threadExpression: String,
          expiration: TimeInterval? = nil,
@@ -35,7 +35,7 @@ class Message: Sendable, CustomStringConvertible {
          expirationTimerUpdateFlag: Bool = false,
          userAgent: String = "LibSignalSwift Client",
          threadTitle: String? = nil,
-         threadType: FLIThreadType = .conversation,
+         threadType: ForstaPayloadV1.ThreadType = .conversation,
          messageRef: UUID? = nil,
          bodyPlain: String? = nil,
          bodyHtml: String? = nil
@@ -79,15 +79,15 @@ class SignalClientTests: XCTestCase {
         payload.sender = sender
         XCTAssert(payload.sender! == sender)
         
-        let messageType = FLIMessageType.content
+        let messageType = ForstaPayloadV1.MessageType.content
         XCTAssert(payload.messageType == nil)
         payload.messageType = messageType
         XCTAssert(payload.messageType! == messageType)
         
-        let controlMessageType = FLIControlMessageType.callJoin
-        XCTAssert(payload.controlMessageType == nil)
-        payload.controlMessageType = controlMessageType
-        XCTAssert(payload.controlMessageType! == controlMessageType)
+        let controlType = ForstaPayloadV1.ControlType.callJoin
+        XCTAssert(payload.controlType == nil)
+        payload.controlType = controlType
+        XCTAssert(payload.controlType! == controlType)
         
         let body: [ForstaPayloadV1.BodyItem] = [.plain("yo baby")]
         XCTAssert(payload.body == nil)
@@ -118,7 +118,7 @@ class SignalClientTests: XCTestCase {
         payload.threadTitle = threadTitle
         XCTAssert(payload.threadTitle! == threadTitle)
         
-        let threadType = FLIThreadType.conversation
+        let threadType = ForstaPayloadV1.ThreadType.conversation
         XCTAssert(payload.threadType == nil)
         payload.threadType = threadType
         XCTAssert(payload.threadType! == threadType)
@@ -142,8 +142,8 @@ class SignalClientTests: XCTestCase {
         payload.messageType = nil
         XCTAssert(payload.messageType == nil)
         
-        payload.controlMessageType = nil
-        XCTAssert(payload.controlMessageType == nil)
+        payload.controlType = nil
+        XCTAssert(payload.controlType == nil)
         
         payload.body = nil
         XCTAssert(payload.body == nil)

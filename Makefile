@@ -14,7 +14,7 @@ ci: $(DEPENDENCIES) test
 
 dependencies $(DEPENDENCIES):
 	carthage update --platform iOS
-	touch $(DEPENDENCIES)
+	@ touch $(DEPENDENCIES)
 
 build: $(DEPENDENCIES)
 	$(XCODE_BUILD) build # | xcpretty
@@ -29,13 +29,14 @@ pristine: clean
 	rm -f $(DEPENDENCIES)
 
 docs: $(DEPENDENCIES)
-	jazzy \
+	@ echo building api docs
+	@ jazzy \
                 --clean \
-                --author Forsta \
+                --hide-documentation-coverage \
+                --author "Forsta, Inc" \
                 --author_url https://forsta.io \
                 --github_url https://github.com/ForstaLabs/LibForstaSwift \
                 --github-file-prefix https://github.com/ForstaLabs/LibForstaSwift/blob/master \
-                --module-version 0.1 \
                 --xcodebuild-arguments -scheme,LibForstaSwift \
                 --module LibForstaSwift \
                 --root-url https://forstalabs.github.io/LibForstaSwift/LATEST/index.html \
