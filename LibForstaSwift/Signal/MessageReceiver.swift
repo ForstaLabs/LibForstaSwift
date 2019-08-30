@@ -163,7 +163,7 @@ public class MessageReceiver {
             }
             let _ = request.respond(status: 200, message: "OK")
         } catch let error {
-            print("Error handling incoming message", error.localizedDescription)
+            print("Telling Signal server we had an error handling incoming message", error.localizedDescription)
             let _ = request.respond(status: 500, message: "Bad encrypted websocket message")
         }
     }

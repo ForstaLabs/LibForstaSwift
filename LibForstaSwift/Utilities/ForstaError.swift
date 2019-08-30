@@ -165,7 +165,7 @@ public final class ForstaError: CustomStringConvertible, Error {
     
     //-MARK: Related Types
     
-    /// The different types of errors that can occur using the LibForstaSwift library.
+    /// The different types of errors that LibForstaSwift can throw.
     public enum ErrorType: String {
         /// Unknown errors should only be thrown of no other, more descriptive error type exists
         case unknown = "Unknown"
@@ -245,7 +245,7 @@ public final class ForstaError: CustomStringConvertible, Error {
         /// A request response was malformed
         case malformedResponse = "Malformed response"
         
-        /// A request response was malformed
+        /// Necessary configuration was missing or wrong
         case configuration = "Configuration error"
         
         /// A transmission failed

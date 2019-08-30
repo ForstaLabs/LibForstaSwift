@@ -109,6 +109,7 @@ func fallbackRequestHandler(request: IncomingWSRequest) {
 
 /// Manage a websocket, reporting dis/connection, routing incoming requests to handlers, and sending websocket requests on demand
 public class WebSocketResource: WebSocketDelegate {
+    var lastConnect: Date?
     var socket: WebSocket?
     let signalClient: SignalClient
     var outgoingRequests = [UInt64 : OutgoingWSRequest]()
@@ -122,6 +123,7 @@ public class WebSocketResource: WebSocketDelegate {
     
     /// connect with our Atlas-designated Signal server using our pre-negotiated credentials
     public func connect() {
+        lastConnect = Date()
         guard signalClient.serverUrl != nil, signalClient.signalServerUsername != nil, signalClient.password != nil else {
             print("CANNOT CONNECT (missing server url, username, or password)")
             return
@@ -140,6 +142,9 @@ public class WebSocketResource: WebSocketDelegate {
     /// broadcast notification of a disconnect
     public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
         NotificationCenter.broadcast(.signalDisconnected, error != nil ? ["error": error!] : nil)
+        if lastConnect != nil {
+            connect() // just immediately reconnect until we purposefully disconnect
+        }
     }
     
     /// absorb receiving a text message
@@ -194,6 +199,7 @@ public class WebSocketResource: WebSocketDelegate {
     
     /// disconnect the socket and free its resources
     public func disconnect() {
+        self.lastConnect = nil
         self.socket?.disconnect()
         self.socket = nil
     }
