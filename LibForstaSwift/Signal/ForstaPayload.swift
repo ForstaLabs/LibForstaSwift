@@ -55,8 +55,17 @@ public class ForstaPayloadV1: CustomStringConvertible {
         if threadExpression == nil { throw ForstaError(.invalidPayload, "missing threadExpression") }
         
         // verify basic coherence between control messages and control message types
-        if messageType == .control && controlType == nil { throw ForstaError(.invalidPayload, "control message has no control type") }
-        if controlType != nil && messageType != .control { throw ForstaError(.invalidPayload, "control type specified in non-control message") }
+        if messageType == .control && controlType == nil {
+            throw ForstaError(.invalidPayload, "control message is missing control type")
+        }
+        if controlType != nil && messageType != .control {
+            throw ForstaError(.invalidPayload, "control type specified in non-control message")
+        }
+        
+        // verify basic coherence on our body contents
+        if bodyHtml != nil && bodyPlain == nil {
+            throw ForstaError(.invalidPayload, "plain body text is required if there is html body text")
+        }
     }
     
     // -MARK: Accessor properties to manipulate/reflect the underlying JSON
