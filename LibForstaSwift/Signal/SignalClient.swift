@@ -210,7 +210,11 @@ public class SignalClient {
     }
     
     /// Request delivery of an encrypted message to all of a user's devices
-    func deliverToUser(userId: UUID, messageBundles: [[String: Any]], timestamp: UInt64) -> Promise<(Int, JSON)> {
+    func deliverToUser(userId: UUID, messageBundles: [[String: Any]]) -> Promise<(Int, JSON)> {
+        guard messageBundles.count > 0,
+            let timestamp = messageBundles[0]["timestamp"] as? UInt64 else {
+                return Promise<(Int, JSON)>(error: ForstaError(.requestRejected, JSON(["message": "malformed message bundles, no timestamp available"])))
+        }
         let parameters: [String: Any] = [
             "messages": messageBundles,
             "timestamp": timestamp

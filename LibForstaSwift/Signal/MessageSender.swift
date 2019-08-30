@@ -175,7 +175,7 @@ public class MessageSender {
             return Promise<TransmissionInfo>(error: error)
         }
         return
-            self.signalClient.deliverToUser(userId: userId, messageBundles: messageBundles, timestamp: Date().millisecondsSince1970)
+            self.signalClient.deliverToUser(userId: userId, messageBundles: messageBundles)
             .then { (statusCode, json) -> Promise<TransmissionInfo> in
                 if statusCode < 300 {
                     return Promise<TransmissionInfo>.value(TransmissionInfo(recipient:.user(userId), deviceCount: messageBundles.count, json: json))
