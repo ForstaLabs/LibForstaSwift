@@ -18,7 +18,6 @@ import SignalProtocol
 
 class Message: Sendable, CustomStringConvertible {
     public var timestamp: Date
-
     public var expiration: TimeInterval?
     public var endSessionFlag: Bool
     public var expirationTimerUpdateFlag: Bool
@@ -58,6 +57,16 @@ class Message: Sendable, CustomStringConvertible {
 }
 
 class SignalClientTests: XCTestCase {
+    func testTimestamps() {
+        for _ in 1...1000000 {
+            let d1 = Date.timestamp
+            let ts1 = d1.millisecondsSince1970
+            let d2 = Date(millisecondsSince1970: ts1)
+            let ts2 = d2.millisecondsSince1970
+            XCTAssert(ts1 == ts2)
+            XCTAssert(d1 == d2)
+        }
+    }
     
     func testPayload() {
         var payload = ForstaPayloadV1()
@@ -182,7 +191,7 @@ class SignalClientTests: XCTestCase {
         payload.threadUpdateTitle = nil
         XCTAssert(payload.threadUpdateTitle == nil)
         
-        let now = Date()
+        let now = Date.timestamp
         XCTAssert(payload.readMark == nil)
         payload.readMark = now
         XCTAssert(payload.readMark == now)

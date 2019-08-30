@@ -105,7 +105,9 @@ public class InboundMessage: CustomStringConvertible {
     /// human-readable string to get the gist of this `InboundMessage`
     public var description: String {
         return """
-        InboundMessage from \(source) @ \(timestamp.millisecondsSince1970) good for \(expiration ?? -1)
+        InboundMessage from \(source) @ \(timestamp.millisecondsSince1970) \(expiration != nil ? "good for \(expiration!) seconds" : "") \
+        \(endSessionFlag ? "\n>>> END SESSION FLAG" : "") \
+        \(expirationTimerUpdateFlag ? "\n>>> EXPIRATION TIMER UPDATE FLAG" : "")
         \(payload.description.indentWith(">>> "))
         """
     }

@@ -72,6 +72,7 @@ public extension Date {
     var millisecondsSince1970:UInt64 {
         return UInt64((self.timeIntervalSince1970 * 1000.0).rounded())
     }
+    
     /// Date initialized with int milliseconds since 1970 (Int64)
     init(millisecondsSince1970:Int64) {
         self.init(timeIntervalSince1970: TimeInterval(milliseconds: millisecondsSince1970))
@@ -79,6 +80,24 @@ public extension Date {
     /// Date initialized with int milliseconds since 1970 (UInt64)
     init(millisecondsSince1970:UInt64) {
         self.init(timeIntervalSince1970: TimeInterval(milliseconds: millisecondsSince1970))
+    }
+    
+    /// Date initialized with int milliseconds since 1970 (UInt64)
+    init(timestamp: UInt64) {
+        self.init(millisecondsSince1970: Int64(timestamp))
+    }
+    /// Date initialized with int milliseconds since 1970 (Int64)
+    init(timestamp: Int64) {
+        self.init(millisecondsSince1970: timestamp)
+    }
+    
+    /// Date initialized to **milliseconds resolution**, making it safe for use as a Signal timestamp
+    init(timestamp: Date) {
+        self.init(millisecondsSince1970: timestamp.millisecondsSince1970)
+    }
+    /// Date of "now" initialized to **milliseconds resolution**, making it safe for use as a Signal timestamp
+    static var timestamp: Date {
+        return Date(millisecondsSince1970: Date().millisecondsSince1970)
     }
 }
 
@@ -89,15 +108,15 @@ public extension TimeInterval {
     }
     /// Init a time interval using milliseconds (UInt64)
     init(milliseconds:UInt64) {
-        self.init(milliseconds / 1000)
+        self.init(Double(milliseconds) / 1000.0)
     }
     /// Time interval expressed in int milliseconds (UInt32)
     init(milliseconds:UInt32) {
-        self.init(milliseconds / 1000)
+        self.init(Double(milliseconds) / 1000.0)
     }
     /// Time interval expressed in int milliseconds (Int64)
     init(milliseconds:Int64) {
-        self.init(milliseconds / 1000)
+        self.init(Double(milliseconds) / 1000.0)
     }
 }
 
