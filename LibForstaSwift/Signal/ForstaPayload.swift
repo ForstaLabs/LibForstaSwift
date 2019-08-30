@@ -45,6 +45,20 @@ public class ForstaPayloadV1: CustomStringConvertible {
         return json.description
     }
     
+    /// Throw an error if mandatory fields are missing, etc
+    public func sanityCheck() throws {
+        // verify mandatory fields are present
+        if json["version"].int == nil { throw ForstaError(.invalidPayload, "missing version") }
+        if messageId == nil { throw ForstaError(.invalidPayload, "missing messageId") }
+        if messageType == nil { throw ForstaError(.invalidPayload, "missing messageType") }
+        if threadId == nil { throw ForstaError(.invalidPayload, "missing threadId") }
+        if threadExpression == nil { throw ForstaError(.invalidPayload, "missing threadExpression") }
+        
+        // verify basic coherence between control messages and control message types
+        if messageType == .control && controlType == nil { throw ForstaError(.invalidPayload, "control message has no control type") }
+        if controlType != nil && messageType != .control { throw ForstaError(.invalidPayload, "control type specified in non-control message") }
+    }
+    
     // -MARK: Accessor properties to manipulate/reflect the underlying JSON
     
     /// The message's globally-unique ID (required)

@@ -51,6 +51,7 @@ public class MessageSender {
     /// Transmit a Sendable (i.e., a message) to a list of MessageRecipients (specific devices and/or users' whole collections of devices)
     public func send(_ sendable: Sendable, to recipients: [MessageRecipient]) -> Promise<[TransmissionInfo]> {
         return firstly { () -> Promise<[TransmissionInfo]> in
+            try sendable.payload.sanityCheck()
             var results: [Promise<TransmissionInfo>] = []
             var paddedClearData = try sendable.contentProto.serializedData()
             pad(&paddedClearData)

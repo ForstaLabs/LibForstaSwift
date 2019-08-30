@@ -250,5 +250,8 @@ public final class ForstaError: CustomStringConvertible, Error {
         
         /// A transmission failed
         case transmissionFailure = "Transmission failure"
+        
+        /// Forsta Payload is invalid
+        case invalidPayload = "Invalid payload"
     }
 }
