@@ -17,13 +17,13 @@ dependencies $(DEPENDENCIES):
 	@ touch $(DEPENDENCIES)
 
 build: $(DEPENDENCIES)
-	$(XCODE_BUILD) build # | xcpretty
+	$(XCODE_BUILD) build | xcpretty
 
 test: build
-	$(XCODE_BUILD) test # | xcpretty
+	$(XCODE_BUILD) test | xcpretty
 
 clean:
-	$(XCODE_BUILD) clean # | xcpretty
+	$(XCODE_BUILD) clean | xcpretty
 
 pristine: clean
 	rm -f $(DEPENDENCIES)

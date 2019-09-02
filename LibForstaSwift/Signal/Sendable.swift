@@ -39,7 +39,7 @@ public protocol Sendable {
 
 
 extension Sendable {
-    /// INTERNAL: the Signal_Content encoding of this `Sendable`
+    /// INTERNAL: the Signal_Content protobuf encoding for this `Sendable`
     var contentProto: Signal_Content {
         get {
             var dm = Signal_DataMessage()
