@@ -34,7 +34,7 @@ public class Forsta {
         self.sender = MessageSender(signalClient: signal)
     }
     
-    // MARK:- Pass-throughs for everything not in the Atlas and Signal clients
+    // -MARK: Pass-throughs for everything not in the Atlas and Signal clients
     
     /// Connect the Signal Server web socket.
     public func connect() {

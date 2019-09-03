@@ -41,7 +41,7 @@ public protocol KVStorageProtocol {
 }
 
 public extension KVStorageProtocol {
-    // MARK:- Derived helpers for saving/restoring various useful types
+    // -MARK: Derived helpers for saving/restoring various useful types
     
     /// Derived extension to set a `Numeric` value for a key in a namespace.
     func set<T: Numeric>(ns: CustomStringConvertible, key: CustomStringConvertible, value: T) {
@@ -83,7 +83,7 @@ public extension KVStorageProtocol {
         return nil
     }
 
-    // MARK:- Ergonomic helpers that set/get in the default namespace
+    // -MARK: Ergonomic helpers that set/get in the default namespace
     
     /// The "default namespace" we use to ergonomically stash a handful of global things.
     var defaultNamespace: String { return "The Default State Namespace" }
@@ -124,7 +124,7 @@ public extension KVStorageProtocol {
     }
 }
 
-// MARK:- Data (de)serialization for types we care about
+// -MARK: Data (de)serialization for types we care about
 
 /// A simple protocol for things that we want
 /// to be able to serialize-to and reconstitute-from `Data`

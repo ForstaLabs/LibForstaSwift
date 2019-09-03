@@ -16,7 +16,7 @@ import SignalProtocol
  */
 public struct SignalCommonCrypto: SignalCryptoProvider {
 
-    // MARK: Protocol SignalCryptoProvider
+    // -MARK: Protocol SignalCryptoProvider
 
     /**
      Create a number of random bytes
@@ -149,7 +149,7 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
         }
     }
 
-    // MARK: Encryption helper functions
+    // -MARK: Encryption helper functions
 
     /**
      Process (encrypt/decrypt) a message with AES in CBC mode and pkcs7 padding.

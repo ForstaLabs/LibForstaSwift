@@ -54,7 +54,7 @@ public class AtlasClient {
         restore()
     }
     
-    // MARK:- Public types for dealing with AtlasClient
+    // -MARK: Public types for dealing with AtlasClient
     
     /// A user's current method of interactive authentication
     public enum AuthenticationMethod {
@@ -72,7 +72,7 @@ public class AtlasClient {
     public typealias AuthenticatedUser = JSON
     
 
-    // MARK:- Authentication and JWT Maintenance
+    // -MARK: Authentication and JWT Maintenance
     
     ///
     /// Request a user's authentication method for the Atlas server.
@@ -221,7 +221,7 @@ public class AtlasClient {
         }
     }
     
-    // MARK:- Invitation, User, and Org CRUD
+    // -MARK: Invitation, User, and Org CRUD
     
     ///
     /// Administrator creation of a new user in the same organization.
@@ -382,7 +382,7 @@ public class AtlasClient {
     }
     
     
-    // MARK:- Tag and User Directory Services
+    // -MARK: Tag and User Directory Services
     
     ///
     /// Take a tag expression (i.e "@foo + @bar - (@joe + @sarah)") and resolve
@@ -465,7 +465,7 @@ public class AtlasClient {
     }
     
     
-    // MARK:- Signal Server Assistance
+    // -MARK: Signal Server Assistance
     
     ///
     /// Request provisioning assistance from any existing devices.
@@ -506,7 +506,7 @@ public class AtlasClient {
         }
     }
     
-    // MARK:- Utility Routines
+    // -MARK: Utility Routines
     
     ///
     /// Breaks a tag into (normalized) user and org slug parts.
