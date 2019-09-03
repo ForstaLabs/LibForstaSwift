@@ -439,7 +439,7 @@ public class AtlasClient {
         
         let idList = userIds.map({ $0.lcString }).joined(separator: ",")
         
-        return (onlyPublicDirectory ? Promise.value((200, JSON(["result": []]))) : request("/v1/user/?id_in=" + idList))
+        return (onlyPublicDirectory ? Promise.value((200, JSON(["results": []]))) : request("/v1/user/?id_in=" + idList))
             .map { (statusCode, json) in
                 if (statusCode != 200) { throw ForstaError(.requestRejected, json) }
                 for user in json["results"].arrayValue {
@@ -464,7 +464,53 @@ public class AtlasClient {
         }
     }
     
+    /// Internal: get all pages for a url
+    private func allResults(url: String, previous: [JSON] = []) -> Promise<[JSON]> {
+        print("allResults called for \(url)")
+        return request(url)
+            .then { result -> Promise<[JSON]> in
+                let (statusCode, json) = result
+                if statusCode == 200 {
+                    let next = json["next"].string
+                    let combined = previous + json["results"].arrayValue
+                    if next == nil {
+                        return Promise<[JSON]>.value(combined)
+                    } else {
+                        return self.allResults(url: next!, previous: combined)
+                    }
+                }
+                throw ForstaError(.requestRejected, json)
+        }
+    }
     
+    ///
+    /// Get all user objects in this org based on an optional search/filter query string.
+    /// Retrieves from the `/v1/user` endpoint. This will retrieve
+    /// *all* pages of results.
+    ///
+    /// - parameter q: Optional query search/filter string.
+    ///                No query string means retreive **all** users.
+    /// - returns: A `Promise` resolving to a `JSON` array of
+    ///            retrieved users' information
+    ///
+    public func getUsers(q: String? = nil) -> Promise<[JSON]> {
+        let url = "/v1/user/\(q == nil ? "" : "?q=\(q!)")"
+        return allResults(url: url)
+    }
+    
+    ///
+    /// Get all tag objects for this org.
+    /// Retrieves from the `/v1/tag` endpoint. This will retrieve
+    /// *all* pages of results.
+    ///
+    /// - returns: A `Promise` resolving to a `JSON` array of
+    ///            retrieved tags' information
+    ///
+    public func getTags(q: String? = nil) -> Promise<[JSON]> {
+        let url = "/v1/tag/\(q == nil ? "" : "?q=\(q!)")"
+        return allResults(url: url)
+    }
+
     // -MARK: Signal Server Assistance
     
     ///
@@ -530,8 +576,9 @@ public class AtlasClient {
     /// Internal: Basic Atlas http request that returns a `Promise` of `(statuscode, JSON)`
     private func request(_ url: String, method: HTTPMethod = .get, parameters: Parameters? = nil) -> Promise<(Int, JSON)> {
         return Promise { seal in
-            let headers = isAuthenticated ? ["Authorization": "JWt \(authenticatedUserJwt!)"] : nil
-            Alamofire.request("\(baseUrl)\(url)", method: method, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+            let headers = isAuthenticated ? ["Authorization": "JWT \(authenticatedUserJwt!)"] : nil
+            let fullUrl = url.starts(with: "http") ? url : "\(baseUrl)\(url)"
+            Alamofire.request(fullUrl, method: method, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
                 .responseJSON { response in
                     let statusCode = response.response?.statusCode ?? 500
                     switch response.result {
