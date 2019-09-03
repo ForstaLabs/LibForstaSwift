@@ -14,8 +14,10 @@ import SwiftyJSON
 /// A convenience wrapper for v1 of the Forsta message exchange payload
 /// (see https://bit.ly/forsta-payload for details)
 public class ForstaPayloadV1: CustomStringConvertible {
-    /// The underlying JSON that is manipulated/reflected by these properties
+    /// The underlying payload JSON that is being manipulated/reflected
     public var json: JSON
+    
+    // -MARK: Constructors
     
     /// Initialize with an (optional) JSON string
     public init(_ jsonString: String? = nil) {
@@ -35,6 +37,8 @@ public class ForstaPayloadV1: CustomStringConvertible {
         self.json = json
     }
     
+    // -MARK: Utilities
+    
     /// The current underlying `JSON` object encoded as a JSON string
     var jsonString: String {
         return json.rawString([.castNilToNSNull: true]) ?? "<malformed JSON>"
@@ -45,16 +49,16 @@ public class ForstaPayloadV1: CustomStringConvertible {
         return json.description
     }
     
-    /// Throw an error if mandatory fields are missing, etc
+    /// Throw an error if mandatory fields are missing, etc.
     public func sanityCheck() throws {
-        // verify mandatory fields are present
+        // check that mandatory fields are present
         if json["version"].int == nil { throw ForstaError(.invalidPayload, "missing version") }
         if messageId == nil { throw ForstaError(.invalidPayload, "missing messageId") }
         if messageType == nil { throw ForstaError(.invalidPayload, "missing messageType") }
         if threadId == nil { throw ForstaError(.invalidPayload, "missing threadId") }
         if threadExpression == nil { throw ForstaError(.invalidPayload, "missing threadExpression") }
         
-        // verify basic coherence between control messages and control message types
+        // check basic coherence between control messages and specifying a control message type
         if messageType == .control && controlType == nil {
             throw ForstaError(.invalidPayload, "control message is missing control type")
         }
@@ -62,13 +66,13 @@ public class ForstaPayloadV1: CustomStringConvertible {
             throw ForstaError(.invalidPayload, "control type specified in non-control message")
         }
         
-        // verify basic coherence on our body contents
+        // check basic coherence on body contents
         if bodyHtml != nil && bodyPlain == nil {
             throw ForstaError(.invalidPayload, "plain body text is required if there is html body text")
         }
     }
     
-    // -MARK: Accessor properties to manipulate/reflect the underlying JSON
+    // -MARK: Accessor properties for the underlying JSON
     
     /// The message's globally-unique ID (required)
     public var messageId: UUID? {
@@ -162,7 +166,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
     }
     
-    /// directly manipulate the (presumed singular) `.plain` entry in the `body` array
+    /// Directly manipulate the (presumed singular) `.plain` entry in the `body` array
     public var bodyPlain: String? {
         get {
             let ary = (body ?? []).filter({ switch $0 { case .plain: return true; default: return false }})
@@ -177,7 +181,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
     }
     
-    /// directly manipulate the (presumed singular) `.html` entry in the `body` array
+    /// Directly manipulate the (presumed singular) `.html` entry in the `body` array
     public var bodyHtml: String? {
         get {
             let ary = (body ?? []).filter({ switch $0 { case .html: return true; default: return false }})

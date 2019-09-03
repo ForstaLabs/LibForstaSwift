@@ -16,7 +16,6 @@
 		DB2B00A422E12CC000B9931A /* SignalProtocol.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009D22E12CC000B9931A /* SignalProtocol.framework */; };
 		DB2B00A522E12CC000B9931A /* JWTDecode.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009E22E12CC000B9931A /* JWTDecode.framework */; };
 		DB2B00A822E12D4600B9931A /* AtlasClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00A722E12D4600B9931A /* AtlasClient.swift */; };
-		DB2B00B122E12D6100B9931A /* the-Makefile in Resources */ = {isa = PBXBuildFile; fileRef = DB2B00AA22E12D6100B9931A /* the-Makefile */; };
 		DB2B00B322E12D6100B9931A /* IncomingPushMessageSignal.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00AC22E12D6100B9931A /* IncomingPushMessageSignal.pb.swift */; };
 		DB2B00B522E12D6100B9931A /* DeviceMessages.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00AE22E12D6100B9931A /* DeviceMessages.pb.swift */; };
 		DB2B00B622E12D6100B9931A /* SubProtocol.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00AF22E12D6100B9931A /* SubProtocol.pb.swift */; };
@@ -101,7 +100,7 @@
 		DB2B009D22E12CC000B9931A /* SignalProtocol.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SignalProtocol.framework; path = Carthage/Build/iOS/SignalProtocol.framework; sourceTree = "<group>"; };
 		DB2B009E22E12CC000B9931A /* JWTDecode.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JWTDecode.framework; path = Carthage/Build/iOS/JWTDecode.framework; sourceTree = "<group>"; };
 		DB2B00A722E12D4600B9931A /* AtlasClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AtlasClient.swift; sourceTree = "<group>"; };
-		DB2B00AA22E12D6100B9931A /* the-Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "the-Makefile"; sourceTree = "<group>"; };
+		DB2B00AA22E12D6100B9931A /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		DB2B00AB22E12D6100B9931A /* DeviceMessages.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.protobuf; path = DeviceMessages.proto; sourceTree = "<group>"; };
 		DB2B00AC22E12D6100B9931A /* IncomingPushMessageSignal.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IncomingPushMessageSignal.pb.swift; sourceTree = "<group>"; };
 		DB2B00AD22E12D6100B9931A /* SubProtocol.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.protobuf; path = SubProtocol.proto; sourceTree = "<group>"; };
@@ -180,7 +179,7 @@
 		DB2B00A922E12D6100B9931A /* protos */ = {
 			isa = PBXGroup;
 			children = (
-				DB2B00AA22E12D6100B9931A /* the-Makefile */,
+				DB2B00AA22E12D6100B9931A /* Makefile */,
 				DB2B00AB22E12D6100B9931A /* DeviceMessages.proto */,
 				DB2B00AC22E12D6100B9931A /* IncomingPushMessageSignal.pb.swift */,
 				DB2B00AD22E12D6100B9931A /* SubProtocol.proto */,
@@ -380,7 +379,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB2B00B122E12D6100B9931A /* the-Makefile in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

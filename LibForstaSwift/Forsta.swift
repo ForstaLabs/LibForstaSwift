@@ -11,7 +11,7 @@ import PromiseKit
 import SwiftyJSON
 import SignalProtocol
 
-/// A helper class for using LibForstaSwift
+/// A top-level helper class for using LibForstaSwift
 public class Forsta {
     /// An Atlas client for all Forsta Atlas server operations.
     /// This will restore from the kvstore and continue using an authenticated session if possible.
@@ -34,7 +34,7 @@ public class Forsta {
         self.sender = MessageSender(signalClient: signal)
     }
     
-    // MARK:- Shortcuts for everything not in the Atlas and Signal clients
+    // MARK:- Pass-throughs for everything not in the Atlas and Signal clients
     
     /// Connect the Signal Server web socket.
     public func connect() {

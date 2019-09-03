@@ -58,13 +58,13 @@ public class AtlasClient {
     
     /// A user's current method of interactive authentication
     public enum AuthenticationMethod {
-        /// Authenticate by providing a code that has sent by SMS: `authenticateViaCode()`
+        /// Authenticate by providing a code that has sent by SMS: `authenticateViaCode(...)`
         case sms
         
-        /// Authenticate by providing a password: `authenticateViaPassword()`
+        /// Authenticate by providing a password: `authenticateViaPassword(...)`
         case password
         
-        /// Authenticate by providing a password and an authenticator code: `authenticateViaPasswordOtp()`
+        /// Authenticate by providing a password and an authenticator code: `authenticateViaPasswordOtp(...)`
         case passwordOtp
     }
     
