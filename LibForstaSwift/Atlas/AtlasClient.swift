@@ -466,7 +466,6 @@ public class AtlasClient {
     
     /// Internal: get all pages for a url
     private func allResults(url: String, previous: [JSON] = []) -> Promise<[JSON]> {
-        print("allResults called for \(url)")
         return request(url)
             .then { result -> Promise<[JSON]> in
                 let (statusCode, json) = result
@@ -506,9 +505,8 @@ public class AtlasClient {
     /// - returns: A `Promise` resolving to a `JSON` array of
     ///            retrieved tags' information
     ///
-    public func getTags(q: String? = nil) -> Promise<[JSON]> {
-        let url = "/v1/tag/\(q == nil ? "" : "?q=\(q!)")"
-        return allResults(url: url)
+    public func getTags() -> Promise<[JSON]> {
+        return allResults(url: "/v1/tag/")
     }
 
     // -MARK: Signal Server Assistance
