@@ -29,16 +29,16 @@ public class Forsta {
     public init(_ kvstore: KVStorageProtocol) throws {
         self.atlas = AtlasClient(kvstore: kvstore)
         self.signal = try SignalClient(atlasClient: atlas)
-        self.wsr = WebSocketResource(signalClient: signal)
+        self.wsr = WebSocketResource()
         self.receiver = MessageReceiver(signalClient: signal, webSocketResource: wsr)
         self.sender = MessageSender(signalClient: signal)
     }
     
     // -MARK: Pass-throughs for everything not in the Atlas and Signal clients
     
-    /// Connect the Signal Server web socket.
-    public func connect() {
-        self.wsr.connect()
+    /// Connect the Signal Server web socket for messaging.
+    public func connect() throws {
+        self.wsr.connect(url: try self.signal.messagingSocketUrl())
     }
     
     /// Disconnect the Signal Server web socket.

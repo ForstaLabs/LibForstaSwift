@@ -124,7 +124,7 @@ public class MessageReceiver {
     /// Init with `SignalClient` and an optional `WebSocketResource` to use (it will make its own if not provided)
     public init(signalClient: SignalClient, webSocketResource: WebSocketResource? = nil) {
         self.signalClient = signalClient
-        self.wsr = webSocketResource ?? WebSocketResource(signalClient: signalClient)
+        self.wsr = webSocketResource ?? WebSocketResource()
         self.wsr.requestHandler = self.handleRequest
     }
     

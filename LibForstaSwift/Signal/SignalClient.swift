@@ -211,10 +211,10 @@ public class SignalClient {
     
     /// Request delivery of an encrypted message to all of a user's devices
     func deliverToUser(userId: UUID, messageBundles: [[String: Any]]) -> Promise<(Int, JSON)> {
-        guard messageBundles.count > 0,
-            let timestamp = messageBundles[0]["timestamp"] as? UInt64 else {
-                return Promise<(Int, JSON)>(error: ForstaError(.requestRejected, JSON(["message": "malformed message bundles, no timestamp available"])))
-        }
+        let timestamp = messageBundles.count > 0
+            ? messageBundles[0]["timestamp"] as? UInt64 ?? Date.timestamp.millisecondsSince1970
+            : Date.timestamp.millisecondsSince1970
+        
         let parameters: [String: Any] = [
             "messages": messageBundles,
             "timestamp": timestamp
@@ -320,5 +320,21 @@ public class SignalClient {
         case keys = "/v2/keys"
         case messages = "/v1/messages"
         case attachment = "/v2/attachments"
+    }
+    
+    /// URL for the Signal server encrypted messaging socket
+    func messagingSocketUrl() throws -> String {
+        guard self.serverUrl != nil, self.signalServerUsername != nil, self.password != nil else {
+            throw ForstaError(.configuration , "no server url, username, or password")
+        }
+        return "\(self.serverUrl!)/v1/websocket/?login=\(self.signalServerUsername!)&password=\(self.password!)"
+    }
+    
+    /// URL for the Signal server provisioning socket
+    func provisioningSocketUrl() throws -> String {
+        guard self.serverUrl != nil else {
+            throw ForstaError(.configuration , "no server url")
+        }
+        return "\(self.serverUrl!)/v1/websocket/provisioning"
     }
 }

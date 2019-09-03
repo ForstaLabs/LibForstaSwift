@@ -226,12 +226,12 @@ class SignalClientTests: XCTestCase {
             wait(for: [registrated], timeout: 10.0)
             
             let connectified = XCTestExpectation()
-            let wsr = WebSocketResource(signalClient: signalClient, requestHandler: { request in
+            let wsr = WebSocketResource(requestHandler: { request in
                 print("sending response of 404 Not found to request: \(request.verb) \(request.path)")
                 let _ = request.respond(status: 404, message: "Not found")
                 connectified.fulfill()
             })
-            wsr.connect()
+            wsr.connect(url: try signalClient.messagingSocketUrl())
             wait(for: [connectified], timeout: 60.0)
             wsr.disconnect()
         } catch {
@@ -275,9 +275,9 @@ class SignalClientTests: XCTestCase {
                     connectAndReceive.fulfill()
             }
             defer { NotificationCenter.default.removeObserver(dataMessageObserver) }
-            let wsr = WebSocketResource(signalClient: signalClient)
+            let wsr = WebSocketResource()
             let _ = MessageReceiver(signalClient: signalClient, webSocketResource: wsr)
-            wsr.connect()
+            wsr.connect(url: try signalClient.messagingSocketUrl())
             wait(for: [connectAndReceive], timeout: 2 * 60.0)
             let thenSend = XCTestExpectation()
             
@@ -395,9 +395,9 @@ class SignalClientTests: XCTestCase {
                     connectified.fulfill()
             }
             defer { NotificationCenter.default.removeObserver(dataMessageObserver) }
-            let wsr = WebSocketResource(signalClient: signalClient)
+            let wsr = WebSocketResource()
             let _ = MessageReceiver(signalClient: signalClient, webSocketResource: wsr)
-            wsr.connect()
+            wsr.connect(url: try signalClient.messagingSocketUrl())
             wait(for: [connectified], timeout: 2 * 60.0)
 
             let theReceive = XCTestExpectation()
@@ -478,7 +478,7 @@ class SignalClientTests: XCTestCase {
                 queue: nil) { _ in
                     connectified.fulfill()
             }
-            forsta.connect()
+            try forsta.connect()
             wait(for: [connectified], timeout: 2 * 60.0)
 
             let theEnd = XCTestExpectation()
@@ -509,6 +509,37 @@ class SignalClientTests: XCTestCase {
 
             wait(for: [theEnd], timeout: 5 * 60.0)
             forsta.disconnect()
+        } catch let error {
+            XCTFail("surprising error \(error)")
+        }
+    }
+    
+    func testGetAll() {
+        do {
+            let forsta = try Forsta(MemoryKVStore())
+            forsta.atlas.baseUrl = "https://atlas.forsta.io"
+            
+            let finished = XCTestExpectation()
+            forsta.atlas.authenticateViaPassword(userTag: "", password: "")
+                .then { _ in
+                    forsta.atlas.getTags()
+                }
+                .then { result -> Promise<[JSON]> in
+                    print("\(result.count) results")
+                    return forsta.atlas.getTags()
+                }
+                .done { result in
+                    print("\(result.count) results")
+                    finished.fulfill()
+                }
+                .catch { error in
+                    if let ferr = error as? ForstaError {
+                        XCTFail(ferr.description)
+                    } else {
+                        XCTFail("surprising error")
+                    }
+            }
+            wait(for: [finished], timeout: 60.0)
         } catch let error {
             XCTFail("surprising error \(error)")
         }

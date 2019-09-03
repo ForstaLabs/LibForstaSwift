@@ -111,25 +111,20 @@ func fallbackRequestHandler(request: IncomingWSRequest) {
 public class WebSocketResource: WebSocketDelegate {
     var lastConnect: Date?
     var socket: WebSocket?
-    let signalClient: SignalClient
+    var url: String?
     var outgoingRequests = [UInt64 : OutgoingWSRequest]()
     var requestHandler: WSRequestHandler
     
-    /// init with a `SignalClient` and an optional requestHandler (falls back to our default that rejects all requests)
-    public init(signalClient: SignalClient, requestHandler: WSRequestHandler? = nil) {
-        self.signalClient = signalClient
+    /// Construct with a url `String` and an optional `WSRequestHandler` (falls back to our default handler that rejects all requests)
+    public init(requestHandler: WSRequestHandler? = nil) {
         self.requestHandler = requestHandler != nil ? requestHandler! : fallbackRequestHandler
     }
     
     /// connect with our Atlas-designated Signal server using our pre-negotiated credentials
-    public func connect() {
+    public func connect(url: String) {
+        self.url = url
         lastConnect = Date()
-        guard signalClient.serverUrl != nil, signalClient.signalServerUsername != nil, signalClient.password != nil else {
-            print("CANNOT CONNECT (missing server url, username, or password)")
-            return
-        }
-        let url = "\(signalClient.serverUrl!)/v1/websocket/?login=\(signalClient.signalServerUsername!)&password=\(signalClient.password!)"
-        socket = WebSocket(url: URL(string: url)!)
+        socket = WebSocket(url: URL(string: self.url!)!)
         socket!.delegate = self
         socket!.connect()
     }
@@ -143,7 +138,7 @@ public class WebSocketResource: WebSocketDelegate {
     public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
         NotificationCenter.broadcast(.signalDisconnected, error != nil ? ["error": error!] : nil)
         if lastConnect != nil {
-            connect() // just immediately reconnect until we purposefully disconnect
+            connect(url: self.url ?? "url somehow missing") // just immediately reconnect until we purposefully disconnect
         }
     }
     
