@@ -75,28 +75,6 @@ public class SignalClient {
         }
     }
     
-    /*
-    public func registerDevice() -> Promise<Void> {
-        let provisioningCipher = ProvisioningCipher()
-        var pubKey: String? = nil
-        
-        return firstly {
-            pubKey = (try provisioningCipher.getPublicKey()).base64EncodedString()
-            return self.atlasClient.getDevices()
-        }
-            .map { devices in
-                if devices.count == 0 {
-                    throw ForstaError(.requestRejected, JSON(["error": "No existing devices, use registerAccount()."]))
-                }
-                return try provisioningCipher.getPublicKey()
-            }
-            .done { pubKey in
-                return pubKey
-        }
-        return Promise<Void>(error: ForstaError(.unknown, "wut"))
-    }
- */
-    
     /// Create a new identity key and create or replace the signal account.
     /// Note that any existing devices asssociated with your account will be
     /// purged as a result of this action.  This should only be used for new
@@ -280,6 +258,86 @@ public class SignalClient {
                 }
         }
     }
+    
+    /// Register a new device with an existing Signal server account.
+    ///
+    /// - parameter name: The public name to store in the Signal server.
+    /// - returns: A tuple of a Promise that resolves when complete, and a cancellation function if the caller decides we've timed out
+    public func registerDevice(name: String) throws -> (Promise<Void>, ()->Void) {
+        let provisioningCipher = ProvisioningCipher()
+        let pubKey = try provisioningCipher.getPublicKey().base64EncodedString()
+        let (wswaiter, seal) = Promise<Signal_ProvisionMessage>.pending()
+        let wsr = WebSocketResource(requestHandler: { request in
+            if request.path == "/v1/address" && request.verb == "PUT" {
+                // get provisioning request
+            } else if request.path == "/v1/message" && request.verb == "PUT" {
+                // get provisioning envelope
+                if !request.hasBody {
+                    throw ForstaError(.unknown, "provisioning envelope has no body")
+                }
+                let msg = try Signal_ProvisionMessage(serializedData: request.body!)
+                seal.fulfill(())
+            } else {
+                // freak out
+                seal.reject(ForstaError(.unknown, "unexpected websocket request \(request.verb) \(request.path)"))
+            }
+        })
+        let promise = firstly {
+            }
+            .done {
+                return Promise<Void>.init(error: ForstaError(ForstaError.ErrorType.unknown, "blah"))
+        }
+
+        let cancel: () -> Void = {
+            wsr.close()
+            // don't bother waiting wswaiter to resolve, for now
+        }
+        return (promise, cancel)
+    }
+    /*
+        0. accountInfo = GET Atlas /v1/provision/account to find out our own id and device count
+            - throw if there are no other devices
+        1. get public key as b64 string
+        2. build wsr
+        3. build a request handler for it
+            - on a WS PUT /v1/address
+                - extract a ProvisioningUuid from the body
+                - respond with 200 'Ok'
+                - POST to Atlas:  /v1/provision/request with { uuid: extracted uuid, key: b64pubkey } // IF THIS THROWS, USE IT TO REJECT THE WSWaiter
+                - maybe notify a delegate/notificationcenter listener that we've done this step
+            - on a WS PUT /v1/message
+                - extract a ProvisionEnvelope from the body
+                - respond with 200 'Ok'
+                - websocket.close()
+                - resolve the WSWWaiter with the ProvisionEnvelope
+            - on any other WS message
+                - respond with some 400+ thing
+                - reject the WSWAiter with a wtf
+     
+        4. wsr.connect(provisioning ws url)
+        5. return a tuple of:
+            - completion promise (that's waiting on the WSWaiter so it can provision and resolve, or throw)
+                - wait on WSWaiter for provisionEnvelope
+                - *decrypt it* using the provisioningcipher
+                - maybe indicate that we're no longer waiting on that envelope with a delegate or notificationcenter message
+                - get .addr and .identityKeyPair from envelope
+                - throw with a security violation if the addr != accountInfo.addr
+                - PUT to signal server 'devices' url with URL parm /{envelope.provisioningCode} // username: addr, password: newly-generated-pw
+                     json: {
+                        signalingKey: signalingKey.toString('base64'),
+                        supportsSms: false,
+                        fetchesMessages: true,
+                        registrationId,
+                        name
+                     }
+                - response should include deviceId
+                - proceed with similar work as registerAccount at this point...
+                - resolve happily
+            - closure to cancel the operation (no need to make this async yet)
+                - could close websocket and await the waiter promise [error]
+    */
+    
+    
 
     /// Internal: Generate authorization header for Signal Server requests
     private func authHeader() -> [String: String] {
