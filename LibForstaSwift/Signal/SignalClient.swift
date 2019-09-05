@@ -104,7 +104,7 @@ public class SignalClient {
                 "supportsSms": false,
             ]
             
-            return self.atlasClient.provisionAccount(data)
+            return self.atlasClient.provisionSignalAccount(data)
             }
             .map { result in
                 guard
@@ -259,40 +259,55 @@ public class SignalClient {
         }
     }
     
+    /// Internal: gather asynchrononous prerequesites for performing registerDevice
+    private func registerDeviceAsyncPrerequisites() -> Promise<JSON> {
+        do {
+            return self.atlasClient.getSignalAccountInfo()
+        } catch let error {
+            return Promise<JSON>.init(error: error)
+        }
+    }
+    
     /// Register a new device with an existing Signal server account.
     ///
     /// - parameter name: The public name to store in the Signal server.
-    /// - returns: A tuple of a Promise that resolves when complete, and a cancellation function if the caller decides we've timed out
-    public func registerDevice(name: String) throws -> (Promise<Void>, ()->Void) {
+    /// - returns: A tuple of a Promise that resolves when completed, and a cancellation function
+    public func registerDevice(name: String) throws -> (Promise<Void>, ()->Promise<Void>) {
         let provisioningCipher = ProvisioningCipher()
-        let pubKey = try provisioningCipher.getPublicKey().base64EncodedString()
         let (wswaiter, seal) = Promise<Signal_ProvisionMessage>.pending()
         let wsr = WebSocketResource(requestHandler: { request in
+            print("Provisioning WS Request! \(request.verb) \(request.path)")
             if request.path == "/v1/address" && request.verb == "PUT" {
                 // get provisioning request
             } else if request.path == "/v1/message" && request.verb == "PUT" {
-                // get provisioning envelope
-                if !request.hasBody {
-                    throw ForstaError(.unknown, "provisioning envelope has no body")
+                if request.body == nil { seal.reject(ForstaError(.unknown, "provisioning envelope has no body")) }
+                do {
+                    let envelope = try Signal_ProvisionMessage(serializedData: request.body!)
+                    seal.fulfill(envelope)
+                } catch let error {
+                    seal.reject(ForstaError("cannot decrypt provision message", cause: error))
                 }
-                let msg = try Signal_ProvisionMessage(serializedData: request.body!)
-                seal.fulfill(())
             } else {
-                // freak out
+                let _ = request.respond(status: 404, message: "Not found")
                 seal.reject(ForstaError(.unknown, "unexpected websocket request \(request.verb) \(request.path)"))
             }
         })
-        let promise = firstly {
-            }
-            .done {
-                return Promise<Void>.init(error: ForstaError(ForstaError.ErrorType.unknown, "blah"))
+        let completed =
+            registerDeviceAsyncPrerequisites()
+                .then { prerequisites in
+                    return wswaiter
+                }
+            .then { enelope in
+                return Promise<Void>.value(())
         }
 
-        let cancel: () -> Void = {
-            wsr.close()
-            // don't bother waiting wswaiter to resolve, for now
+        let cancel: () -> Promise<Void> = {
+            wsr.disconnect()
+            return wswaiter.map { _ in return }
         }
-        return (promise, cancel)
+        
+        wsr.connect(url: try self.provisioningSocketUrl())
+        return (completed, cancel)
     }
     /*
         0. accountInfo = GET Atlas /v1/provision/account to find out our own id and device count

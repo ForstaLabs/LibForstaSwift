@@ -534,16 +534,16 @@ export JWT_PROXY_AUDIENCE='atlas'
                 XCTAssert(user["first_name"].stringValue == "Password")
             }
             .then {
-                atlas.getDevices()
+                atlas.getSignalAccountInfo()
             }
-            .done { devices in
-                XCTAssert(devices.count == 0)
+            .done { result in
+                XCTAssert(result["devices"].arrayValue.count == 0)
             }.catch { error in
-                XCTFail("error authenticating and getting devices \(error)")
+                XCTFail("error authenticating and getting account info \(error)")
             }.finally {
                 expectation.fulfill()
         }
-        wait(for: [expectation], timeout: 5.0)
+        wait(for: [expectation], timeout: 30.0)
     }
     
     func testUserAndOrgCreation() {

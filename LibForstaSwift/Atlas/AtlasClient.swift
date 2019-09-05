@@ -509,14 +509,14 @@ public class AtlasClient {
         return allResults(url: "/v1/tag/")
     }
 
-    // -MARK: Signal Server Assistance
+    // -MARK: Atlas Calls for Signal Server Assistance
     
     ///
     /// Request provisioning assistance from any existing devices.
     ///
     /// - returns: `Promise` resolving to results bundled in a `JSON`.
     ///
-    public func provisionDevice() -> Promise<JSON> {
+    public func provisionSignalDevice() -> Promise<JSON> {
         return request("/v1/provision/request", method: .post)
             .map { (statusCode, json) in
                 if statusCode == 200 { return json }
@@ -529,7 +529,7 @@ public class AtlasClient {
     ///
     /// - returns: `Promise` resolving to results bundled in a `JSON`.
     ///
-    public func provisionAccount(_ fields: [String: Any]) -> Promise<JSON> {
+    public func provisionSignalAccount(_ fields: [String: Any]) -> Promise<JSON> {
         return request("/v1/provision/account", method: .put, parameters: fields)
             .map { (statusCode, json) in
                 if statusCode == 200 { return json }
@@ -538,14 +538,14 @@ public class AtlasClient {
     }
     
     ///
-    /// The current set of known devices for the authenticated account.
+    /// Retrieve information about the current Signal server account.
     ///
     /// - returns: `Promise` resolving to an `JSON` array of device(s) info.
     ///
-    public func getDevices() -> Promise<[JSON]> {
+    public func getSignalAccountInfo() -> Promise<JSON> {
         return request("/v1/provision/account")
             .map { (statusCode, json) in
-                if statusCode == 200 { return json["devices"].arrayValue }
+                if statusCode == 200 { return json }
                 throw ForstaError(.requestRejected, json)
         }
     }
