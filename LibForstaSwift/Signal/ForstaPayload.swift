@@ -72,6 +72,32 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
     }
     
+    /// Internal: ensure this (dictionary) path exists
+    private func ensurePath(_ path: ArraySlice<String>) {
+        func ensure(_ dict: inout JSON, _ path: ArraySlice<String>) {
+            if path.count > 0 {
+                if !dict[path.first!].exists() { dict[path.first!] = [:] }
+                ensure(&(dict[path.first!]), path.dropFirst())
+            }
+        }
+        
+        ensure(&json, path)
+    }
+    
+    /// Internal: clear the key at this path (removing empty dictionaries)
+    private func clearKey(_ path: ArraySlice<String>) {
+        func clear(_ dict: inout JSON, _ path: ArraySlice<String>) {
+            if path.count > 0 {
+                clear(&(dict[path.first!]), path.dropFirst())
+                if path.count == 1 || dict[path.first!].dictionaryValue.count == 0 {
+                    dict.dictionaryObject?.removeValue(forKey: path.first!)
+                }
+            }
+        }
+        
+        clear(&json, path)
+    }
+    
     // -MARK: Accessor properties for the underlying JSON
     
     /// The message's globally-unique ID (required)
@@ -416,40 +442,6 @@ public class ForstaPayloadV1: CustomStringConvertible {
                 json["data"]["icecandidates"] = JSON(value!)
             }
         }
-    }
-    
-    // - MARK: Utility Routines
-    
-    /// Internal: ensure this path to a dictionary is in the underlying json
-    private func ensurePath(_ path: ArraySlice<String>) {
-        func recurse(_ dict: inout JSON, _ path: ArraySlice<String>) {
-            if path.count >= 1 {
-                let entry = path[path.startIndex]
-                if !dict[entry].exists() {
-                    dict[entry] = [:]
-                }
-                recurse(&(dict[entry]), path.dropFirst())
-            }
-        }
-        recurse(&json, path)
-    }
-    
-    /// Internal: clear this key at this path (as deeply as possible, if it ends up empty)
-    private func clearKey(_ path: ArraySlice<String>) {
-        func recurse(_ dict: inout JSON, _ path: ArraySlice<String>) {
-            if path.count == 0 {
-                return
-            } else if path.count == 1 {
-                dict.dictionaryObject?.removeValue(forKey: path[path.startIndex])
-            } else {
-                let entry = path[path.startIndex]
-                recurse(&(dict[entry]), path.dropFirst())
-                if dict[entry].dictionaryValue.count == 0 {
-                    dict.dictionaryObject?.removeValue(forKey: entry)
-                }
-            }
-        }
-        recurse(&json, path)
     }
 
     // - MARK: Related Enums
