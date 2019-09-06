@@ -545,21 +545,21 @@ class SignalClientTests: XCTestCase {
     }
     
     func testRegisterDevice() {
+
         do {
             let forsta = try Forsta(MemoryKVStore())
             forsta.atlas.baseUrl = "https://atlas-dev.forsta.io"
-            
+            var registrator: SignalClient.Registrator? = nil
+
             let finished = XCTestExpectation()
             forsta.atlas.authenticateViaPassword(userTag: "@greg1:forsta", password: "asdfasdf24")
-                .then { _ in
-                    forsta.atlas.getSignalAccountInfo()
+                .map { stuff in
+                    print("signed in")
+                    registrator = forsta.signal.registerDevice(name: "foo the bar")
                 }
-                .map { json in
-                    print("getAccountInfo: \(json)")
-                }
-                .then { x -> Promise<Void> in
-                    let (completed, cancel) = try forsta.signal.registerDevice(name: "foo the bar")
-                    return completed
+                .then { _ -> Promise<Void> in
+                    print("got registrator")
+                    return registrator!.start()
                 }
                 .done {
                     print("completed the completed promise")
@@ -570,7 +570,7 @@ class SignalClientTests: XCTestCase {
                     XCTFail(error.localizedDescription)
                     print("ERRORED!")
             }
-            wait(for: [finished], timeout: 60.0)
+            wait(for: [finished], timeout: 5*6*10.0)
         } catch let error {
             XCTFail("surprising error \(error)")
         }

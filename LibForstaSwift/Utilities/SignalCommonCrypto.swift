@@ -15,7 +15,6 @@ import SignalProtocol
  CommonCrypto.
  */
 public struct SignalCommonCrypto: SignalCryptoProvider {
-
     // -MARK: Protocol SignalCryptoProvider
 
     /**

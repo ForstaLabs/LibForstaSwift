@@ -1,4 +1,4 @@
-github "ForstaLabs/libsignal-protocol-swift" "tweaks"
+github "ForstaForks/libsignal-protocol-swift" "tweaks"
 github "apple/swift-protobuf" ~> 1.0
 github "daltoniam/Starscream"
 github "Alamofire/Alamofire"

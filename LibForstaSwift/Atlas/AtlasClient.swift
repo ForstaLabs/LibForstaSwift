@@ -520,7 +520,10 @@ public class AtlasClient {
     /// - returns: `Promise` resolving to results bundled in a `JSON`
     ///
     public func provisionSignalDevice(uuidString: String, pubKeyString: String) -> Promise<JSON> {
-        return request("/v1/provision/request", method: .post)
+        return request("/v1/provision/request",
+                       method: .post,
+                       parameters: [ "uuid": uuidString,
+                                     "key": pubKeyString ])
             .map { (statusCode, json) in
                 if statusCode == 200 { return json }
                 throw ForstaError(.requestRejected, json)

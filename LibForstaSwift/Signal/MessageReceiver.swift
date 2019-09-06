@@ -251,14 +251,6 @@ public class MessageReceiver {
         throw ForstaError(.decryptionError, "Padding with no content.")
     }
     
-    /// Internal: verify the message MAC
-    private func verifyWSMessageMAC(data: Data, key: Data, expectedMAC: Data) throws {
-        let calculatedMAC = signalClient.crypto.hmacSHA256(for: data, with: key)
-        if calculatedMAC[..<expectedMAC.count] != expectedMAC {
-            throw ForstaError(.invalidMac)
-        }
-    }
-    
     /// Internal: decrypt the inbound message (encrypted by the Signal server for us)
     private func decryptWebSocketMessage(message: Data, signalingKey: Data) throws -> Data {
         guard signalingKey.count == 52 else {
@@ -278,7 +270,7 @@ public class MessageReceiver {
         let ivAndCyphertext = message[0...message.count-11]
         let mac = message[(message.count-10)...]
         
-        try verifyWSMessageMAC(data: ivAndCyphertext, key: macKey, expectedMAC: mac)
+        try signalClient.verifyMAC(data: ivAndCyphertext, key: macKey, expectedMAC: mac)
         return try signalClient.crypto.decrypt(message: ciphertext, with: .AES_CBCwithPKCS5, key: aesKey, iv: iv)
     }
 }

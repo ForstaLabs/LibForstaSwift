@@ -119,6 +119,9 @@ public class WebSocketResource: WebSocketDelegate {
     public init(requestHandler: WSRequestHandler? = nil) {
         self.requestHandler = requestHandler != nil ? requestHandler! : fallbackRequestHandler
     }
+    deinit {
+        print("destroying websocket")
+    }
     
     /// connect with our Atlas-designated Signal server using our pre-negotiated credentials
     public func connect(url: String) {
