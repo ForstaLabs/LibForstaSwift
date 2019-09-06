@@ -348,6 +348,84 @@ public class ForstaPayloadV1: CustomStringConvertible {
             }
         }
     }
+    
+    /// callId (only relevant for call-related `.control` messages)
+    public var callId: UUID? {
+        get {
+            return UUID(uuidString: json["data"]["callId"].string ?? "")
+        }
+        set(value) {
+            if value == nil {
+                json["data"].dictionaryObject?.removeValue(forKey: "callId")
+            } else {
+                if !json["data"].exists() {
+                    json["data"] = [:]
+                }
+                json["data"]["callId"].string = value?.uuidString
+            }
+        }
+    }
+    
+    /// peerId (only relevant for call-related `.control` messages)
+    public var peerId: UUID? {
+        get {
+            return UUID(uuidString: json["data"]["peerId"].string ?? "")
+        }
+        set(value) {
+            if value == nil {
+                json["data"].dictionaryObject?.removeValue(forKey: "peerId")
+            } else {
+                if !json["data"].exists() {
+                    json["data"] = [:]
+                }
+                json["data"]["peerId"].string = value?.uuidString
+            }
+        }
+    }
+    
+    /// sessionDescription (only relevant for call-related `.control` messages)
+    public var sessionDescription: String? {
+        get {
+            return sdp
+        }
+        set(value) {
+            sdp = value
+        }
+    }
+    
+    /// sdp (only relevant for call-related `.control` messages)
+    public var sdp: String? {
+        get {
+            return json["data"]["sdp"].string
+        }
+        set(value) {
+            if value == nil {
+                json["data"].dictionaryObject?.removeValue(forKey: "sdp")
+            } else {
+                if !json["data"].exists() {
+                    json["data"] = [:]
+                }
+                json["data"]["sdp"].string = value
+            }
+        }
+    }
+    
+    /// iceCandidates
+    public var iceCandidates: [JSON]? {
+        get {
+            return json["data"]["icecandidates"].array
+        }
+        set(value) {
+            if value == nil {
+                json["data"].dictionaryObject?.removeValue(forKey: "icecandidates")
+            } else {
+                if !json["data"].exists() {
+                    json["data"] = [:]
+                }
+                json["data"]["icecandidates"].arrayObject = value
+            }
+        }
+    }
 
     // - MARK: Related Enums
     
