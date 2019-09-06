@@ -259,28 +259,37 @@ public class SignalClient {
         }
     }
     
-    /// Internal: gather asynchrononous prerequesites for performing registerDevice
-    private func registerDeviceAsyncPrerequisites() -> Promise<JSON> {
-        do {
-            return self.atlasClient.getSignalAccountInfo()
-        } catch let error {
-            return Promise<JSON>.init(error: error)
-        }
-    }
-    
     /// Register a new device with an existing Signal server account.
     ///
     /// - parameter name: The public name to store in the Signal server.
     /// - returns: A tuple of a Promise that resolves when completed, and a cancellation function
     public func registerDevice(name: String) throws -> (Promise<Void>, ()->Promise<Void>) {
         let provisioningCipher = ProvisioningCipher()
+        let pubKeyString = try provisioningCipher.getPublicKey().base64EncodedString()
+        
+        var userId: UUID?
         let (wswaiter, seal) = Promise<Signal_ProvisionMessage>.pending()
         let wsr = WebSocketResource(requestHandler: { request in
-            print("Provisioning WS Request! \(request.verb) \(request.path)")
+            print("Got Provisioning WS Request! \(request.verb) \(request.path)")
+            if request.body == nil { seal.reject(ForstaError(.unknown, "provisioning ws request \(request.verb) \(request.path) has no body")) }
             if request.path == "/v1/address" && request.verb == "PUT" {
-                // get provisioning request
+                do {
+                    let proto = try Signal_ProvisioningUuid(serializedData: request.body!)
+                    if !proto.hasUuid {
+                        seal.reject(ForstaError(.invalidProtoBuf, "missing provisioning uuid"))
+                        return
+                    }
+                    self.atlasClient.provisionSignalDevice(uuidString: proto.uuid, pubKeyString: pubKeyString)
+                        .done { result in
+                            print("request to provision device succeeded with \(result)")
+                        }
+                        .catch { error in
+                           seal.reject(ForstaError("request to provision device failed", cause: error))
+                    }
+                } catch let error {
+                    seal.reject(ForstaError("cannot decode provision uuid message", cause: error))
+                }
             } else if request.path == "/v1/message" && request.verb == "PUT" {
-                if request.body == nil { seal.reject(ForstaError(.unknown, "provisioning envelope has no body")) }
                 do {
                     let envelope = try Signal_ProvisionMessage(serializedData: request.body!)
                     seal.fulfill(envelope)
@@ -292,16 +301,28 @@ public class SignalClient {
                 seal.reject(ForstaError(.unknown, "unexpected websocket request \(request.verb) \(request.path)"))
             }
         })
+        
         let completed =
-            registerDeviceAsyncPrerequisites()
-                .then { prerequisites in
+            atlasClient.getSignalAccountInfo()
+                .then { prerequisites -> Promise<Signal_ProvisionMessage> in
+                    guard prerequisites["devices"].arrayValue.count > 0 else {
+                        throw ForstaError(ForstaError.ErrorType.configuration, "must use registerAccount for first device")
+                    }
+                    userId = UUID(uuidString: prerequisites["userId"].stringValue)
+                    if userId == nil {
+                        throw ForstaError(.invalidPayload, "no userId in account info")
+                    }
                     return wswaiter
                 }
-            .then { enelope in
-                return Promise<Void>.value(())
+                .then { envelope in
+                    return Promise<Void>.value(())
+                }
+                .ensure {
+                    let _ = print("resolved registerDevice's completed promise")
         }
 
         let cancel: () -> Promise<Void> = {
+            print("cancelling registerDevice...")
             wsr.disconnect()
             return wswaiter.map { _ in return }
         }

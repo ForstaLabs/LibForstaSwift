@@ -514,9 +514,12 @@ public class AtlasClient {
     ///
     /// Request provisioning assistance from any existing devices.
     ///
-    /// - returns: `Promise` resolving to results bundled in a `JSON`.
+    /// - parameter uuidString: provisioning UUID string provided by Signal server
+    /// - parameter pubKeyString: base64-encoded public key to use in encrypting provisioning secrets for me
     ///
-    public func provisionSignalDevice() -> Promise<JSON> {
+    /// - returns: `Promise` resolving to results bundled in a `JSON`
+    ///
+    public func provisionSignalDevice(uuidString: String, pubKeyString: String) -> Promise<JSON> {
         return request("/v1/provision/request", method: .post)
             .map { (statusCode, json) in
                 if statusCode == 200 { return json }

@@ -175,8 +175,7 @@ class SignalClientTests: XCTestCase {
         XCTAssert(payload.userAgent == nil)
         
         XCTAssert(payload.json["version"] == 1)
-        XCTAssert(payload.json["data"].exists())
-        XCTAssert(payload.json["data"].dictionary!.count == 0)
+        XCTAssert(!(payload.json["data"].exists()))
         
         payload = ForstaPayloadV1()
         XCTAssert(payload.threadUpdateExpression == nil)
@@ -538,6 +537,38 @@ class SignalClientTests: XCTestCase {
                     } else {
                         XCTFail("surprising error")
                     }
+            }
+            wait(for: [finished], timeout: 60.0)
+        } catch let error {
+            XCTFail("surprising error \(error)")
+        }
+    }
+    
+    func testRegisterDevice() {
+        do {
+            let forsta = try Forsta(MemoryKVStore())
+            forsta.atlas.baseUrl = "https://atlas-dev.forsta.io"
+            
+            let finished = XCTestExpectation()
+            forsta.atlas.authenticateViaPassword(userTag: "@greg1:forsta", password: "asdfasdf24")
+                .then { _ in
+                    forsta.atlas.getSignalAccountInfo()
+                }
+                .map { json in
+                    print("getAccountInfo: \(json)")
+                }
+                .then { x -> Promise<Void> in
+                    let (completed, cancel) = try forsta.signal.registerDevice(name: "foo the bar")
+                    return completed
+                }
+                .done {
+                    print("completed the completed promise")
+                    finished.fulfill()
+                }
+                .catch { error in
+                    print("ERRORING!")
+                    XCTFail(error.localizedDescription)
+                    print("ERRORED!")
             }
             wait(for: [finished], timeout: 60.0)
         } catch let error {

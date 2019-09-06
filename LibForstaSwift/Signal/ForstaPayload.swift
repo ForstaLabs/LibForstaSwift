@@ -77,11 +77,11 @@ public class ForstaPayloadV1: CustomStringConvertible {
     /// The message's globally-unique ID (required)
     public var messageId: UUID? {
         get {
-            return UUID(uuidString: json["messageId"].string ?? "")
+            return UUID(uuidString: json["messageId"].stringValue)
         }
         set(value) {
             if value == nil {
-                json.dictionaryObject?.removeValue(forKey: "messageId")
+                clearKey(["messageId"])
             } else {
                 json["messageId"].string = value!.lcString
             }
@@ -91,11 +91,11 @@ public class ForstaPayloadV1: CustomStringConvertible {
     /// A reference to another message, by ID (useful for message replies, or survey responses)
     public var messageRef: UUID? {
         get {
-            return UUID(uuidString: json["messageRef"].string ?? "")
+            return UUID(uuidString: json["messageRef"].stringValue)
         }
         set(value) {
             if value == nil {
-                json.dictionaryObject?.removeValue(forKey: "messageRef")
+                clearKey(["messageRef"])
             } else {
                 json["messageRef"].string = value!.lcString
             }
@@ -114,7 +114,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
         set(value) {
             if value == nil {
-                json.dictionaryObject?.removeValue(forKey: "sender")
+                clearKey(["sender"])
             } else {
                 json["sender"] = ["userId": value!.name, "device": value!.deviceId]
             }
@@ -128,7 +128,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
         set(value) {
             if value == nil {
-                json.dictionaryObject?.removeValue(forKey: "messageType")
+                clearKey(["messageType"])
             } else {
                 json["messageType"].string = value!.rawValue
             }
@@ -149,7 +149,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
         set(value) {
             if value == nil {
-                json["data"].dictionaryObject?.removeValue(forKey: "body")
+                clearKey(["data", "body"])
             } else {
                 let ary:[[String: String]] = value!.map {
                     switch $0 {
@@ -158,9 +158,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
                     case .unknown(let value): return ["type": "text/unknown", "value": value]
                     }
                 }
-                if !json["data"].exists() {
-                    json["data"] = [:]
-                }
+                ensurePath(["data"])
                 json["data"]["body"] = JSON(ary)
             }
         }
@@ -203,11 +201,9 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
         set(value) {
             if value == nil {
-                json["data"].dictionaryObject?.removeValue(forKey: "control")
+                clearKey(["data", "control"])
             } else {
-                if !json["data"].exists() {
-                    json["data"] = [:]
-                }
+                ensurePath(["data"])
                 json["data"]["control"].string = value!.rawValue
             }
         }
@@ -220,7 +216,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
         set(value) {
             if value == nil {
-                json.dictionaryObject?.removeValue(forKey: "distribution")
+                clearKey(["distribution", "expression"])
             } else {
                 json["distribution"] = ["expression": value!]
             }
@@ -230,11 +226,11 @@ public class ForstaPayloadV1: CustomStringConvertible {
     /// The globally-unique thread ID (required)
     public var threadId: UUID? {
         get {
-            return UUID(uuidString: json["threadId"].string ?? "")
+            return UUID(uuidString: json["threadId"].stringValue)
         }
         set(value) {
             if value == nil {
-                json.dictionaryObject?.removeValue(forKey: "threadId")
+                clearKey(["threadId"])
             } else {
                 json["threadId"].string = value!.lcString
             }
@@ -248,7 +244,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
         set(value) {
             if value == nil {
-                json.dictionaryObject?.removeValue(forKey: "threadTitle")
+                clearKey(["threadTitle"])
             } else {
                 json["threadTitle"].string = value!
             }
@@ -262,7 +258,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
         set(value) {
             if value == nil {
-                json.dictionaryObject?.removeValue(forKey: "threadType")
+                clearKey(["threadType"])
             } else {
                 json["threadType"].string = value!.rawValue
             }
@@ -276,7 +272,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
         set(value) {
             if value == nil {
-                json.dictionaryObject?.removeValue(forKey: "userAgent")
+                clearKey(["userAgent"])
             } else {
                 json["userAgent"].string = value!
             }
@@ -293,11 +289,9 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
         set(value) {
             if value == nil {
-                json["data"].dictionaryObject?.removeValue(forKey: "readMark")
+                clearKey(["data", "readMark"])
             } else {
-                if !json["data"].exists() {
-                    json["data"] = [:]
-                }
+                ensurePath(["data"])
                 json["data"]["readMark"].uInt64 = value!.millisecondsSince1970
             }
         }
@@ -310,17 +304,9 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
         set(value) {
             if value == nil {
-                json["data"]["threadUpdate"].dictionaryObject?.removeValue(forKey: "threadTitle")
-                if json["data"]["threadUpdate"].dictionaryValue.count == 0 {
-                    json["data"].dictionaryObject?.removeValue(forKey: "threadUpdate")
-                }
+                clearKey(["data", "threadUpdate", "threadTitle"])
             } else {
-                if !json["data"].exists() {
-                    json["data"] = [:]
-                }
-                if !json["data"]["threadUpdate"].exists() {
-                    json["data"]["threadUpdate"] = [:]
-                }
+                ensurePath(["data", "threadUpdate"])
                 json["data"]["threadUpdate"]["threadTitle"].string = value!
             }
         }
@@ -333,35 +319,41 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
         set(value) {
             if value == nil {
-                json["data"]["threadUpdate"].dictionaryObject?.removeValue(forKey: "expression")
-                if json["data"]["threadUpdate"].dictionaryValue.count == 0 {
-                    json["data"].dictionaryObject?.removeValue(forKey: "threadUpdate")
-                }
+                clearKey(["data", "threadUpdate", "expression"])
             } else {
-                if !json["data"].exists() {
-                    json["data"] = [:]
-                }
-                if !json["data"]["threadUpdate"].exists() {
-                    json["data"]["threadUpdate"] = [:]
-                }
+                ensurePath(["data", "threadUpdate"])
                 json["data"]["threadUpdate"]["expression"].string = value!
             }
         }
     }
+
+    /// callVersion (only relevant for call-related `.control` messages)
+    public var callVersion: Int? {
+        get {
+            return json["data"]["callVersion"].int
+        }
+        set(value) {
+            if value == nil {
+                clearKey(["data", "callVersion"])
+            } else {
+                ensurePath(["data"])
+                json["data"]["callVersion"].int = value!
+            }
+        }
+    }
+    
     
     /// callId (only relevant for call-related `.control` messages)
     public var callId: UUID? {
         get {
-            return UUID(uuidString: json["data"]["callId"].string ?? "")
+            return UUID(uuidString: json["data"]["callId"].stringValue)
         }
         set(value) {
             if value == nil {
-                json["data"].dictionaryObject?.removeValue(forKey: "callId")
+                clearKey(["data", "callId"])
             } else {
-                if !json["data"].exists() {
-                    json["data"] = [:]
-                }
-                json["data"]["callId"].string = value?.uuidString
+                ensurePath(["data"])
+                json["data"]["callId"].string = value!.lcString
             }
         }
     }
@@ -369,62 +361,95 @@ public class ForstaPayloadV1: CustomStringConvertible {
     /// peerId (only relevant for call-related `.control` messages)
     public var peerId: UUID? {
         get {
-            return UUID(uuidString: json["data"]["peerId"].string ?? "")
+            return UUID(uuidString: json["data"]["peerId"].stringValue)
         }
         set(value) {
             if value == nil {
-                json["data"].dictionaryObject?.removeValue(forKey: "peerId")
+                clearKey(["data", "peerId"])
             } else {
-                if !json["data"].exists() {
-                    json["data"] = [:]
-                }
-                json["data"]["peerId"].string = value?.uuidString
+                ensurePath(["data"])
+                json["data"]["peerId"].string = value!.lcString
             }
         }
     }
     
-    /// sessionDescription (only relevant for call-related `.control` messages)
-    public var sessionDescription: String? {
+    /// Call offer sdp string (only relevant for `.control` messages of type `.callAnswer`)
+    public var sdpOffer: String? {
         get {
-            return sdp
-        }
-        set(value) {
-            sdp = value
-        }
-    }
-    
-    /// sdp (only relevant for call-related `.control` messages)
-    public var sdp: String? {
-        get {
-            return json["data"]["sdp"].string
+            return json["data"]["offer"].string
         }
         set(value) {
             if value == nil {
-                json["data"].dictionaryObject?.removeValue(forKey: "sdp")
+                clearKey(["data", "offer"])
             } else {
-                if !json["data"].exists() {
-                    json["data"] = [:]
-                }
-                json["data"]["sdp"].string = value
+                ensurePath(["data"])
+                json["data"]["offer"].string = value!
             }
         }
     }
     
-    /// iceCandidates
+    /// Call answer sdp string (only relevant for `.control` messages of type `.callOffer`)
+    public var sdpAnswer: String? {
+        get {
+            return json["data"]["answer"].string
+        }
+        set(value) {
+            if value == nil {
+                clearKey(["data", "answer"])
+            } else {
+                ensurePath(["data"])
+                json["data"]["answer"].string = value!
+            }
+        }
+    }
+    
+    /// iceCandidates (only relevant for `.control` messages of type `.callICECandidates`)
     public var iceCandidates: [JSON]? {
         get {
             return json["data"]["icecandidates"].array
         }
         set(value) {
             if value == nil {
-                json["data"].dictionaryObject?.removeValue(forKey: "icecandidates")
+                clearKey(["data", "icecandidates"])
             } else {
-                if !json["data"].exists() {
-                    json["data"] = [:]
-                }
-                json["data"]["icecandidates"].arrayObject = value
+                ensurePath(["data"])
+                json["data"]["icecandidates"] = JSON(value!)
             }
         }
+    }
+    
+    // - MARK: Utility Routines
+    
+    /// Internal: ensure this path to a dictionary is in the underlying json
+    private func ensurePath(_ path: ArraySlice<String>) {
+        func recurse(_ dict: inout JSON, _ path: ArraySlice<String>) {
+            if path.count >= 1 {
+                let entry = path[path.startIndex]
+                if !dict[entry].exists() {
+                    dict[entry] = [:]
+                }
+                recurse(&(dict[entry]), path.dropFirst())
+            }
+        }
+        recurse(&json, path)
+    }
+    
+    /// Internal: clear this key at this path (as deeply as possible, if it ends up empty)
+    private func clearKey(_ path: ArraySlice<String>) {
+        func recurse(_ dict: inout JSON, _ path: ArraySlice<String>) {
+            if path.count == 0 {
+                return
+            } else if path.count == 1 {
+                dict.dictionaryObject?.removeValue(forKey: path[path.startIndex])
+            } else {
+                let entry = path[path.startIndex]
+                recurse(&(dict[entry]), path.dropFirst())
+                if dict[entry].dictionaryValue.count == 0 {
+                    dict.dictionaryObject?.removeValue(forKey: entry)
+                }
+            }
+        }
+        recurse(&json, path)
     }
 
     // - MARK: Related Enums
