@@ -544,6 +544,32 @@ class SignalClientTests: XCTestCase {
         }
     }
     
+    func testRtcServers() {
+        
+        do {
+            let forsta = try Forsta(MemoryKVStore())
+            forsta.atlas.baseUrl = "https://atlas-dev.forsta.io"
+
+            let finished = XCTestExpectation()
+            forsta.atlas.authenticateViaPassword(userTag: "@greg1:forsta", password: "asdfasdf24")
+                .then { _ in
+                    forsta.atlas.getRtcTurnServersInfo()
+                }
+                .done { result in
+                    print(result)
+                    finished.fulfill()
+                }
+                .catch { error in
+                    print("ERRORING!")
+                    XCTFail(error.localizedDescription)
+                    print("ERRORED!")
+            }
+            wait(for: [finished], timeout: 5*6*10.0)
+        } catch let error {
+            XCTFail("surprising error \(error)")
+        }
+    }
+    
     func testRegisterDevice() {
 
         do {

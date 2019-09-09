@@ -556,6 +556,19 @@ public class AtlasClient {
         }
     }
     
+    ///
+    /// Retrieve information about our WebRTC TURN servers.
+    ///
+    /// - returns: `Promise` resolving to an array of `JSON` with TURN server info.
+    ///
+    public func getRtcTurnServersInfo() -> Promise<[JSON]> {
+        return request("/v1/rtc/servers")
+            .map { (statusCode, json) in
+                if statusCode == 200 { return json.arrayValue }
+                throw ForstaError(.requestRejected, json)
+        }
+    }
+
     // -MARK: Utility Routines
     
     ///
