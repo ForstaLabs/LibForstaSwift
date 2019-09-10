@@ -88,6 +88,20 @@ class SignalClientTests: XCTestCase {
         payload.sender = sender
         XCTAssert(payload.sender! == sender)
         
+        let originator = UUID()
+        XCTAssert(payload.callOriginator == nil)
+        payload.callOriginator = originator
+        XCTAssert(payload.callOriginator! == originator)
+        payload.callOriginator = nil
+        XCTAssert(payload.callOriginator == nil)
+        
+        let members = [UUID(), UUID(), UUID()]
+        XCTAssert(payload.callMembers == nil)
+        payload.callMembers = members
+        XCTAssert(payload.callMembers! == members)
+        payload.callMembers = nil
+        XCTAssert(payload.callMembers == nil)
+
         let messageType = ForstaPayloadV1.MessageType.content
         XCTAssert(payload.messageType == nil)
         payload.messageType = messageType

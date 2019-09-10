@@ -399,6 +399,42 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
     }
     
+    /// callOriginator (only relevant for `.control` of type `.callJoin`)
+    public var callOriginator: UUID? {
+        get {
+            return UUID(uuidString: json["data"]["originator"].stringValue)
+        }
+        set(value) {
+            if value == nil {
+                clearKey(["data", "originator"])
+            } else {
+                ensurePath(["data"])
+                json["data"]["originator"].string = value!.lcString
+            }
+        }
+    }
+    
+    /// callMembers (only relevant for `.control` of type `.callJoin`)
+    public var callMembers: [UUID]? {
+        get {
+            guard let ary = json["data"]["members"].array else {
+                return nil
+            }
+            return ary
+                .map { UUID(uuidString: $0.stringValue) }
+                .filter { $0 != nil }
+                .map { $0! }
+        }
+        set(value) {
+            if value == nil {
+                clearKey(["data", "members"])
+            } else {
+                ensurePath(["data"])
+                json["data"]["members"] = JSON(value!.map { $0.lcString })
+            }
+        }
+    }
+    
     /// Call offer sdp string (only relevant for `.control` messages of type `.callAnswer`)
     public var sdpOffer: String? {
         get {
