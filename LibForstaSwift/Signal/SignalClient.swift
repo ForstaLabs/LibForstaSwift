@@ -68,39 +68,62 @@ public class SignalClient {
     
     private class ProvisioningCipher {
         var keyPair: KeyPair?
+        let signalClient: SignalClient
+        
+        init(signalClient: SignalClient) {
+            self.signalClient = signalClient
+        }
         
         func getPublicKey() throws -> Data {
             if keyPair == nil { self.keyPair = try Signal.generateIdentityKeyPair() }
             return self.keyPair!.publicKey
         }
         
-        func decrypt(envelope: Signal_ProvisionEnvelope) throws -> Data {
-            let masterEphemeral = envelope.publicKey
-            let message = envelope.body
-            if message[0] != 1 {
-                throw ForstaError(ForstaError.ErrorType.decryptionError, "Bad version number on ProvisioningMessage")
-            }
+        func decrypt(publicKey: Data, message: Data) throws -> Data {
+            if keyPair == nil { throw SignalError.invalidKey }
+            
+            let version = message[0]
             let iv = message[1...16]
+            let ivAndCyphertext = message[...(message.count-33)]
+            let ciphertext = message[17...(message.count-33)]
             let mac = message[(message.count-32)...]
-            let ivAndCyphertext = message[0...message.count-32]
-            let ciphertext = message[1+16...message.count-32]
-            // let ecRes = libsignal.curve.calculateAgreement(masterEphemeral, this.keyPair.privKey);
-            // let keys = libsignal.crypto.deriveSecrets(ecRes, Buffer.alloc(32), Buffer.from("TextSecure Provisioning Message"));
-            // try verifyMAC(data: ivAndCyphertext, key: keys[1], expectedMAC: mac)
-            // let plaintext = libsignal.crypto.decrypt(keys[0], ciphertext, iv);
-            // let provisionMessage = protobufs.ProvisionMessage.decode(plaintext);
-            // let privKey = provisionMessage.identityKeyPrivate;
-            /*
-            return {
-                identityKeyPair: libsignal.curve.createKeyPair(privKey),
-                addr: provisionMessage.addr,
-                provisioningCode: provisionMessage.provisioningCode,
-                userAgent: provisionMessage.userAgent
-            };
-            */
-            return Data()
+            
+            if version != 1 { throw SignalError.invalidVersion }
+            
+            let ecRes = try signalClient.calculateAgreement(publicKeyData: publicKey.dropFirst(), privateKeyData: self.keyPair!.privateKey)
+            let keys = try signalClient.deriveSecrets(input: ecRes, info: "TextSecure Provisioning Message".toData(), chunks: 2)
+            try signalClient.verifyMAC(data: ivAndCyphertext, key: keys[1], expectedMAC: mac)
+            let plaintext = try signalClient.crypto.decrypt(message: ciphertext, with: .AES_CBCwithPKCS5, key: keys[0], iv: iv)
+            
+            return plaintext
         }
+        /*
+         public func encrypt(theirPublicKey, message) {
+             let ourKeyPair = libsignal.curve.generateKeyPair()
+             let sharedSecret = libsignal.curve.calculateAgreement(theirPublicKey,
+                                                                 ourKeyPair.privKey)
+             let derivedSecret = libsignal.crypto.deriveSecrets(sharedSecret, Buffer.alloc(32),
+                                                                 Buffer.from("TextSecure Provisioning Message"))
+             let ivLen = 16
+             let macLen = 32
+             let iv = crypto.randomBytes(ivLen)
+             let encryptedMsg = libsignal.crypto.encrypt(derivedSecret[0], message, iv)
+             let msgLen = encryptedMsg.byteLength
+             let data = new Uint8Array(1 + ivLen + msgLen)
+             data[0] = 1
+             data.set(iv, 1)
+             data.set(new Uint8Array(encryptedMsg), 1 + ivLen)
+             let mac = libsignal.crypto.calculateMAC(derivedSecret[1], data.buffer)
+             let pEnvelope = new protobufs.ProvisionEnvelope()
+             pEnvelope.body = new Uint8Array(data.byteLength + macLen)
+             pEnvelope.body.set(data, 0)
+             pEnvelope.body.set(new Uint8Array(mac), data.byteLength)
+             pEnvelope.publicKey = ourKeyPair.pubKey
+             return pEnvelope
+         }
+         */
     }
+
     
     /// Create a new identity key and create or replace the signal account.
     /// Note that any existing devices asssociated with your account will be
@@ -120,7 +143,7 @@ public class SignalClient {
         } catch let error {
             return Promise.init(error: ForstaError("Unable to generate random bits for account registration.", cause: error))
         }
-        
+
         return firstly { () -> Promise<JSON> in
             let data: [String: Any] = [
                 "name": name,
@@ -287,17 +310,20 @@ public class SignalClient {
     }
     
     public class Registrator {
-        private let provisioningCipher = ProvisioningCipher()
+        private let name: String
+        private let provisioningCipher: ProvisioningCipher
         private let (waiter, waitSeal) = Promise<Signal_ProvisionEnvelope>.pending()
         private var userId: UUID? = nil
         private let signalClient: SignalClient
         private var wsr: WebSocketResource? = nil
 
         init(name: String, signalClient: SignalClient) {
+            self.name = name
             self.signalClient = signalClient
+            self.provisioningCipher = ProvisioningCipher(signalClient: signalClient)
             
             self.wsr = WebSocketResource(requestHandler: { request in
-                print("GEP! Got provisioning WS request \(request.verb) \(request.path)")
+                print("got WS request: \(request.verb) \(request.path)")
                 if request.body == nil { self.waitSeal.reject(ForstaError(.unknown, "provisioning ws request \(request.verb) \(request.path) has no body")) }
                 if request.path == "/v1/address" && request.verb == "PUT" {
                     do {
@@ -308,8 +334,8 @@ public class SignalClient {
                         }
                         self.signalClient.atlasClient.provisionSignalDevice(uuidString: proto.uuid,
                                                                             pubKeyString: try self.provisioningCipher.getPublicKey().base64EncodedString())
-                            .done { result in
-                                print("request to provision device succeeded with \(result)")
+                            .done { _ in
+                                print("(request to send provisioning help succeeded)")
                             }
                             .catch { error in
                                 self.waitSeal.reject(ForstaError("request to provision device failed", cause: error))
@@ -342,9 +368,25 @@ public class SignalClient {
         }
         
         public func start() -> Promise<Void> {
+            var signalingKey: Data
+            var signalServerPassword: String
+            var registrationId: UInt32
+            var userId: UUID?
+
+            do {
+                signalingKey = try self.signalClient.generateSignalingKey()
+                signalServerPassword = try self.signalClient.generatePassword()
+                registrationId = try Signal.generateRegistrationId()
+            } catch let error {
+                return Promise.init(error: ForstaError("Unable to generate random bits for account registration.", cause: error))
+            }
+            
+            self.signalClient.kvstore.set(DNK.ssName, self.name)
+            self.signalClient.kvstore.set(DNK.ssSignalingKey, signalingKey)
+            
             return self.signalClient.atlasClient.getSignalAccountInfo()
                 .then { accountInfo -> Promise<Signal_ProvisionEnvelope> in
-                    print("got accountInfo")
+                    print("retrieved account info")
                     guard accountInfo["devices"].arrayValue.count > 0 else {
                         throw ForstaError(ForstaError.ErrorType.configuration, "must use registerAccount for first device")
                     }
@@ -353,23 +395,75 @@ public class SignalClient {
                         throw ForstaError(.invalidPayload, "no serverUrl in account info")
                     }
                     self.signalClient.store.kv.set(DNK.ssUrl, self.signalClient.serverUrl!)
-                    print("stashed server url")
+
                     self.wsr?.connect(url: try self.signalClient.provisioningSocketUrl())
                     print("connected provisioning socket")
-                    self.userId = UUID(uuidString: accountInfo["userId"].stringValue)
-                    if self.userId == nil {
+                    userId = UUID(uuidString: accountInfo["userId"].stringValue)
+                    if userId == nil {
                         throw ForstaError(.invalidPayload, "no userId in account info")
                     }
-                    print("waiting on waiter now...")
+                    print("waiting on help to arrive...")
                     return self.waiter
                 }
-                .map { envelope in
-                    print("waiter gave envelope...")
-                    print(envelope)
-                    let x = envelope.publicKey
-                    let y = envelope.body
+                .then { envelope -> Promise<(Int, JSON)> in
+                    print("help has arrived!")
+                    let plaintext = try self.provisioningCipher.decrypt(publicKey: envelope.publicKey, message: envelope.body)
+                    let provisionMessage = try Signal_ProvisionMessage(serializedData: plaintext)
+                    let identity = try self.signalClient.generateKeyPairFromPrivateKey(privateKeyData: provisionMessage.identityKeyPrivate)
+                    self.signalClient.store.forstaIdentityKeyStore.setIdentityKeyPair(identity: identity)
+                    self.signalClient.store.forstaIdentityKeyStore.setLocalRegistrationId(id: registrationId)
+                    self.userId = UUID(uuidString: provisionMessage.addr)
+                    let expectedUserId = self.signalClient.atlasClient.authenticatedUserId
+                    if self.userId != expectedUserId {
+                        throw ForstaError(.invalidId, "Security Violation: Foreign account sent us an identity key!")
+                    }
+                    let provisioningCode = provisionMessage.provisioningCode
+
+                    let parms: [String: Any] = [
+                        "signalingKey": signalingKey.base64EncodedString(),
+                        "supportsSms": false,
+                        "fetchesMessages": true,
+                        "registrationId": registrationId,
+                        "name": self.name
+                    ]
+                    self.signalClient.signalServerUsername = self.userId!.lcString
+                    self.signalClient.password = signalServerPassword
+                    print("sending provision request for new device")
+                    return self.signalClient.request(.devices,
+                                                     urlParameters: "/\(provisioningCode)",
+                                                     method: .put,
+                                                     parameters: parms)
+                }
+                .map { (code, json) in
+                    guard code == 200, let deviceId = json["deviceId"].uInt32 else {
+                        throw ForstaError(.requestRejected, json)
+                    }
+                    print("success, got new deviceId", deviceId)
+                    let mySignalAddress = SignalAddress(userId: userId!, deviceId: deviceId)
+                    self.signalClient.kvstore.set(DNK.ssSignalAddress, mySignalAddress)
+                    self.signalClient.kvstore.set(DNK.ssUsername, mySignalAddress.description)
+                    self.signalClient.signalServerUsername = mySignalAddress.description
+                    guard let myPubKey = self.signalClient.store.identityKeyStore.identityKeyPair()?.publicKey else {
+                        throw ForstaError(.storageError, "unable to retrieve my identity key")
+                    }
+                    if !self.signalClient.store.forstaIdentityKeyStore.save(identity: myPubKey,
+                                                                            for: mySignalAddress) {
+                        throw ForstaError(.storageError, "unable to store self identity key")
+                    }
+                    
+                    print("killing socket")
                     self.wsr?.disconnect()
                     self.wsr = nil
+                }
+                .then { x in
+                    self.signalClient.genKeystuffBundle()
+                }
+                .then { bundle in
+                    self.signalClient.request(.keys, method: .put, parameters: bundle)
+                }
+                .map { (code, json) in
+                    if code == 204 { return }
+                    throw ForstaError(.requestFailure, "problem performing registerAccount: \(code), \(json)")
                 }
                 .ensure {
                     let _ = print("resolved registerDevice's completed promise")
@@ -446,12 +540,63 @@ public class SignalClient {
         return "\(self.serverUrl!)/v1/websocket/provisioning/"
     }
     
+    /// Calculate a message MAC
+    func calculateMAC(key: Data, data: Data) -> Data {
+        return self.crypto.hmacSHA256(for: data, with: key)
+    }
+    
+
     /// Verify message MAC
-    func verifyMAC(data: Data, key: Data, expectedMAC: Data) throws {
-        let calculatedMAC = self.crypto.hmacSHA256(for: data, with: key)
+    public func verifyMAC(data: Data, key: Data, expectedMAC: Data) throws {
+        let calculatedMAC = calculateMAC(key: key, data: data)
         if calculatedMAC[..<expectedMAC.count] != expectedMAC {
             throw ForstaError(.invalidMac)
         }
     }
     
+    /// RFC 5869 key derivation
+    public func deriveSecrets(input: Data, salt: Data = Data(count: 32), info: Data, chunks: Int = 3) throws -> [Data] {
+        if chunks < 1 { return [] }
+        
+        // Salts always end up being 32 bytes
+        if salt.count != 32 {
+            throw ForstaError(.invalidLength, "Got salt of incorrect length")
+        }
+        
+        let PRK = calculateMAC(key: salt, data: input)
+        var infoArray = Data(count: info.count + 1 + 32)
+        infoArray.replaceSubrange(32...(infoArray.count-2), with: info)
+        infoArray[infoArray.count-1] = 1
+        var signed = [calculateMAC(key: PRK, data: infoArray[32...])]
+        
+        for i in 2...chunks {
+            infoArray.replaceSubrange(...31, with: signed[i-2])
+            infoArray[infoArray.count-1] = UInt8(i)
+            signed.append(calculateMAC(key: PRK, data: infoArray));
+        }
+        
+        return signed;
+    }
+    
+    /// Calculate an ECDH agreement.
+    ///
+    /// - parameter publicKeyData: The curve25519 (typically remote party's) 32-byte public key data
+    /// - parameter privateKeyData: The curve25519 (typically your) 32-byte private key data
+    /// - returns: a 32-bit shared secret on success, throwing on failure
+    public func calculateAgreement(publicKeyData: Data, privateKeyData: Data) throws -> Data {
+        return try Utility.curve25519Donna(secret: privateKeyData, basepoint: publicKeyData)
+    }
+    
+    /// Generates a Curve25519 keypair.
+    ///
+    /// - parameter privateKeyData: The curve25519 (typically your) 32-byte private key data
+    /// - returns: the full `KeyPair`
+    public func generateKeyPairFromPrivateKey(privateKeyData: Data) throws -> KeyPair {
+        var basepoint = Data(count: 32)
+        basepoint[0] = 9
+        
+        let pubKeyData = try Utility.curve25519Donna(secret: privateKeyData, basepoint: basepoint)
+        
+        return KeyPair(publicKey: Data([5]) + pubKeyData, privateKey: privateKeyData)
+    }
 }
