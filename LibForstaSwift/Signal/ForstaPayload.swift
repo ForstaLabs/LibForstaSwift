@@ -21,7 +21,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
     
     /// Initialize with an (optional) JSON string
     public init(_ jsonString: String? = nil) {
-        self.json = JSON(string: jsonString ?? "[\"version\": 1]") ?? JSON(["version": 1])
+        self.json = JSON(string: jsonString ?? "[{\"version\": 1}]") ?? JSON([["version": 1]])
         for item in json.arrayValue {
             if item["version"].intValue == 1 {
                 json = item
@@ -435,32 +435,32 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
     }
     
-    /// Call offer sdp string (only relevant for `.control` messages of type `.callAnswer`)
+    /// Call offer sdp string (only relevant for `.control` messages of type `.callOffer`)
     public var sdpOffer: String? {
         get {
-            return json["data"]["offer"].string
+            return json["data"]["offer"]["sdp"].string
         }
         set(value) {
             if value == nil {
                 clearKey(["data", "offer"])
             } else {
                 ensurePath(["data"])
-                json["data"]["offer"].string = value!
+                json["data"]["offer"] = JSON(["type": "offer", "sdp": value!])
             }
         }
     }
     
-    /// Call answer sdp string (only relevant for `.control` messages of type `.callOffer`)
+    /// Call answer sdp string (only relevant for `.control` messages of type `.callAcceptOffer`)
     public var sdpAnswer: String? {
         get {
-            return json["data"]["answer"].string
+            return json["data"]["answer"]["sdp"].string
         }
         set(value) {
             if value == nil {
                 clearKey(["data", "answer"])
             } else {
                 ensurePath(["data"])
-                json["data"]["answer"].string = value!
+                json["data"]["answer"] = JSON(["type": "answer", "sdp": value!])
             }
         }
     }

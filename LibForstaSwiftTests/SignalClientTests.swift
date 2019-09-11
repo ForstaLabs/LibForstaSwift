@@ -92,15 +92,21 @@ class SignalClientTests: XCTestCase {
         XCTAssert(payload.callOriginator == nil)
         payload.callOriginator = originator
         XCTAssert(payload.callOriginator! == originator)
-        payload.callOriginator = nil
-        XCTAssert(payload.callOriginator == nil)
-        
+
+        let offer = "some sdp call offer string"
+        XCTAssert(payload.sdpOffer == nil)
+        payload.sdpOffer = offer
+        XCTAssert(payload.sdpOffer! == offer)
+
+        let answer = "some sdp call answer string"
+        XCTAssert(payload.sdpAnswer == nil)
+        payload.sdpAnswer = answer
+        XCTAssert(payload.sdpAnswer! == answer)
+
         let members = [UUID(), UUID(), UUID()]
         XCTAssert(payload.callMembers == nil)
         payload.callMembers = members
         XCTAssert(payload.callMembers! == members)
-        payload.callMembers = nil
-        XCTAssert(payload.callMembers == nil)
 
         let messageType = ForstaPayloadV1.MessageType.content
         XCTAssert(payload.messageType == nil)
@@ -167,6 +173,18 @@ class SignalClientTests: XCTestCase {
         
         payload.controlType = nil
         XCTAssert(payload.controlType == nil)
+        
+        payload.callOriginator = nil
+        XCTAssert(payload.callOriginator == nil)
+        
+        payload.sdpOffer = nil
+        XCTAssert(payload.sdpOffer == nil)
+        
+        payload.sdpAnswer = nil
+        XCTAssert(payload.sdpAnswer == nil)
+        
+        payload.callMembers = nil
+        XCTAssert(payload.callMembers == nil)
         
         payload.body = nil
         XCTAssert(payload.body == nil)
