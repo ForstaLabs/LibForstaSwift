@@ -479,7 +479,7 @@ class SignalClientTests: XCTestCase {
         }
     }
     
-    func testConversation() {
+    func testNewAccountConversation() {
         do {
             watchEverything()
             let forsta = try Forsta(MemoryKVStore())
@@ -644,5 +644,75 @@ class SignalClientTests: XCTestCase {
         let result = try forsta.signal.calculateAgreement(publicKeyData: pubKey.dropFirst(), privateKeyData: privKey)
         
         XCTAssert(expected == result)
+    }
+    
+    func testNewDeviceConversation() {
+        do {
+            watchEverything()
+            let forsta = try Forsta(MemoryKVStore())
+            var registrator: SignalClient.Registrator? = nil
+            
+            let registrated = XCTestExpectation()
+            forsta.atlas.authenticateViaPassword(userTag: "@greg1:forsta", password: "asdfasdf24")
+                .map { stuff in
+                    registrator = forsta.signal.registerDevice(name: "foo the bar")
+                }
+                .then { _ -> Promise<Void> in
+                    return registrator!.start()
+                }
+                .done {
+                    print("registered new device")
+                    registrated.fulfill()
+                }
+                .catch { error in
+                    if let ferr = error as? ForstaError {
+                        XCTFail(ferr.description)
+                    } else {
+                        XCTFail("surprising error")
+                    }
+            }
+            wait(for: [registrated], timeout: 10.0)
+            
+            let connectified = XCTestExpectation()
+            let _ = NotificationCenter.default.addObserver(
+                forName: .signalConnected,
+                object: nil,
+                queue: nil) { _ in
+                    connectified.fulfill()
+            }
+            try forsta.connect()
+            wait(for: [connectified], timeout: 2 * 60.0)
+            
+            let theEnd = XCTestExpectation()
+            
+            let _ = NotificationCenter.default.addObserver(
+                forName: .signalInboundMessage,
+                object: nil,
+                queue: nil) { notification in
+                    let inbound = notification.userInfo?["inboundMessage"] as? InboundMessage
+                    if inbound?.payload.messageType! == .content {
+                        let words = inbound!.payload.body![0].raw
+                        if words == "end" {
+                            theEnd.fulfill()
+                        }
+                        let outbound = Message(threadId: inbound!.payload.threadId!,
+                                               threadExpression: inbound!.payload.threadExpression!,
+                                               bodyPlain: "That's \(words.count) character\(words.count == 1 ? "" : "s"), yo.")
+                        print("\n>>>", outbound)
+                        forsta.send(outbound, to: [.user(inbound!.source.userId)])
+                            .map { response in
+                                print("send result:", response)
+                            }
+                            .catch { error in
+                                XCTFail("send error \(error)")
+                        }
+                    }
+            }
+            
+            wait(for: [theEnd], timeout: 5 * 60.0)
+            forsta.disconnect()
+        } catch let error {
+            XCTFail("surprising error \(error)")
+        }
     }
 }
