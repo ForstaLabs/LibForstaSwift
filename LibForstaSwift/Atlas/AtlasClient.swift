@@ -25,33 +25,57 @@ import JWTDecode
 ///
 public class AtlasClient {
     static let defaultPublicOrg = "forsta"
-    static let defaultBaseUrl = "https://atlas-dev.forsta.io"
+    static let defaultServerUrl = "https://atlas-dev.forsta.io"
     
-    /// The default public organization name
-    public var defaultOrg = defaultPublicOrg
-    /// The URL of the Atlas server we are dealing with
-    /// (this will be persisted and restored if there is an active login session)
-    public var baseUrl = defaultBaseUrl
-    
+    private var _defaultOrg: KVBacked<String>
+    /// The default public organization name (added to unqualified login tags)
+    public var defaultOrg: String? {
+        get { return _defaultOrg.value }
+        set(value) { _defaultOrg.value = value }
+    }
+
+    private var _serverUrl: KVBacked<String>
+    /// The URL of the Atlas server we are using
+    public var serverUrl: String? {
+        get { return _serverUrl.value }
+        set(value) { _serverUrl.value = value }
+    }
+
     var kvstore: KVStorageProtocol
     
-    var authenticatedUserJwt: String?
-    var authenticatedUserId: UUID?
-    
+
+    /// The current authenticated user UUID
+    public var authenticatedUserId: UUID?
+
     /// predicate for whether this Atlas client is currently authenticated
     public var isAuthenticated: Bool {
         return self.authenticatedUserJwt != nil
     }
     
+    private var _authenticatedUserJwt: KVBacked<String>
+    /// The current authenticated user JWT (will be automatically set and maintained)
+    public var authenticatedUserJwt: String? {
+        get { return _authenticatedUserJwt.value }
+        set(value) {
+            _authenticatedUserJwt.value = value
+            if value != nil { maintainJwt() }
+        }
+    }
+
     ///
     /// Initialize this Atlas client.
-    /// This will continue maintaining an auth session if possible.
+    /// This will resume maintaining an auth session, if possible.
     ///
     /// - parameter kvstore: a persistent key-value store
     ///
     public init(kvstore: KVStorageProtocol) {
         self.kvstore = kvstore
-        restore()
+        self._serverUrl = KVBacked(kvstore: kvstore, key: DNK.atlasServerUrl, initial: AtlasClient.defaultServerUrl)
+        self._authenticatedUserJwt = KVBacked(kvstore: kvstore, key: DNK.atlasCredential)
+        self._defaultOrg = KVBacked(kvstore: kvstore, key: DNK.atlasDefaultOrg, initial: AtlasClient.defaultPublicOrg)
+
+        // restart maintenance of the current JWT, if there is one
+        if let jwt = self.authenticatedUserJwt { self.authenticatedUserJwt = jwt }
     }
     
     // -MARK: Public types for dealing with AtlasClient
@@ -186,7 +210,8 @@ public class AtlasClient {
             .map { (statusCode, json) in
                 if statusCode == 200 {
                     let user = json["user"]
-                    if self.setJwt(json["token"].stringValue) {
+                    self.authenticatedUserJwt = json["token"].stringValue
+                    if self.isAuthenticated {
                         return user
                     } else {
                         throw ForstaError(.invalidJWT)
@@ -201,16 +226,18 @@ public class AtlasClient {
     private func refreshJwt() {
         guard let oldJwt = self.authenticatedUserJwt else { return }
         self.requestJwtRefresh(oldJwt)
-            .done { newJwt in if !self.setJwt(newJwt) { self.expireJwt() } }
+            .done { newJwt in self.authenticatedUserJwt = newJwt }
             .catch { err in self.expireJwt() }
     }
     
     /// Internal: Request a refreshed JWT token from Atlas.
     private func requestJwtRefresh(_ jwt: String) -> Promise<String> {
+        print("requesting refresh")
         return request("/v1/api-token-refresh/", method: .post, parameters: ["token": jwt])
             .map { (statusCode, json) in
                 if statusCode == 200 {
                     if let jwt = json["token"].string {
+                        print("got new jwt")
                         return jwt
                     } else {
                         throw ForstaError(.malformedResponse, "missing JWT in refresh response")
@@ -310,7 +337,8 @@ public class AtlasClient {
                     let nameTag = json["nametag"].string,
                     let orgSlug = json["orgslug"].string,
                     let jwt = json["jwt"].string {
-                    if (!self.setJwt(jwt)) {
+                    self.authenticatedUserJwt = jwt
+                    if !self.isAuthenticated {
                         throw ForstaError(.invalidJWT, "user creation succeeded but setJwt failed")
                     }
                     return ("@\(nameTag):\(orgSlug)", self.authenticatedUserId!)
@@ -582,7 +610,7 @@ public class AtlasClient {
     public func tagParts(_ tag: String) -> (String, String) {
         let trimmables = CharacterSet(charactersIn: "@ \t\n")
         
-        let parts = "\(tag):\(defaultOrg)"
+        let parts = "\(tag):\(defaultOrg!)"
             .lowercased()
             .components(separatedBy: ":")
             .map { s in s.trimmingCharacters(in: trimmables) }
@@ -594,7 +622,7 @@ public class AtlasClient {
     private func request(_ url: String, method: HTTPMethod = .get, parameters: Parameters? = nil) -> Promise<(Int, JSON)> {
         return Promise { seal in
             let headers = isAuthenticated ? ["Authorization": "JWT \(authenticatedUserJwt!)"] : nil
-            let fullUrl = url.starts(with: "http") ? url : "\(baseUrl)\(url)"
+            let fullUrl = url.starts(with: "http") ? url : "\(serverUrl!)\(url)"
             Alamofire.request(fullUrl, method: method, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
                 .responseJSON { response in
                     let statusCode = response.response?.statusCode ?? 500
@@ -611,30 +639,32 @@ public class AtlasClient {
     
     /// Internal: Check JWT for freshness, stash it for current and future use,
     /// broadcast that event, and set up refreshes based on it's expiration date.
-    private func setJwt(_ jwt: String) -> Bool {
+    private func maintainJwt() {
         do {
+            guard let jwt = authenticatedUserJwt else { return }
+            
             let decodedJwt = try decode(jwt: jwt)
-            let timestamp = decodedJwt.body["exp"] as! Double
-            if timestamp < Date().timeIntervalSince1970 { return false; }
-            
-            self.kvstore.set(DNK.atlasCredential, jwt)
-            self.kvstore.set(DNK.atlasUrl, self.baseUrl)
-            
-            guard let id = decodedJwt.body["user_id"] as? String else {
-                print("warning: malformed jwt, missing user_id")
-                return false
+            guard let timestamp = decodedJwt.body["exp"] as? Double,
+                timestamp > Date().timeIntervalSince1970 else {
+                    print("warning: jwt missing expiration or in the past")
+                    expireJwt()
+                    return
             }
-            self.authenticatedUserId = UUID(uuidString: id)
-            self.authenticatedUserJwt = jwt
             
+            guard let id = decodedJwt.body["user_id"] as? String,
+                let uuid = UUID(uuidString: id) else {
+                    print("warning: malformed jwt, missing user_id")
+                    expireJwt()
+                    return
+            }
+
+            self.authenticatedUserId = uuid
             NotificationCenter.broadcast(.atlasCredentialSet, ["jwt": jwt])
             
             let halfDead = DispatchTime.now() + DispatchTimeInterval.seconds(Int(timestamp - Date().timeIntervalSince1970) / 2)
             DispatchQueue.main.asyncAfter(deadline: halfDead) { self.refreshJwt() }
-            
-            return true
         } catch {
-            return false
+            expireJwt()
         }
     }
     
@@ -642,16 +672,6 @@ public class AtlasClient {
     private func expireJwt() {
         self.authenticatedUserJwt = nil
         self.authenticatedUserId = nil
-        self.kvstore.remove(DNK.atlasCredential)
         NotificationCenter.broadcast(.atlasCredentialExpired, nil)
-    }
-    
-    /// Internal: Restore JWT and baseUrl from kvstore, if possible.
-    private func restore() {
-        self.baseUrl = kvstore.get(DNK.atlasUrl) ?? AtlasClient.defaultBaseUrl
-        
-        if let jwt: String = kvstore.get(DNK.atlasCredential) {
-            if !setJwt(jwt) { expireJwt() }
-        }
     }
 }

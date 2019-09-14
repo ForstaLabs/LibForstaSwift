@@ -124,6 +124,43 @@ public extension KVStorageProtocol {
     }
 }
 
+
+/// A generic class for reading and writing store-backed default-namespace typed values,
+/// backed by a value cache (this assumes there is no other cache to stay coherent with).
+public class KVBacked<Type> where Type: ToFromData {
+    var kvstore: KVStorageProtocol
+    var cache: Type?
+    let key: CustomStringConvertible
+    
+    /// Create a `KVBacked`
+    public init(kvstore: KVStorageProtocol, key: CustomStringConvertible, initial: Type? = nil) {
+        self.key = key
+        self.kvstore = kvstore
+        
+        if initial != nil && self.value == nil {
+            self.value = initial
+        }
+    }
+    
+    /// get and set the backed, cached value
+    public var value: Type? {
+        get {
+            if cache == nil {
+                cache = kvstore.get(key)
+            }
+            return cache
+        }
+        set(value) {
+            cache = value
+            if value == nil {
+                kvstore.remove(key)
+            } else {
+                kvstore.set(key, value!)
+            }
+        }
+    }
+}
+
 // -MARK: Data (de)serialization for types we care about
 
 /// A simple protocol for things that we want
@@ -134,6 +171,18 @@ public protocol ToFromData {
     
     /// Deserialize from `Data`
     static func fromData(_ data: Data) throws -> Self
+}
+
+extension Data: ToFromData {
+    /// Serialize a `Data` to `Data`
+    public func toData() -> Data {
+        return self
+    }
+    
+    /// Deserialize a `Data` from `Data`
+    static public func fromData(_ data: Data) -> Data {
+        return data
+    }
 }
 
 extension String: ToFromData {

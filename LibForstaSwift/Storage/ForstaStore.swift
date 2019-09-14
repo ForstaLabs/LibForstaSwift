@@ -14,17 +14,19 @@ enum DNK: String, CustomStringConvertible {
     /// The current JWT for authorizing Atlas calls
     case atlasCredential = "atlasCredential"
     /// The URL of the Atlas server we are authenticated against
-    case atlasUrl = "atlasUrl"
-    
+    case atlasServerUrl = "atlasUrl"
+    /// The default organization we will use if one isn't provided during authentication
+    case atlasDefaultOrg = "atlasDefaultOrg"
+
     /// URL that Atlas gave us to use to reach our Signal server
     case ssUrl = "signalServerUrl"
     /// The `SignalAddress` we have for our device on the Signal server
     case ssSignalAddress = "signalServerSignalAddress"
-    /// The descriptive name we gave Signal server for this device registration
-    case ssName = "signalServerName"
+    /// The descriptive public name we gave Signal server for this device during registration
+    case ssDeviceLabel = "signalServerDeviceName"
     /// The username that Signal server knows us as (currently it is the `.description` string of our `SignalAddress`)
     case ssUsername = "signalServerUsername"
-    /// The random password we gave to Signal to authenticate future API calls
+    /// The random password we gave Signal server to authenticate future API calls
     case ssPassword = "signalServerPassword"
     /// The random secret we shared with Signal server for encrypting websocket traffic
     case ssSignalingKey = "signalServerSignalingKey"

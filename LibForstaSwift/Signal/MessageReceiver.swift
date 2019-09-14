@@ -141,17 +141,17 @@ public class MessageReceiver {
             return
         }
         do {
-            let signalingKey = signalClient.kvstore.get(DNK.ssSignalingKey)
             guard request.body != nil else {
                 throw ForstaError(.invalidMessage, "No body for incoming WS request.")
             }
-            guard signalingKey != nil else {
+            guard self.signalClient.signalingKey != nil else {
                 throw ForstaError(.decryptionError, "No signaling key established.")
             }
-            let data = try decryptWebSocketMessage(message: request.body!, signalingKey: signalingKey!)
+            let data = try decryptWebSocketMessage(message: request.body!, signalingKey: self.signalClient.signalingKey!)
             let envelope = try Signal_Envelope(serializedData: data)
             if envelope.type == .receipt {
-                let receipt = DeliveryReceipt(SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice),
+                let receipt = DeliveryReceipt(SignalAddress(userId: envelope.source,
+                                                            deviceId: envelope.sourceDevice),
                                               Date(millisecondsSince1970: envelope.timestamp))
                 NotificationCenter.broadcast(.signalDeliveryReceipt, ["deliveryReceipt": receipt])
             } else if envelope.hasContent {

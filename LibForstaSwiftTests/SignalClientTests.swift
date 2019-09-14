@@ -239,7 +239,7 @@ class SignalClientTests: XCTestCase {
             let registrated = XCTestExpectation(description: "registerAccount test")
             atlasClient.authenticateViaPassword(userTag: "@password:swift.test", password: "asdfasdf24")
                 .then { _ in
-                    signalClient.registerAccount(name: "testing")
+                    signalClient.registerAccount(deviceLabel: "testing")
                 }
                 .done { result in
                     print(result)
@@ -279,7 +279,7 @@ class SignalClientTests: XCTestCase {
             let registrated = XCTestExpectation()
             atlasClient.authenticateViaPassword(userTag: "@password:swift.test", password: "asdfasdf24")
                 .then { _ in
-                    signalClient.registerAccount(name: "testing")
+                    signalClient.registerAccount(deviceLabel: "testing")
                 }
                 .done { result in
                     print(result)
@@ -401,7 +401,7 @@ class SignalClientTests: XCTestCase {
             let registrated = XCTestExpectation()
             atlasClient.authenticateViaPassword(userTag: "@password:swift.test", password: "asdfasdf24")
                 .then { _ in
-                    signalClient.registerAccount(name: "testing")
+                    signalClient.registerAccount(deviceLabel: "testing")
                 }
                 .done { result in
                     print(result)
@@ -487,7 +487,7 @@ class SignalClientTests: XCTestCase {
             let registrated = XCTestExpectation()
             forsta.atlas.authenticateViaPassword(userTag: "@password:swift.test", password: "asdfasdf24")
                 .then { _ in
-                    forsta.signal.registerAccount(name: "testing")
+                    forsta.signal.registerAccount(deviceLabel: "testing")
                 }
                 .done {
                     print("registered account")
@@ -548,7 +548,7 @@ class SignalClientTests: XCTestCase {
     func testGetAll() {
         do {
             let forsta = try Forsta(MemoryKVStore())
-            forsta.atlas.baseUrl = "https://atlas.forsta.io"
+            forsta.atlas.serverUrl = "https://atlas.forsta.io"
             
             let finished = XCTestExpectation()
             forsta.atlas.authenticateViaPassword(userTag: "", password: "")
@@ -580,7 +580,7 @@ class SignalClientTests: XCTestCase {
         
         do {
             let forsta = try Forsta(MemoryKVStore())
-            forsta.atlas.baseUrl = "https://atlas-dev.forsta.io"
+            forsta.atlas.serverUrl = "https://atlas-dev.forsta.io"
 
             let finished = XCTestExpectation()
             forsta.atlas.authenticateViaPassword(userTag: "@greg1:forsta", password: "asdfasdf24")
@@ -606,13 +606,13 @@ class SignalClientTests: XCTestCase {
 
         do {
             let forsta = try Forsta(MemoryKVStore())
-            forsta.atlas.baseUrl = "https://atlas-dev.forsta.io"
+            forsta.atlas.serverUrl = "https://atlas-dev.forsta.io"
             var registrator: SignalClient.Registrator? = nil
 
             let finished = XCTestExpectation()
             forsta.atlas.authenticateViaPassword(userTag: "@greg1:forsta", password: "asdfasdf24")
                 .map { stuff in
-                    registrator = forsta.signal.registerDevice(name: "foo the bar")
+                    registrator = forsta.signal.registerDevice(deviceLabel: "foo the bar")
                 }
                 .then { _ -> Promise<Void> in
                     return registrator!.start()
@@ -655,7 +655,7 @@ class SignalClientTests: XCTestCase {
             let registrated = XCTestExpectation()
             forsta.atlas.authenticateViaPassword(userTag: "@greg1:forsta", password: "asdfasdf24")
                 .map { stuff in
-                    registrator = forsta.signal.registerDevice(name: "foo the bar")
+                    registrator = forsta.signal.registerDevice(deviceLabel: "foo the bar")
                 }
                 .then { _ -> Promise<Void> in
                     return registrator!.start()

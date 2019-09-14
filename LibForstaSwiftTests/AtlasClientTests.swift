@@ -16,7 +16,7 @@ import Base32
 
 let dummyTwilioNumber = "+15005550006"
 
-let testBaseUrl = "http://localhost:8000"
+let testServerUrl = "http://localhost:8000"
 let testOrgSlug = "test.org.\(String(Int.random(in: 1000..<10000)))"
 var (testOrgReady, testOrgReadyResolver) = Promise<Void>.pending()
 
@@ -59,7 +59,7 @@ export JWT_PROXY_AUDIENCE='atlas'
     
     override static func setUp() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         atlas.joinForsta(["captcha": "doesn't matter locally",
                           "email": "nobody@qwerwerwerewrwr4314324qewre.com",
                           "fullname": "Admin",
@@ -121,7 +121,7 @@ export JWT_PROXY_AUDIENCE='atlas'
     
     func testTagParts() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         atlas.defaultOrg = "yobaby"
         
         var (n1, o1) = atlas.tagParts("foo")
@@ -151,7 +151,7 @@ export JWT_PROXY_AUDIENCE='atlas'
     
     func testRequestAuthentication() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         
         var expectations:[XCTestExpectation] = []
 
@@ -195,7 +195,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 expectation2.fulfill()
         }
         
-        atlas.baseUrl += "/v1/whatevs/"
+        atlas.serverUrl = atlas.serverUrl! + "/v1/whatevs/"
         let expectation3 = XCTestExpectation(description: "requestAuthentication 3")
         expectations.append(expectation3)
         
@@ -210,7 +210,7 @@ export JWT_PROXY_AUDIENCE='atlas'
                 expectation3.fulfill()
         }
 
-        atlas.baseUrl = "https://nobodys.server.anywhere.foobar/"
+        atlas.serverUrl = "https://nobodys.server.anywhere.foobar/"
         let expectation4 = XCTestExpectation(description: "requestAuthentication 3")
         expectations.append(expectation4)
         
@@ -230,7 +230,7 @@ export JWT_PROXY_AUDIENCE='atlas'
     
     func testAuthentication() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         
         let expectation1 = XCTestExpectation(description: "auth via password")
         
@@ -342,7 +342,7 @@ export JWT_PROXY_AUDIENCE='atlas'
     func testAtlasClientRestore() {
         let kvstore = MemoryKVStore()
         let atlas = AtlasClient(kvstore: kvstore)
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         
         XCTAssert(!kvstore.has(ns: kvstore.defaultNamespace, key: DNK.atlasCredential))
         XCTAssert(atlas.authenticatedUserId == nil)
@@ -397,7 +397,7 @@ export JWT_PROXY_AUDIENCE='atlas'
     
     func testTagExpressionResolution() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         
         let expectation = XCTestExpectation(description: "auth via password")
         atlas.authenticateViaPassword(userTag: "@password:\(testOrgSlug)", password: "asdfasdf24")
@@ -428,7 +428,7 @@ export JWT_PROXY_AUDIENCE='atlas'
     
     func testTagExpressionBatchResolution() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         
         let expectation = XCTestExpectation(description: "auth via password")
         atlas.authenticateViaPassword(userTag: "@password:\(testOrgSlug)", password: "asdfasdf24")
@@ -462,7 +462,7 @@ export JWT_PROXY_AUDIENCE='atlas'
     
     func testGetUsers() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         
         let expectAuth = XCTestExpectation(description: "auth via password")
         atlas.authenticateViaPassword(userTag: "@password:\(testOrgSlug)", password: "asdfasdf24")
@@ -526,7 +526,7 @@ export JWT_PROXY_AUDIENCE='atlas'
 
     func testGetDevices() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         
         let expectation = XCTestExpectation(description: "auth via password")
         atlas.authenticateViaPassword(userTag: "@password:\(testOrgSlug)", password: "asdfasdf24")
@@ -548,7 +548,7 @@ export JWT_PROXY_AUDIENCE='atlas'
     
     func testUserAndOrgCreation() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         
         let uniquifier = String(Int.random(in: 1000..<10000)) // so I don't have to keep resetting my local db
         
@@ -676,7 +676,7 @@ export JWT_PROXY_AUDIENCE='atlas'
 
     func testAdminCRUD() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         
         let uniquifier = String(Int.random(in: 1000..<10000)) // so I don't have to keep resetting my local db
         
@@ -746,7 +746,7 @@ export JWT_PROXY_AUDIENCE='atlas'
     
     func testInvitations() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         
         let expectation = XCTestExpectation(description: "auth via password")
         atlas.authenticateViaPassword(userTag: "@password:\(testOrgSlug)", password: "asdfasdf24")
@@ -783,7 +783,7 @@ export JWT_PROXY_AUDIENCE='atlas'
         //
         let atlas = AtlasClient(kvstore: MemoryKVStore())
         let userTag = "@sms:\(testOrgSlug)"
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         
         let expectation = XCTestExpectation(description: "auth via full sms")
         atlas.requestAuthentication(userTag)
@@ -812,7 +812,7 @@ export JWT_PROXY_AUDIENCE='atlas'
         // 'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(minutes=2),
         //
         let atlas = AtlasClient(kvstore: MemoryKVStore())
-        atlas.baseUrl = testBaseUrl
+        atlas.serverUrl = testServerUrl
         
         var setCount = 0
         let setObserver = NotificationCenter.default.addObserver(

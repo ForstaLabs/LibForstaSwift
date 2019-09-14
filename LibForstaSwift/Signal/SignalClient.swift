@@ -22,13 +22,51 @@ public class SignalClient {
     var store: SignalStore
 
     var kvstore: KVStorageProtocol {
-        get {
-            return self.atlasClient.kvstore
-        }
+        get { return self.atlasClient.kvstore }
     }
-    var serverUrl: String?
-    var signalServerUsername: String?
-    var password: String?
+    
+    /// URL that Atlas gave us to use to reach our Signal server
+    var serverUrl: String? {
+        get { return _serverUrl.value }
+        set(value) { _serverUrl.value = value }
+    }
+    private var _serverUrl: KVBacked<String>
+    
+    /// Our full Signal address (user ID & device ID)
+    public var signalAddress: SignalAddress? {
+        get { return _signalAddress.value }
+        set(value) { _signalAddress.value = value }
+    }
+    private var _signalAddress: KVBacked<SignalAddress>
+    
+    /// The username that Signal server knows us as (currently it is the .description string of our SignalAddress)
+    var signalServerUsername: String? {
+        get { return _signalServerUsername.value }
+        set(value) { _signalServerUsername.value = value }
+    }
+    private var _signalServerUsername: KVBacked<String>
+    
+    /// The random password we gave Signal server to authenticate future API calls
+    var signalServerPassword: String? {
+        get { return _signalServerPassword.value }
+        set(value) { _signalServerPassword.value = value }
+    }
+    private var _signalServerPassword: KVBacked<String>
+    
+    /// The random secret we shared with Signal server for encrypting websocket traffic
+    var signalingKey: Data? {
+        get { return _signalingKey.value }
+        set(value) { _signalingKey.value = value }
+    }
+    private var _signalingKey: KVBacked<Data>
+    
+    /// The public label we provided during Signal server registration for this device
+    public var deviceLabel: String? {
+        get { return _deviceLabel.value }
+        set(value) { _deviceLabel.value = value }
+    }
+    private var _deviceLabel: KVBacked<String>
+    
     
     ///
     /// Initialize this Signal client.
@@ -39,9 +77,14 @@ public class SignalClient {
     public init(atlasClient: AtlasClient) throws {
         self.atlasClient = atlasClient
         let kv = atlasClient.kvstore
-        self.serverUrl = kv.get(DNK.ssUrl)
-        self.signalServerUsername = kv.get(DNK.ssUsername)
-        self.password = kv.get(DNK.ssPassword)
+        
+        self._serverUrl = KVBacked(kvstore: kv, key: DNK.ssUrl)
+        self._signalAddress = KVBacked(kvstore: kv, key: DNK.ssSignalAddress)
+        self._signalServerUsername = KVBacked(kvstore: kv, key: DNK.ssUsername)
+        self._signalServerPassword = KVBacked(kvstore: kv, key: DNK.ssPassword)
+        self._signalingKey = KVBacked(kvstore: kv, key: DNK.ssSignalingKey)
+        self._deviceLabel = KVBacked(kvstore: kv, key: DNK.ssDeviceLabel)
+
         self.store = try SignalStore(
             identityKeyStore: ForstaIdentityKeyStore(kvstore: kv),
             preKeyStore: ForstaPreKeyStore(kvstore: kv),
@@ -50,14 +93,6 @@ public class SignalClient {
             senderKeyStore: nil)
     }
     
-    /// Retrieve my address from the kvstore (or return nil if not available)
-    public func myAddress() -> SignalAddress? {
-        guard let address = self.kvstore.get(DNK.ssSignalAddress) as SignalAddress? else {
-            return nil
-        }
-        return address
-    }
-
     private func generatePassword() throws -> String {
         return try String(crypto.random(bytes: 16).base64EncodedString().dropLast(2))
     }
@@ -130,12 +165,12 @@ public class SignalClient {
     /// purged as a result of this action.  This should only be used for new
     /// accounts or when you need to start over.
     ///
-    /// - parameter name: The public name to store in the Signal server.
+    /// - parameter deviceLabel: The public name to store in the Signal server.
     /// - returns: A Promise to indicate completion or an error condition
-    public func registerAccount(name: String) -> Promise<Void> {
-        var signalingKey: Data
-        var signalServerPassword: String
+    public func registerAccount(deviceLabel: String) -> Promise<Void> {
+        self.deviceLabel = deviceLabel
         var registrationId: UInt32
+        
         do {
             signalingKey = try generateSignalingKey()
             signalServerPassword = try generatePassword()
@@ -145,11 +180,13 @@ public class SignalClient {
         }
 
         return firstly { () -> Promise<JSON> in
+            if self.signalingKey == nil { throw ForstaError(.configuration, "Signaling key not available.") }
+            
             let data: [String: Any] = [
-                "name": name,
-                "password": signalServerPassword,
+                "name": deviceLabel,
+                "password": signalServerPassword!,
                 "registrationId": registrationId,
-                "signalingKey": signalingKey.base64EncodedString(),
+                "signalingKey": self.signalingKey!.base64EncodedString(),
                 "fetchesMessages": true,
                 "supportsSms": false,
             ]
@@ -164,7 +201,9 @@ public class SignalClient {
                         throw ForstaError(.malformedResponse, "unexpected result from provisionAccount")
                 }
                 
-                let mySignalAddress = SignalAddress(userId: userId, deviceId: deviceId)
+                self.signalAddress = SignalAddress(userId: userId, deviceId: deviceId)
+                self.serverUrl = serverUrl
+                self.signalServerUsername = self.signalAddress?.description
                 
                 let identity = try Signal.generateIdentityKeyPair()
                 self.store.forstaIdentityKeyStore.setIdentityKeyPair(identity: identity)
@@ -172,17 +211,6 @@ public class SignalClient {
                     throw ForstaError(.storageError, "unable to store self identity key")
                 }
                 self.store.forstaIdentityKeyStore.setLocalRegistrationId(id: registrationId)
-
-                self.kvstore.set(DNK.ssUrl, serverUrl)
-                self.serverUrl = serverUrl
-                self.kvstore.set(DNK.ssUsername, mySignalAddress.description)
-                self.signalServerUsername = mySignalAddress.description
-                self.kvstore.set(DNK.ssPassword, signalServerPassword)
-                self.password = signalServerPassword
-                
-                self.kvstore.set(DNK.ssSignalAddress, mySignalAddress)
-                self.kvstore.set(DNK.ssName, name)
-                self.kvstore.set(DNK.ssSignalingKey, signalingKey)
             }
             .then {
                 self.genKeystuffBundle()
@@ -309,17 +337,17 @@ public class SignalClient {
         }
     }
     
+    /// Manage a requested registration task (start and cancel)
     public class Registrator {
-        private let name: String
         private let provisioningCipher: ProvisioningCipher
         private let (waiter, waitSeal) = Promise<Signal_ProvisionEnvelope>.pending()
         private var userId: UUID? = nil
         private let signalClient: SignalClient
         private var wsr: WebSocketResource? = nil
 
-        init(name: String, signalClient: SignalClient) {
-            self.name = name
+        init(deviceLabel: String, signalClient: SignalClient) {
             self.signalClient = signalClient
+            self.signalClient.deviceLabel = deviceLabel
             self.provisioningCipher = ProvisioningCipher(signalClient: signalClient)
             
             self.wsr = WebSocketResource(requestHandler: { request in
@@ -361,28 +389,27 @@ public class SignalClient {
             print("destroying registrator")
         }
         
+        /// Cancel a registration that has already begun.
+        /// - returns: A `Promise<Void>` to indicate completion.
         public func cancel() -> Promise<Void> {
             print("cancelling registerDevice...")
             wsr?.disconnect()
             return waiter.map { _ in return }
         }
         
+        /// Begin the registration.
+        /// - returns: A `Promise<Void>` to indicate completion.
         public func start() -> Promise<Void> {
-            var signalingKey: Data
-            var signalServerPassword: String
             var registrationId: UInt32
             var userId: UUID?
 
             do {
-                signalingKey = try self.signalClient.generateSignalingKey()
-                signalServerPassword = try self.signalClient.generatePassword()
+                self.signalClient.signalingKey = try self.signalClient.generateSignalingKey()
+                self.signalClient.signalServerPassword = try self.signalClient.generatePassword()
                 registrationId = try Signal.generateRegistrationId()
             } catch let error {
                 return Promise.init(error: ForstaError("Unable to generate random bits for account registration.", cause: error))
             }
-            
-            self.signalClient.kvstore.set(DNK.ssName, self.name)
-            self.signalClient.kvstore.set(DNK.ssSignalingKey, signalingKey)
             
             return self.signalClient.atlasClient.getSignalAccountInfo()
                 .then { accountInfo -> Promise<Signal_ProvisionEnvelope> in
@@ -394,7 +421,6 @@ public class SignalClient {
                     if self.signalClient.serverUrl == nil {
                         throw ForstaError(.invalidPayload, "no serverUrl in account info")
                     }
-                    self.signalClient.store.kv.set(DNK.ssUrl, self.signalClient.serverUrl!)
 
                     self.wsr?.connect(url: try self.signalClient.provisioningSocketUrl())
                     print("connected provisioning socket")
@@ -417,17 +443,17 @@ public class SignalClient {
                     if self.userId != expectedUserId {
                         throw ForstaError(.invalidId, "Security Violation: Foreign account sent us an identity key!")
                     }
+                    if self.signalClient.signalingKey == nil { throw ForstaError(.configuration, "Signaling key not available.") }
                     let provisioningCode = provisionMessage.provisioningCode
 
                     let parms: [String: Any] = [
-                        "signalingKey": signalingKey.base64EncodedString(),
+                        "signalingKey": self.signalClient.signalingKey!.base64EncodedString(),
                         "supportsSms": false,
                         "fetchesMessages": true,
                         "registrationId": registrationId,
-                        "name": self.name
+                        "name": self.signalClient.deviceLabel ?? "no device label??"
                     ]
                     self.signalClient.signalServerUsername = self.userId!.lcString
-                    self.signalClient.password = signalServerPassword
                     print("sending provision request for new device")
                     return self.signalClient.request(.devices,
                                                      urlParameters: "/\(provisioningCode)",
@@ -439,15 +465,14 @@ public class SignalClient {
                         throw ForstaError(.requestRejected, json)
                     }
                     print("success, got new deviceId", deviceId)
-                    let mySignalAddress = SignalAddress(userId: userId!, deviceId: deviceId)
-                    self.signalClient.kvstore.set(DNK.ssSignalAddress, mySignalAddress)
-                    self.signalClient.kvstore.set(DNK.ssUsername, mySignalAddress.description)
-                    self.signalClient.signalServerUsername = mySignalAddress.description
+                    self.signalClient.signalAddress = SignalAddress(userId: userId!, deviceId: deviceId)
+                    self.signalClient.signalServerUsername = self.signalClient.signalAddress?.description
                     guard let myPubKey = self.signalClient.store.identityKeyStore.identityKeyPair()?.publicKey else {
                         throw ForstaError(.storageError, "unable to retrieve my identity key")
                     }
-                    if !self.signalClient.store.forstaIdentityKeyStore.save(identity: myPubKey,
-                                                                            for: mySignalAddress) {
+                    if self.signalClient.signalAddress == nil ||
+                        !self.signalClient.store.forstaIdentityKeyStore.save(identity: myPubKey,
+                                                                             for: self.signalClient.signalAddress!) {
                         throw ForstaError(.storageError, "unable to store self identity key")
                     }
                     
@@ -473,20 +498,23 @@ public class SignalClient {
     
     ///
     /// Register a new device with an existing Signal server account.
-    /// This uses Forsta's "autoprovisioning" procedure.
+    /// This uses Forsta's "autoprovisioning" procedure to
+    /// safely transfer the private key information from a user's
+    /// existing device.
     ///
-    /// - parameter name: The public name to store in the Signal server.
-    /// - returns: A `Registrator` that the caller can tell to `.go()` and optionally `.cancel()`
+    /// - parameter deviceLabel: The public name to store in the Signal server.
+    /// - returns: A `Registrator` that the caller can tell to `.start()`
+    ///            and optionally `.cancel()`
     ///            (both of which return a `Promise<Void>` for completion).
     ///
-    public func registerDevice(name: String) -> Registrator {
-        return Registrator(name: name, signalClient: self)
+    public func registerDevice(deviceLabel: String) -> Registrator {
+        return Registrator(deviceLabel: deviceLabel, signalClient: self)
     }
 
     /// Internal: Generate authorization header for Signal Server requests
     private func authHeader() -> [String: String] {
-        if signalServerUsername != nil && password != nil {
-            let up64 = "\(signalServerUsername!):\(password!)".data(using: .utf8)!.base64EncodedString()
+        if signalServerUsername != nil && signalServerPassword != nil {
+            let up64 = "\(signalServerUsername!):\(signalServerPassword!)".data(using: .utf8)!.base64EncodedString()
             let auth = "Basic " + up64
             return ["Authorization": auth]
         } else {
@@ -526,10 +554,10 @@ public class SignalClient {
     
     /// URL for the Signal server encrypted messaging socket
     func messagingSocketUrl() throws -> String {
-        guard self.serverUrl != nil, self.signalServerUsername != nil, self.password != nil else {
+        guard self.serverUrl != nil, self.signalServerUsername != nil, self.signalServerPassword != nil else {
             throw ForstaError(.configuration , "no server url, username, or password")
         }
-        return "\(self.serverUrl!)/v1/websocket/?login=\(self.signalServerUsername!)&password=\(self.password!)"
+        return "\(self.serverUrl!)/v1/websocket/?login=\(self.signalServerUsername!)&password=\(self.signalServerPassword!)"
     }
     
     /// URL for the Signal server provisioning socket
