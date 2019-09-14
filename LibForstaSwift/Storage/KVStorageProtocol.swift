@@ -126,7 +126,7 @@ public extension KVStorageProtocol {
 
 
 /// A generic class for reading and writing store-backed default-namespace typed values,
-/// backed by a value cache (this assumes there is no other cache to stay coherent with).
+/// backed by a value cache (each assumes there is no other cache to stay coherent with).
 public class KVBacked<Type> where Type: ToFromData {
     var kvstore: KVStorageProtocol
     var cache: Type?

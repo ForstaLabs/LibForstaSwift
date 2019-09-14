@@ -338,7 +338,7 @@ public class SignalClient {
     }
     
     /// Manage a requested registration task (start and cancel)
-    public class Registrator {
+    public class RegistrationTask {
         private let provisioningCipher: ProvisioningCipher
         private let (waiter, waitSeal) = Promise<Signal_ProvisionEnvelope>.pending()
         private var userId: UUID? = nil
@@ -392,14 +392,19 @@ public class SignalClient {
         /// Cancel a registration that has already begun.
         /// - returns: A `Promise<Void>` to indicate completion.
         public func cancel() -> Promise<Void> {
-            print("cancelling registerDevice...")
+            print("canceling registerDevice...")
             wsr?.disconnect()
             return waiter.map { _ in return }
         }
         
+        /// A promise that resolves when the registration task completes
+        public var complete: Promise<Void> {
+            get { return start() }
+        }
+        
         /// Begin the registration.
         /// - returns: A `Promise<Void>` to indicate completion.
-        public func start() -> Promise<Void> {
+        private func start() -> Promise<Void> {
             var registrationId: UInt32
             var userId: UUID?
 
@@ -500,15 +505,15 @@ public class SignalClient {
     /// Register a new device with an existing Signal server account.
     /// This uses Forsta's "autoprovisioning" procedure to
     /// safely transfer the private key information from a user's
-    /// existing device.
+    /// existing device to this new one.
     ///
-    /// - parameter deviceLabel: The public name to store in the Signal server.
-    /// - returns: A `Registrator` that the caller can tell to `.start()`
+    /// - parameter deviceLabel: This device's public name to store in the Signal server.
+    /// - returns: A `RegistationTask` that the caller can wait to `.complete`
     ///            and optionally `.cancel()`
-    ///            (both of which return a `Promise<Void>` for completion).
+    ///            (both of which return a `Promise<Void>` when they are done).
     ///
-    public func registerDevice(deviceLabel: String) -> Registrator {
-        return Registrator(deviceLabel: deviceLabel, signalClient: self)
+    public func registerDevice(deviceLabel: String) -> RegistrationTask {
+        return RegistrationTask(deviceLabel: deviceLabel, signalClient: self)
     }
 
     /// Internal: Generate authorization header for Signal Server requests

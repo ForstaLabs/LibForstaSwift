@@ -607,15 +607,14 @@ class SignalClientTests: XCTestCase {
         do {
             let forsta = try Forsta(MemoryKVStore())
             forsta.atlas.serverUrl = "https://atlas-dev.forsta.io"
-            var registrator: SignalClient.Registrator? = nil
 
             let finished = XCTestExpectation()
             forsta.atlas.authenticateViaPassword(userTag: "@greg1:forsta", password: "asdfasdf24")
                 .map { stuff in
-                    registrator = forsta.signal.registerDevice(deviceLabel: "foo the bar")
+                    forsta.signal.registerDevice(deviceLabel: "foo the bar")
                 }
-                .then { _ -> Promise<Void> in
-                    return registrator!.start()
+                .then { registrator -> Promise<Void> in
+                    return registrator.complete
                 }
                 .done {
                     finished.fulfill()
@@ -650,15 +649,14 @@ class SignalClientTests: XCTestCase {
         do {
             watchEverything()
             let forsta = try Forsta(MemoryKVStore())
-            var registrator: SignalClient.Registrator? = nil
-            
+
             let registrated = XCTestExpectation()
             forsta.atlas.authenticateViaPassword(userTag: "@greg1:forsta", password: "asdfasdf24")
-                .map { stuff in
-                    registrator = forsta.signal.registerDevice(deviceLabel: "foo the bar")
+                .map { _ in
+                    forsta.signal.registerDevice(deviceLabel: "test new device conversation")
                 }
-                .then { _ -> Promise<Void> in
-                    return registrator!.start()
+                .then { registrator -> Promise<Void> in
+                    registrator.complete
                 }
                 .done {
                     print("registered new device")
