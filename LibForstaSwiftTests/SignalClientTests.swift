@@ -635,13 +635,13 @@ class SignalClientTests: XCTestCase {
     
     func testAgreement() throws {
         let forsta = try Forsta(MemoryKVStore())
+        
         let pubKey = Data([5, 239, 170, 16, 171, 98, 104, 236, 70, 100, 230, 43, 185, 74, 114, 210, 117, 30, 178, 102, 86, 128, 247, 16, 104, 237, 119, 165, 188, 194, 18, 24, 45])
         let privKey = Data([240, 75, 137, 33, 250, 129, 45, 123, 186, 62, 192, 174, 158, 21, 144, 106, 12, 132, 114, 2, 117, 222, 3, 28, 183, 174, 153, 136, 151, 169, 177, 102])
-        // let privKey = Data([5, 240, 75, 137, 33, 250, 129, 45, 123, 186, 62, 192, 174, 158, 21, 144, 106, 12, 132, 114, 2, 117, 222, 3, 28, 183, 174, 153, 136, 151, 169, 177, 102])
         
         let expected = Data([171, 129, 171, 89, 95, 194, 145, 144, 106, 36, 158, 103, 150, 99, 227, 65, 212, 135, 218, 207, 111, 208, 192, 245, 228, 222, 118, 203, 252, 93, 123, 114])
         let result = try forsta.signal.calculateAgreement(publicKeyData: pubKey.dropFirst(), privateKeyData: privKey)
-        
+
         XCTAssert(expected == result)
     }
     
@@ -711,6 +711,82 @@ class SignalClientTests: XCTestCase {
             forsta.disconnect()
         } catch let error {
             XCTFail("surprising error \(error)")
+        }
+    }
+    
+    func testProvisionResponse() {
+        do {
+            watchEverything()
+            let forsta = try Forsta(MemoryKVStore())
+            
+            let registrated = XCTestExpectation()
+            forsta.atlas.authenticateViaPassword(userTag: "@password:swift.test", password: "asdfasdf24")
+                .then { _ in
+                    forsta.signal.registerAccount(deviceLabel: "new account to test provision response")
+                }
+                .done {
+                    registrated.fulfill()
+                    print("registered new account")
+                }
+                .catch { error in
+                    if let ferr = error as? ForstaError {
+                        XCTFail(ferr.description)
+                    } else {
+                        XCTFail("surprising error")
+                    }
+            }
+            wait(for: [registrated], timeout: 10.0)
+            
+            let connectified = XCTestExpectation()
+            let _ = NotificationCenter.default.addObserver(
+                forName: .signalConnected,
+                object: nil,
+                queue: nil) { _ in
+                    print("connected")
+                    connectified.fulfill()
+            }
+            try forsta.connect()
+            wait(for: [connectified], timeout: 2 * 60.0)
+
+            let theEnd = XCTestExpectation()
+            
+            let _ = NotificationCenter.default.addObserver(
+                forName: .signalInboundMessage,
+                object: nil,
+                queue: nil) { notification in
+                    let inbound = notification.userInfo?["inboundMessage"] as? InboundMessage
+                    guard let payload = inbound?.payload else {
+                        print("no inbound message payload!")
+                        return
+                    }
+                    if payload.messageType! == .control && payload.controlType == .provisionRequest {
+                        print("it's a provision request!")
+                        guard
+                            let provisioningKey = payload.provisioningKey,
+                            let provisioningUuid = payload.provisioningUuidString else {
+                                print("missing provisioning parts!")
+                                return
+                        }
+                        
+                        forsta.signal.linkDevice(uuidString: provisioningUuid, ephemeralPublicKey: provisioningKey)
+                            .done { iHandledIt in
+                                print("finished: \(iHandledIt ? "I handled it":"someone else beat me to it")")
+                                theEnd.fulfill()
+                            }
+                            .catch { error in
+                                if let ferr = error as? ForstaError {
+                                    XCTFail(ferr.description)
+                                } else {
+                                    XCTFail("inner surprising error \(error)")
+                                }
+                        }
+                    }
+            }
+            
+            wait(for: [theEnd], timeout: 5 * 60.0)
+            forsta.disconnect()
+        } catch let error {
+            XCTFail("outer surprising error \(error)")
         }
     }
 }

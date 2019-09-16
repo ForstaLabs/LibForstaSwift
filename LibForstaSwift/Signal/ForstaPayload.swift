@@ -479,6 +479,25 @@ public class ForstaPayloadV1: CustomStringConvertible {
             }
         }
     }
+    
+    /// The ephemeral public key provided by a new device for provisioning
+    /// (only relevant for `.control` messages of type `.provisionRequest`)
+    public var provisioningKey: Data? {
+        guard
+            let b64Key = json["data"]["key"].string,
+            let key = Data(base64Encoded: b64Key),
+            key.count == 33 else {
+                return nil
+        }
+        return key.dropFirst()
+    }
+    
+    /// The uuid (string-encoded) provided for provisioning a new device
+    /// (only relevant for `.control` messages of type `.provisionRequest`)
+    public var provisioningUuidString: String? {
+        return json["data"]["uuid"].string
+    }
+
 
     // - MARK: Related Enums
     

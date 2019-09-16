@@ -133,21 +133,17 @@ public class SignalClient {
             return plaintext
         }
         
-        public func encrypt(theirPublicKey: Data, message: Data) throws -> Signal_ProvisionEnvelope {
+        public func encrypt(theirPublicKey: Data, plaintext: Data) throws -> (Data, Data) {
             let ourKeyPair = try Signal.generateIdentityKeyPair()
             let sharedSecret = try self.signalClient.calculateAgreement(publicKeyData: theirPublicKey, privateKeyData: ourKeyPair.privateKey)
             let derivedSecret = try self.signalClient.deriveSecrets(input: sharedSecret, info: "TextSecure Provisioning Message".toData())
             let iv = try self.signalClient.crypto.random(bytes: 16)
-            let encryptedMsg = try signalClient.crypto.encrypt(message: message, with: .AES_CBCwithPKCS5, key: derivedSecret[0], iv: iv)
+            let encryptedMsg = try signalClient.crypto.encrypt(message: plaintext, with: .AES_CBCwithPKCS5, key: derivedSecret[0], iv: iv)
 
             let data = Data([1]) + iv + encryptedMsg
             let mac = self.signalClient.calculateMAC(key: derivedSecret[1], data: data)
             
-            var pEnvelope = Signal_ProvisionEnvelope()
-            pEnvelope.body = data + mac
-            pEnvelope.publicKey = ourKeyPair.publicKey
-            
-            return pEnvelope
+            return (data + mac, ourKeyPair.publicKey)
         }
     }
 
@@ -329,8 +325,8 @@ public class SignalClient {
         }
     }
     
-    /// Manage a requested registration task (start and cancel)
-    public class RegistrationTask {
+    /// Manage a requested autoprovision registration task for a new device
+    public class AutoprovisionTask {
         private let provisioningCipher: ProvisioningCipher
         private let (waiter, waitSeal) = Promise<Signal_ProvisionEnvelope>.pending()
         private var userId: UUID? = nil
@@ -378,10 +374,10 @@ public class SignalClient {
         }
         
         deinit {
-            print("destroying registrator")
+            print("destroying autoprovision-task")
         }
         
-        /// Cancel a registration that has already begun.
+        /// Cancel an autoprovision registration that has already begun.
         /// - returns: A `Promise<Void>` to indicate completion.
         public func cancel() -> Promise<Void> {
             print("canceling registerDevice...")
@@ -389,12 +385,12 @@ public class SignalClient {
             return waiter.map { _ in return }
         }
         
-        /// A promise that resolves when the registration task completes
+        /// A promise that resolves when the autoprovision device registration task is complete.
         public var complete: Promise<Void> {
             get { return start() }
         }
         
-        /// Begin the registration.
+        /// Begin the autoprovisioned registration.
         /// - returns: A `Promise<Void>` to indicate completion.
         private func start() -> Promise<Void> {
             var registrationId: UInt32
@@ -500,13 +496,73 @@ public class SignalClient {
     /// existing device to this new one.
     ///
     /// - parameter deviceLabel: This device's public name to store in the Signal server.
-    /// - returns: A `RegistationTask` that the caller can wait to `.complete`
-    ///            and optionally `.cancel()`
-    ///            (both of which return a `Promise<Void>` when they are done).
+    /// - returns: An `AutoprovisionTask` that the caller can wait to `.complete`,
+    ///            and can optionally `.cancel()`.
+    ///            (Both yield a `Promise<Void>` to indicate completion.)
     ///
-    public func registerDevice(deviceLabel: String) -> RegistrationTask {
-        return RegistrationTask(deviceLabel: deviceLabel, signalClient: self)
+    public func registerDevice(deviceLabel: String) -> AutoprovisionTask {
+        return AutoprovisionTask(deviceLabel: deviceLabel, signalClient: self)
     }
+    
+    
+    ///
+    /// Respond positively to a provision request from a new foreign device.
+    /// *WARNING: This will deliver your private identity key to the
+    ///           requesting device!*
+    ///
+    /// - parameters:
+    ///     - uuidString: the UUID (string-encoded) provided for provisioning
+    ///     - ephemeralPublicKey: the ephemeral public key (32 bytes) provided by the new device
+    ///     - userAgent: our own user agent string
+    ///
+    /// - returns: A `Promise<Bool>` upon completion.
+    ///            (A resolution of `true` means our information was used;
+    ///            `false` means another device handled it first.)
+    ///
+    public func linkDevice(uuidString: String, ephemeralPublicKey: Data, userAgent: String = "LibRelaySwift") -> Promise<Bool> {
+        let ourIdentity = self.store.identityKeyStore.identityKeyPair()
+        let ourAddress = self.signalAddress
+        
+        return self.request(.devices, urlParameters: "/provisioning/code")
+            .then { result -> Promise<(Int, JSON)> in
+                let (code, json) = result
+                if code != 200 {
+                    throw ForstaError(.requestRejected, json)
+                }
+                if ourIdentity == nil || ourAddress == nil {
+                    throw ForstaError(.configuration, "identity or address not available")
+                }
+                
+                var message = Signal_ProvisionMessage()
+                message.identityKeyPrivate = ourIdentity!.privateKey
+                message.addr = ourAddress!.userId.lcString
+                message.userAgent = userAgent
+                message.provisioningCode = json["verificationCode"].stringValue
+                
+                let provisioningCipher = ProvisioningCipher(signalClient: self)
+                let (body, myEphemeralPublicKey) = try provisioningCipher.encrypt(theirPublicKey: ephemeralPublicKey,
+                                                                                  plaintext: message.serializedData())
+                var envelope = Signal_ProvisionEnvelope()
+                envelope.body = body
+                envelope.publicKey = myEphemeralPublicKey
+
+                return self.request(.provisioning, urlParameters: "/\(uuidString)", method: .put,
+                                    parameters: ["body": try envelope.serializedData().base64EncodedString()])
+            }
+            .map { result in
+                let (code, json) = result
+                
+                let handledByMe = code == 204
+                
+                // 404 means someone else handled it already.
+                if !handledByMe && code != 404 {
+                    throw ForstaError(.requestRejected, json)
+                }
+                
+                return handledByMe
+        }
+    }
+    
 
     /// Internal: Generate authorization header for Signal Server requests
     private func authHeader() -> [String: String] {
@@ -547,6 +603,7 @@ public class SignalClient {
         case keys = "/v2/keys"
         case messages = "/v1/messages"
         case attachment = "/v2/attachments"
+        case provisioning = "/v1/provisioning"
     }
     
     /// URL for the Signal server encrypted messaging socket
