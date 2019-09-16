@@ -373,11 +373,9 @@ public class SignalClient {
         }
         
         /// Cancel an autoprovision registration that is underway.
-        /// - returns: A `Promise<Void>` to indicate completion.
-        public func cancel() -> Promise<Void> {
-            print("canceling registerDevice...")
+        public func cancel() {
             wsr?.disconnect()
-            return waiter.map { _ in return }
+            waitSeal.reject(ForstaError(.canceled, "registerDevice was canceled by caller"))
         }
         
         /// A `Promise<Void>` that resolves when the autoprovision device registration task is complete.
@@ -471,9 +469,6 @@ public class SignalClient {
                 .map { (code, json) in
                     if code == 204 { return }
                     throw ForstaError(.requestFailure, "problem performing registerAccount: \(code), \(json)")
-                }
-                .ensure {
-                    let _ = print("resolved registerDevice's completed promise")
             }
         }
     }

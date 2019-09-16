@@ -253,5 +253,8 @@ public final class ForstaError: CustomStringConvertible, Error {
         
         /// Forsta Payload is invalid
         case invalidPayload = "Invalid payload"
+        
+        /// "Error" is due to a cancellation
+        case canceled = "Canceled operation"
     }
 }
