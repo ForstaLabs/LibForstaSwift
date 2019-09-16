@@ -126,37 +126,29 @@ public class SignalClient {
             if version != 1 { throw SignalError.invalidVersion }
             
             let ecRes = try signalClient.calculateAgreement(publicKeyData: publicKey.dropFirst(), privateKeyData: self.keyPair!.privateKey)
-            let keys = try signalClient.deriveSecrets(input: ecRes, info: "TextSecure Provisioning Message".toData(), chunks: 2)
+            let keys = try signalClient.deriveSecrets(input: ecRes, info: "TextSecure Provisioning Message".toData())
             try signalClient.verifyMAC(data: ivAndCyphertext, key: keys[1], expectedMAC: mac)
             let plaintext = try signalClient.crypto.decrypt(message: ciphertext, with: .AES_CBCwithPKCS5, key: keys[0], iv: iv)
             
             return plaintext
         }
-        /*
-         public func encrypt(theirPublicKey, message) {
-             let ourKeyPair = libsignal.curve.generateKeyPair()
-             let sharedSecret = libsignal.curve.calculateAgreement(theirPublicKey,
-                                                                 ourKeyPair.privKey)
-             let derivedSecret = libsignal.crypto.deriveSecrets(sharedSecret, Buffer.alloc(32),
-                                                                 Buffer.from("TextSecure Provisioning Message"))
-             let ivLen = 16
-             let macLen = 32
-             let iv = crypto.randomBytes(ivLen)
-             let encryptedMsg = libsignal.crypto.encrypt(derivedSecret[0], message, iv)
-             let msgLen = encryptedMsg.byteLength
-             let data = new Uint8Array(1 + ivLen + msgLen)
-             data[0] = 1
-             data.set(iv, 1)
-             data.set(new Uint8Array(encryptedMsg), 1 + ivLen)
-             let mac = libsignal.crypto.calculateMAC(derivedSecret[1], data.buffer)
-             let pEnvelope = new protobufs.ProvisionEnvelope()
-             pEnvelope.body = new Uint8Array(data.byteLength + macLen)
-             pEnvelope.body.set(data, 0)
-             pEnvelope.body.set(new Uint8Array(mac), data.byteLength)
-             pEnvelope.publicKey = ourKeyPair.pubKey
-             return pEnvelope
-         }
-         */
+        
+        public func encrypt(theirPublicKey: Data, message: Data) throws -> Signal_ProvisionEnvelope {
+            let ourKeyPair = try Signal.generateIdentityKeyPair()
+            let sharedSecret = try self.signalClient.calculateAgreement(publicKeyData: theirPublicKey, privateKeyData: ourKeyPair.privateKey)
+            let derivedSecret = try self.signalClient.deriveSecrets(input: sharedSecret, info: "TextSecure Provisioning Message".toData())
+            let iv = try self.signalClient.crypto.random(bytes: 16)
+            let encryptedMsg = try signalClient.crypto.encrypt(message: message, with: .AES_CBCwithPKCS5, key: derivedSecret[0], iv: iv)
+
+            let data = Data([1]) + iv + encryptedMsg
+            let mac = self.signalClient.calculateMAC(key: derivedSecret[1], data: data)
+            
+            var pEnvelope = Signal_ProvisionEnvelope()
+            pEnvelope.body = data + mac
+            pEnvelope.publicKey = ourKeyPair.publicKey
+            
+            return pEnvelope
+        }
     }
 
     
@@ -588,7 +580,7 @@ public class SignalClient {
     }
     
     /// RFC 5869 key derivation
-    public func deriveSecrets(input: Data, salt: Data = Data(count: 32), info: Data, chunks: Int = 3) throws -> [Data] {
+    public func deriveSecrets(input: Data, salt: Data = Data(count: 32), info: Data, chunks: Int = 2) throws -> [Data] {
         if chunks < 1 { return [] }
         
         // Salts always end up being 32 bytes
