@@ -13,8 +13,8 @@
 import Foundation
 import SwiftyJSON
 
-
 /// All errors thrown by `LibForstaSwift` are `ForstaError` objects.
+/// (adapted from the [LibSignalProtocolSwift](https://github.com/christophhagen/LibSignalProtocolSwift) error class)
 public final class ForstaError: CustomStringConvertible, Error {
 
     /// The error type

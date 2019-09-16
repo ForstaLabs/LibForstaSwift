@@ -270,7 +270,7 @@ public class MessageReceiver {
         let ivAndCyphertext = message[0...message.count-11]
         let mac = message[(message.count-10)...]
         
-        try signalClient.verifyMAC(data: ivAndCyphertext, key: macKey, expectedMAC: mac)
-        return try signalClient.crypto.decrypt(message: ciphertext, with: .AES_CBCwithPKCS5, key: aesKey, iv: iv)
+        try SignalCommonCrypto.verifyMAC(data: ivAndCyphertext, key: macKey, expectedMAC: mac)
+        return try SignalCommonCrypto.decrypt(message: ciphertext, key: aesKey, iv: iv)
     }
 }

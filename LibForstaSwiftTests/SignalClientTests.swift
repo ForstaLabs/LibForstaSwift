@@ -613,8 +613,8 @@ class SignalClientTests: XCTestCase {
                 .map { stuff in
                     forsta.signal.registerDevice(deviceLabel: "foo the bar")
                 }
-                .then { registrator -> Promise<Void> in
-                    return registrator.complete
+                .then { registrator in
+                    registrator.complete
                 }
                 .done {
                     finished.fulfill()
@@ -634,13 +634,11 @@ class SignalClientTests: XCTestCase {
     }
     
     func testAgreement() throws {
-        let forsta = try Forsta(MemoryKVStore())
-        
         let pubKey = Data([5, 239, 170, 16, 171, 98, 104, 236, 70, 100, 230, 43, 185, 74, 114, 210, 117, 30, 178, 102, 86, 128, 247, 16, 104, 237, 119, 165, 188, 194, 18, 24, 45])
         let privKey = Data([240, 75, 137, 33, 250, 129, 45, 123, 186, 62, 192, 174, 158, 21, 144, 106, 12, 132, 114, 2, 117, 222, 3, 28, 183, 174, 153, 136, 151, 169, 177, 102])
         
         let expected = Data([171, 129, 171, 89, 95, 194, 145, 144, 106, 36, 158, 103, 150, 99, 227, 65, 212, 135, 218, 207, 111, 208, 192, 245, 228, 222, 118, 203, 252, 93, 123, 114])
-        let result = try forsta.signal.calculateAgreement(publicKeyData: pubKey.dropFirst(), privateKeyData: privKey)
+        let result = try SignalCommonCrypto.calculateAgreement(publicKeyData: pubKey.dropFirst(), privateKeyData: privKey)
 
         XCTAssert(expected == result)
     }

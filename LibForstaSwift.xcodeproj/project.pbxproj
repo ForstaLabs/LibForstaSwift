@@ -26,7 +26,6 @@
 		DB2B00C722E12D7800B9931A /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00C322E12D7800B9931A /* Extensions.swift */; };
 		DB2B00C822E12D7800B9931A /* SignalCommonCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00C422E12D7800B9931A /* SignalCommonCrypto.swift */; };
 		DB2B00C922E12D7800B9931A /* ForstaError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00C522E12D7800B9931A /* ForstaError.swift */; };
-		DB2B00CA22E12D7800B9931A /* SignalCryptoProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00C622E12D7800B9931A /* SignalCryptoProvider.swift */; };
 		DB2B00CE22E12DB200B9931A /* KVStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00CB22E12DB200B9931A /* KVStoreTests.swift */; };
 		DB2B00CF22E12DB200B9931A /* AtlasClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00CC22E12DB200B9931A /* AtlasClientTests.swift */; };
 		DB2B00D022E12DB200B9931A /* SignalClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2B00CD22E12DB200B9931A /* SignalClientTests.swift */; };
@@ -114,7 +113,6 @@
 		DB2B00C322E12D7800B9931A /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		DB2B00C422E12D7800B9931A /* SignalCommonCrypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalCommonCrypto.swift; sourceTree = "<group>"; };
 		DB2B00C522E12D7800B9931A /* ForstaError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForstaError.swift; sourceTree = "<group>"; };
-		DB2B00C622E12D7800B9931A /* SignalCryptoProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalCryptoProvider.swift; sourceTree = "<group>"; };
 		DB2B00CB22E12DB200B9931A /* KVStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KVStoreTests.swift; sourceTree = "<group>"; };
 		DB2B00CC22E12DB200B9931A /* AtlasClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AtlasClientTests.swift; sourceTree = "<group>"; };
 		DB2B00CD22E12DB200B9931A /* SignalClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalClientTests.swift; sourceTree = "<group>"; };
@@ -218,7 +216,6 @@
 				DB2B00C322E12D7800B9931A /* Extensions.swift */,
 				DB2B00C422E12D7800B9931A /* SignalCommonCrypto.swift */,
 				DB2B00C522E12D7800B9931A /* ForstaError.swift */,
-				DB2B00C622E12D7800B9931A /* SignalCryptoProvider.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -432,7 +429,6 @@
 				DB2B00B622E12D6100B9931A /* SubProtocol.pb.swift in Sources */,
 				DB2B00B522E12D6100B9931A /* DeviceMessages.pb.swift in Sources */,
 				DB17A447230EF7F000AEEF73 /* Forsta.swift in Sources */,
-				DB2B00CA22E12D7800B9931A /* SignalCryptoProvider.swift in Sources */,
 				DBE3D57622F87B750016B800 /* Sendable.swift in Sources */,
 				DB2B00BC22E12D6A00B9931A /* SignalClient.swift in Sources */,
 			);

@@ -94,21 +94,16 @@ public class SignalClient {
     }
     
     private func generatePassword() throws -> String {
-        return try String(crypto.random(bytes: 16).base64EncodedString().dropLast(2))
+        return try String(SignalCommonCrypto.random(bytes: 16).base64EncodedString().dropLast(2))
     }
     
     private func generateSignalingKey() throws -> Data {
-        return try crypto.random(bytes: 32 + 20)
+        return try SignalCommonCrypto.random(bytes: 32 + 20)
     }
     
     private class ProvisioningCipher {
-        var keyPair: KeyPair?
-        let signalClient: SignalClient
-        
-        init(signalClient: SignalClient) {
-            self.signalClient = signalClient
-        }
-        
+        private var keyPair: KeyPair?
+
         func getPublicKey() throws -> Data {
             if keyPair == nil { self.keyPair = try Signal.generateIdentityKeyPair() }
             return self.keyPair!.publicKey
@@ -125,23 +120,23 @@ public class SignalClient {
             
             if version != 1 { throw SignalError.invalidVersion }
             
-            let ecRes = try signalClient.calculateAgreement(publicKeyData: publicKey.dropFirst(), privateKeyData: self.keyPair!.privateKey)
-            let keys = try signalClient.deriveSecrets(input: ecRes, info: "TextSecure Provisioning Message".toData())
-            try signalClient.verifyMAC(data: ivAndCyphertext, key: keys[1], expectedMAC: mac)
-            let plaintext = try signalClient.crypto.decrypt(message: ciphertext, with: .AES_CBCwithPKCS5, key: keys[0], iv: iv)
+            let ecRes = try SignalCommonCrypto.calculateAgreement(publicKeyData: publicKey.dropFirst(), privateKeyData: self.keyPair!.privateKey)
+            let keys = try SignalCommonCrypto.deriveSecrets(input: ecRes, info: "TextSecure Provisioning Message".toData())
+            try SignalCommonCrypto.verifyMAC(data: ivAndCyphertext, key: keys[1], expectedMAC: mac)
+            let plaintext = try SignalCommonCrypto.decrypt(message: ciphertext, key: keys[0], iv: iv)
             
             return plaintext
         }
         
         public func encrypt(theirPublicKey: Data, plaintext: Data) throws -> (Data, Data) {
             let ourKeyPair = try Signal.generateIdentityKeyPair()
-            let sharedSecret = try self.signalClient.calculateAgreement(publicKeyData: theirPublicKey, privateKeyData: ourKeyPair.privateKey)
-            let derivedSecret = try self.signalClient.deriveSecrets(input: sharedSecret, info: "TextSecure Provisioning Message".toData())
-            let iv = try self.signalClient.crypto.random(bytes: 16)
-            let encryptedMsg = try signalClient.crypto.encrypt(message: plaintext, with: .AES_CBCwithPKCS5, key: derivedSecret[0], iv: iv)
+            let sharedSecret = try SignalCommonCrypto.calculateAgreement(publicKeyData: theirPublicKey, privateKeyData: ourKeyPair.privateKey)
+            let derivedSecret = try SignalCommonCrypto.deriveSecrets(input: sharedSecret, info: "TextSecure Provisioning Message".toData())
+            let iv = try SignalCommonCrypto.random(bytes: 16)
+            let encryptedMsg = try SignalCommonCrypto.encrypt(message: plaintext, key: derivedSecret[0], iv: iv)
 
             let data = Data([1]) + iv + encryptedMsg
-            let mac = self.signalClient.calculateMAC(key: derivedSecret[1], data: data)
+            let mac = SignalCommonCrypto.calculateMAC(key: derivedSecret[1], data: data)
             
             return (data + mac, ourKeyPair.publicKey)
         }
@@ -336,7 +331,7 @@ public class SignalClient {
         init(deviceLabel: String, signalClient: SignalClient) {
             self.signalClient = signalClient
             self.signalClient.deviceLabel = deviceLabel
-            self.provisioningCipher = ProvisioningCipher(signalClient: signalClient)
+            self.provisioningCipher = ProvisioningCipher()
             
             self.wsr = WebSocketResource(requestHandler: { request in
                 print("got WS request: \(request.verb) \(request.path)")
@@ -377,7 +372,7 @@ public class SignalClient {
             print("destroying autoprovision-task")
         }
         
-        /// Cancel an autoprovision registration that has already begun.
+        /// Cancel an autoprovision registration that is underway.
         /// - returns: A `Promise<Void>` to indicate completion.
         public func cancel() -> Promise<Void> {
             print("canceling registerDevice...")
@@ -385,14 +380,8 @@ public class SignalClient {
             return waiter.map { _ in return }
         }
         
-        /// A promise that resolves when the autoprovision device registration task is complete.
+        /// A `Promise<Void>` that resolves when the autoprovision device registration task is complete.
         public var complete: Promise<Void> {
-            get { return start() }
-        }
-        
-        /// Begin the autoprovisioned registration.
-        /// - returns: A `Promise<Void>` to indicate completion.
-        private func start() -> Promise<Void> {
             var registrationId: UInt32
             var userId: UUID?
 
@@ -428,7 +417,7 @@ public class SignalClient {
                     print("help has arrived!")
                     let plaintext = try self.provisioningCipher.decrypt(publicKey: envelope.publicKey, message: envelope.body)
                     let provisionMessage = try Signal_ProvisionMessage(serializedData: plaintext)
-                    let identity = try self.signalClient.generateKeyPairFromPrivateKey(privateKeyData: provisionMessage.identityKeyPrivate)
+                    let identity = try SignalCommonCrypto.generateKeyPairFromPrivateKey(privateKeyData: provisionMessage.identityKeyPrivate)
                     self.signalClient.store.forstaIdentityKeyStore.setIdentityKeyPair(identity: identity)
                     self.signalClient.store.forstaIdentityKeyStore.setLocalRegistrationId(id: registrationId)
                     self.userId = UUID(uuidString: provisionMessage.addr)
@@ -515,7 +504,7 @@ public class SignalClient {
     ///     - ephemeralPublicKey: the ephemeral public key (32 bytes) provided by the new device
     ///     - userAgent: our own user agent string
     ///
-    /// - returns: A `Promise<Bool>` upon completion.
+    /// - returns: A `Promise<Bool>` that resolves upon completion.
     ///            (A resolution of `true` means our information was used;
     ///            `false` means another device handled it first.)
     ///
@@ -539,7 +528,7 @@ public class SignalClient {
                 message.userAgent = userAgent
                 message.provisioningCode = json["verificationCode"].stringValue
                 
-                let provisioningCipher = ProvisioningCipher(signalClient: self)
+                let provisioningCipher = ProvisioningCipher()
                 let (body, myEphemeralPublicKey) = try provisioningCipher.encrypt(theirPublicKey: ephemeralPublicKey,
                                                                                   plaintext: message.serializedData())
                 var envelope = Signal_ProvisionEnvelope()
@@ -620,65 +609,5 @@ public class SignalClient {
             throw ForstaError(.configuration , "no server url")
         }
         return "\(self.serverUrl!)/v1/websocket/provisioning/"
-    }
-    
-    /// Calculate a message MAC
-    func calculateMAC(key: Data, data: Data) -> Data {
-        return self.crypto.hmacSHA256(for: data, with: key)
-    }
-    
-
-    /// Verify message MAC
-    public func verifyMAC(data: Data, key: Data, expectedMAC: Data) throws {
-        let calculatedMAC = calculateMAC(key: key, data: data)
-        if calculatedMAC[..<expectedMAC.count] != expectedMAC {
-            throw ForstaError(.invalidMac)
-        }
-    }
-    
-    /// RFC 5869 key derivation
-    public func deriveSecrets(input: Data, salt: Data = Data(count: 32), info: Data, chunks: Int = 2) throws -> [Data] {
-        if chunks < 1 { return [] }
-        
-        // Salts always end up being 32 bytes
-        if salt.count != 32 {
-            throw ForstaError(.invalidLength, "Got salt of incorrect length")
-        }
-        
-        let PRK = calculateMAC(key: salt, data: input)
-        var infoArray = Data(count: info.count + 1 + 32)
-        infoArray.replaceSubrange(32...(infoArray.count-2), with: info)
-        infoArray[infoArray.count-1] = 1
-        var signed = [calculateMAC(key: PRK, data: infoArray[32...])]
-        
-        for i in 2...chunks {
-            infoArray.replaceSubrange(...31, with: signed[i-2])
-            infoArray[infoArray.count-1] = UInt8(i)
-            signed.append(calculateMAC(key: PRK, data: infoArray));
-        }
-        
-        return signed;
-    }
-    
-    /// Calculate an ECDH agreement.
-    ///
-    /// - parameter publicKeyData: The curve25519 (typically remote party's) 32-byte public key data
-    /// - parameter privateKeyData: The curve25519 (typically your) 32-byte private key data
-    /// - returns: a 32-bit shared secret on success, throwing on failure
-    public func calculateAgreement(publicKeyData: Data, privateKeyData: Data) throws -> Data {
-        return try Utility.curve25519Donna(secret: privateKeyData, basepoint: publicKeyData)
-    }
-    
-    /// Generates a Curve25519 keypair.
-    ///
-    /// - parameter privateKeyData: The curve25519 (typically your) 32-byte private key data
-    /// - returns: the full `KeyPair`
-    public func generateKeyPairFromPrivateKey(privateKeyData: Data) throws -> KeyPair {
-        var basepoint = Data(count: 32)
-        basepoint[0] = 9
-        
-        let pubKeyData = try Utility.curve25519Donna(secret: privateKeyData, basepoint: basepoint)
-        
-        return KeyPair(publicKey: Data([5]) + pubKeyData, privateKey: privateKeyData)
     }
 }

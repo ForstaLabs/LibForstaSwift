@@ -10,20 +10,17 @@ import Foundation
 import CommonCrypto
 import SignalProtocol
 
-/**
- Implementation of the `SignalCryptoProvider` protocol using
- CommonCrypto.
- */
-public struct SignalCommonCrypto: SignalCryptoProvider {
-    // -MARK: Protocol SignalCryptoProvider
-
+/// `SignalCommonCrypto` struct adopted from the
+/// [LibSignalProtocolSwift](https://github.com/christophhagen/LibSignalProtocolSwift)
+/// project (lightly modified)
+public struct SignalCommonCrypto {
     /**
      Create a number of random bytes
      - parameter bytes: The number of random bytes to create
      - returns: An array of `bytes` length with random numbers
      - throws: `SignalError.noRandomBytes`
      */
-    public func random(bytes: Int) throws -> Data {
+    static public func random(bytes: Int) throws -> Data {
         let random = [UInt8](repeating: 0, count: bytes)
         let result = SecRandomCopyBytes(nil, bytes, UnsafeMutableRawPointer(mutating: random))
 
@@ -39,7 +36,7 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
      - parameter salt: The salt for the HMAC
      - returns: The HMAC
      */
-    public func hmacSHA256(for message: Data, with salt: Data) -> Data {
+    static public func hmacSHA256(for message: Data, with salt: Data) -> Data {
         var context = CCHmacContext()
 
         let bytes = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
@@ -67,7 +64,7 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
      - returns: The digest
      - throws: `SignalError.digestError`
      */
-    public func sha512(for message: Data) throws -> Data {
+    static public func sha512(for message: Data) throws -> Data {
         guard message.count > 0 else {
             throw ForstaError(.invalidMessage, "Message length is 0")
         }
@@ -103,7 +100,7 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
      - returns: The encrypted message
      - throws: `SignalError.encryptionError`
      */
-    public func encrypt(message: Data, with cipher: SignalEncryptionScheme, key: Data, iv: Data) throws -> Data {
+    static public func encrypt(message: Data, with cipher: SignalEncryptionScheme = .AES_CBCwithPKCS5, key: Data, iv: Data) throws -> Data {
         guard key.count == kCCKeySizeAES256 else {
             throw ForstaError(.invalidKey, "Invalid key length")
         }
@@ -130,7 +127,7 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
      - returns: The decrypted message
      - throws: `SignalError.decryptionError`
      */
-    public func decrypt(message: Data, with cipher: SignalEncryptionScheme, key: Data, iv: Data) throws -> Data {
+    static public func decrypt(message: Data, with cipher: SignalEncryptionScheme = .AES_CBCwithPKCS5, key: Data, iv: Data) throws -> Data {
         guard key.count == kCCKeySizeAES256 else {
             throw ForstaError(.invalidKey, "Invalid key length")
         }
@@ -159,7 +156,7 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
      - returns: The encrypted/decrypted message
      - throws: `SignalError.encryptionError`, `SignalError.decryptionError`
      */
-    private func process(cbc message: Data, key: Data, iv: Data, encrypt: Bool) throws -> Data {
+    static private func process(cbc message: Data, key: Data, iv: Data, encrypt: Bool) throws -> Data {
         let operation = encrypt ? CCOperation(kCCEncrypt) : CCOperation(kCCDecrypt)
         // Create output memory that can fit the output data
         let dataLength = message.count + kCCBlockSizeAES128
@@ -207,7 +204,7 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
      - returns: The encrypted message
      - throws: `SignalError.encryptionError`
      */
-    private func encrypt(ctr message: Data, key: Data, iv: Data) throws -> Data {
+    static private func encrypt(ctr message: Data, key: Data, iv: Data) throws -> Data {
         return try process(ctr: message, key: key, iv: iv, encrypt: true)
     }
 
@@ -219,7 +216,7 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
      - returns: The decrypted message
      - throws: `SignalError.decryptionError`
      */
-    private func decrypt(ctr message: Data, key: Data, iv: Data) throws -> Data {
+    static private func decrypt(ctr message: Data, key: Data, iv: Data) throws -> Data {
         return try process(ctr: message, key: key, iv: iv, encrypt: false)
     }
 
@@ -232,7 +229,7 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
      - returns: The encrypted/decrypted message
      - throws: `SignalError.encryptionError`, `SignalError.decryptionError`
      */
-    private func process(ctr message: Data, key: Data, iv: Data, encrypt: Bool) throws -> Data {
+    static private func process(ctr message: Data, key: Data, iv: Data, encrypt: Bool) throws -> Data {
         var cryptoRef: CCCryptorRef? = nil
         
         var status: Int32 = key.withUnsafeBytes { ptr1 in
@@ -312,16 +309,80 @@ public struct SignalCommonCrypto: SignalCryptoProvider {
      - parameter count: The length of the array
      - returns: The created array
     */
-    private func toArray(from ptr: UnsafeMutableRawPointer, count: Int) -> Data {
+    static private func toArray(from ptr: UnsafeMutableRawPointer, count: Int) -> Data {
         let typedPointer = ptr.bindMemory(to: UInt8.self, capacity: count)
         let typedBuffer = UnsafeMutableBufferPointer(start: typedPointer, count: count)
         return Data(typedBuffer)
     }
+}
 
-    /**
-     Create an instance.
-     */
-    public init() {
+/**
+ Specifies the type of algorithm to use for encryption and decryption.
+ */
+public enum SignalEncryptionScheme {
+    /// Encrypt/decrypt with AES in CBC mode with PKCS5 padding
+    case AES_CBCwithPKCS5
+    /// Encrypt/decrypt with AES in CTR mode with no padding
+    case AES_CTRnoPadding
+}
 
+extension SignalCommonCrypto {
+    /// Calculate a message MAC
+    static func calculateMAC(key: Data, data: Data) -> Data {
+        return hmacSHA256(for: data, with: key)
+    }
+
+    /// Verify a message MAC
+    static public func verifyMAC(data: Data, key: Data, expectedMAC: Data) throws {
+        let calculatedMAC = calculateMAC(key: key, data: data)
+        if calculatedMAC[..<expectedMAC.count] != expectedMAC {
+            throw ForstaError(.invalidMac)
+        }
+    }
+    
+    /// RFC 5869 key derivation
+    static public func deriveSecrets(input: Data, salt: Data = Data(count: 32), info: Data, chunks: Int = 2) throws -> [Data] {
+        if chunks < 1 { return [] }
+        
+        // Salts always end up being 32 bytes
+        if salt.count != 32 {
+            throw ForstaError(.invalidLength, "Got salt of incorrect length")
+        }
+        
+        let PRK = calculateMAC(key: salt, data: input)
+        var infoArray = Data(count: info.count + 1 + 32)
+        infoArray.replaceSubrange(32...(infoArray.count-2), with: info)
+        infoArray[infoArray.count-1] = 1
+        var signed = [calculateMAC(key: PRK, data: infoArray[32...])]
+        
+        for i in 2...chunks {
+            infoArray.replaceSubrange(...31, with: signed[i-2])
+            infoArray[infoArray.count-1] = UInt8(i)
+            signed.append(calculateMAC(key: PRK, data: infoArray));
+        }
+        
+        return signed;
+    }
+    
+    /// Calculate an ECDH agreement.
+    ///
+    /// - parameter publicKeyData: The curve25519 (typically remote party's) 32-byte public key data
+    /// - parameter privateKeyData: The curve25519 (typically your) 32-byte private key data
+    /// - returns: a 32-bit shared secret on success, throwing on failure
+    static public func calculateAgreement(publicKeyData: Data, privateKeyData: Data) throws -> Data {
+        return try Utility.curve25519Donna(secret: privateKeyData, basepoint: publicKeyData)
+    }
+    
+    /// Generates a Curve25519 keypair.
+    ///
+    /// - parameter privateKeyData: The curve25519 (typically your) 32-byte private key data
+    /// - returns: the full `KeyPair`
+    static public func generateKeyPairFromPrivateKey(privateKeyData: Data) throws -> KeyPair {
+        var basepoint = Data(count: 32)
+        basepoint[0] = 9
+        
+        let pubKeyData = try Utility.curve25519Donna(secret: privateKeyData, basepoint: basepoint)
+        
+        return KeyPair(publicKey: Data([5]) + pubKeyData, privateKey: privateKeyData)
     }
 }
