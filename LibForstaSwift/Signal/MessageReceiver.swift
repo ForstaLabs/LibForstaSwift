@@ -16,9 +16,9 @@ import SignalProtocol
 /// Read-receipt sync message from another of our devices
 public class ReadSyncReceipt: CustomStringConvertible {
     /// the read message's sender's userId
-    let sender: UUID
+    public let sender: UUID
     /// the read message's timestamp (used to identify messages in Signal)
-    let timestamp: Date
+    public let timestamp: Date
     
     /// init with sender and timestamp
     init(_ sender: UUID, _ timestamp: Date) {
@@ -35,9 +35,9 @@ public class ReadSyncReceipt: CustomStringConvertible {
 /// Signal server delivery receipt for a message being received by a recipient's device
 public class DeliveryReceipt: CustomStringConvertible {
     /// the device that retrieved a sent message
-    let address: SignalAddress
+    public let address: SignalAddress
     /// the timestamp of the sent message (used to identify messages in Signal)
-    let timestamp: Date
+    public let timestamp: Date
     
     /// init with address and timestamp
     init(_ address: SignalAddress, _ timestamp: Date) {
@@ -79,7 +79,7 @@ public class InboundMessage: CustomStringConvertible {
     public var destination: String?
     
     /// Create an `InboundMessage` to be broadcast to interested parties
-    public init(source: SignalAddress,
+    init(source: SignalAddress,
          timestamp: Date,
          expiration: TimeInterval? = nil,
          serverAge: TimeInterval,
