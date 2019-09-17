@@ -48,14 +48,16 @@ public class MessageSender {
         }
     }
     
-    /// Transmit a Sendable (i.e., a message) to a list of MessageRecipients (specific devices and/or users' whole collections of devices)
+    /// Transmit a `Sendable` (i.e., a message) to a list of `MessageRecipient`
+    /// (specific devices and/or users' whole collections of devices)
     ///
     /// - parameters:
-    ///     - sendable: the sendable message
+    ///     - sendable: the `Sendable` message
     ///     - recipients: the list of recipients (optional) -- empty means only send sync to self
-    ///     - syncToSelf: whether or not to sync to self (defaults to `true`)
+    ///     - syncToSelf: whether or not to sync to our other devices (defaults to `true`)
     ///
-    /// Note: self (this `.device`, or this `.user`) is ignored if it appears in the list of recipients.
+    /// Note: References to self (our specific `.device`, or all of our devices in the case of
+    ///       our `.user`) are ignored in the list of recipients.
     ///
     public func send(_ sendable: Sendable, to recipients: [MessageRecipient] = [], syncToSelf: Bool = true) -> Promise<[TransmissionInfo]> {
         return firstly { () -> Promise<[TransmissionInfo]> in
@@ -87,7 +89,8 @@ public class MessageSender {
         }
     }
     
-    private func sendSync(signalContent: Signal_Content,
+    /// send sync message to our other devices for an outgoing message
+    func sendSync(signalContent: Signal_Content,
                           timestamp: Date,
                           threadId: UUID? = nil,
                           expirationStartTimestamp: Date? = nil) -> Promise<MessageSender.TransmissionInfo> {

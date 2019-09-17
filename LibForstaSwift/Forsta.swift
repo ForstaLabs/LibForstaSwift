@@ -46,8 +46,20 @@ public class Forsta {
         self.wsr.disconnect()
     }
 
-    /// Send to recipient(s) device(s).
-    public func send(_ sendable: Sendable, to recipients: [MessageRecipient]) -> Promise<[MessageSender.TransmissionInfo]> {
-        return self.sender.send(sendable, to: recipients)
+    /// Transmit a `Sendable` (i.e., a message) to a list of `MessageRecipient`
+    /// (specific devices and/or users' whole collections of devices)
+    ///
+    /// - parameters:
+    ///     - sendable: the `Sendable` message
+    ///     - recipients: the list of recipients (optional) -- empty means only send sync to self
+    ///     - syncToSelf: whether or not to sync to our other devices (defaults to `true`)
+    ///
+    /// Note: References to self (our specific `.device`, or all of our devices in the case of
+    ///       our `.user`) are ignored in the list of recipients.
+    ///
+    public func send(_ sendable: Sendable,
+                     to recipients: [MessageRecipient] = [],
+                     syncToSelf: Bool = true) -> Promise<[MessageSender.TransmissionInfo]> {
+        return self.sender.send(sendable, to: recipients, syncToSelf: syncToSelf)
     }
 }
