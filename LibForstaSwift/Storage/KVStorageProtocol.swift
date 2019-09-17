@@ -11,7 +11,7 @@ import SwiftyJSON
 import SignalProtocol
 
 ///
-/// A Namespace-Key-Value storage protocol.
+/// A simple namespace-key-value storage protocol to stashing and retrieving `Data` blobs.
 ///
 public protocol KVStorageProtocol {
     ///
@@ -20,7 +20,7 @@ public protocol KVStorageProtocol {
     func set(ns: CustomStringConvertible, key: CustomStringConvertible, value: Data)
 
     ///
-    /// Gets `Data` value for a key in a namespace.
+    /// Gets the `Data` value for a key in a namespace.
     ///
     func get(ns: CustomStringConvertible, key: CustomStringConvertible) -> Data?
     
@@ -30,7 +30,7 @@ public protocol KVStorageProtocol {
     func remove(ns: CustomStringConvertible, key: CustomStringConvertible)
     
     ///
-    /// Test whether a namespace has a key.
+    /// Tests whether a namespace has a key.
     ///
     func has(ns: CustomStringConvertible, key: CustomStringConvertible) -> Bool
     
@@ -124,16 +124,16 @@ public extension KVStorageProtocol {
     }
 }
 
-
-/// A generic class for reading and writing store-backed default-namespace typed values,
-/// backed by a value cache (each assumes there is no other cache to stay coherent with).
-public class KVBacked<Type> where Type: ToFromData {
+/// A generic class for using store-backed default-namespace typed values,
+/// cached locally for speed (so note this means that each instance assumes
+/// there is no other cache to keep it's value coherent with).
+public class KVBacked<T> where T: ToFromData {
     var kvstore: KVStorageProtocol
-    var cache: Type?
+    var cache: T?
     let key: CustomStringConvertible
     
     /// Create a `KVBacked`
-    public init(kvstore: KVStorageProtocol, key: CustomStringConvertible, initial: Type? = nil) {
+    public init(kvstore: KVStorageProtocol, key: CustomStringConvertible, initial: T? = nil) {
         self.key = key
         self.kvstore = kvstore
         
@@ -143,7 +143,7 @@ public class KVBacked<Type> where Type: ToFromData {
     }
     
     /// get and set the backed, cached value
-    public var value: Type? {
+    public var value: T? {
         get {
             if cache == nil {
                 cache = kvstore.get(key)
