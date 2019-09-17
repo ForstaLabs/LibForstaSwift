@@ -49,7 +49,7 @@ public class MessageSender {
     }
     
     /// Transmit a Sendable (i.e., a message) to a list of MessageRecipients (specific devices and/or users' whole collections of devices)
-    public func send(_ sendable: Sendable, to recipients: [MessageRecipient]) -> Promise<[TransmissionInfo]> {
+    public func send(_ sendable: Sendable, to recipients: [MessageRecipient], syncToSelf: Bool = true) -> Promise<[TransmissionInfo]> {
         return firstly { () -> Promise<[TransmissionInfo]> in
             try sendable.payload.sanityCheck()
             var results: [Promise<TransmissionInfo>] = []
@@ -58,9 +58,21 @@ public class MessageSender {
             
             for recipient in recipients {
                 switch recipient {
-                case .device(let address): results.append(self.sendToDevice(address: address, paddedClearData: paddedClearData, timestamp: sendable.timestamp))
-                case .user(let userId): results.append(self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: sendable.timestamp))
+                case .device(let address):
+                    if address != self.signalClient.signalAddress {
+                        results.append(self.sendToDevice(address: address, paddedClearData: paddedClearData, timestamp: sendable.timestamp))
+                    }
+                case .user(let userId):
+                    if userId != self.signalClient.signalAddress?.userId {
+                        results.append(self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: sendable.timestamp))
+                    }
                 }
+            }
+            
+            if syncToSelf {
+                results.append(self.sendToUser(userId: self.signalClient.signalAddress!.userId,
+                                               paddedClearData: Data() /* TODO: fix that */,
+                    timestamp: sendable.timestamp /*, TODO: plus other things like sync stuff */))
             }
             
             return when(fulfilled: results)
