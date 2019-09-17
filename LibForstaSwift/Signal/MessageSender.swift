@@ -49,11 +49,21 @@ public class MessageSender {
     }
     
     /// Transmit a Sendable (i.e., a message) to a list of MessageRecipients (specific devices and/or users' whole collections of devices)
-    public func send(_ sendable: Sendable, to recipients: [MessageRecipient], syncToSelf: Bool = true) -> Promise<[TransmissionInfo]> {
+    ///
+    /// - parameters:
+    ///     - sendable: the sendable message
+    ///     - recipients: the list of recipients (optional) -- empty means only send sync to self
+    ///     - syncToSelf: whether or not to sync to self (defaults to `true`)
+    ///
+    /// Note: self (this `.device`, or this `.user`) is ignored if it appears in the list of recipients.
+    ///
+    public func send(_ sendable: Sendable, to recipients: [MessageRecipient] = [], syncToSelf: Bool = true) -> Promise<[TransmissionInfo]> {
         return firstly { () -> Promise<[TransmissionInfo]> in
             try sendable.payload.sanityCheck()
             var results: [Promise<TransmissionInfo>] = []
-            var paddedClearData = try sendable.contentProto.serializedData()
+            let contentProto = sendable.contentProto
+
+            var paddedClearData = try contentProto.serializedData()
             pad(&paddedClearData)
             
             for recipient in recipients {
@@ -70,15 +80,48 @@ public class MessageSender {
             }
             
             if syncToSelf {
-                results.append(self.sendToUser(userId: self.signalClient.signalAddress!.userId,
-                                               paddedClearData: Data() /* TODO: fix that */,
-                    timestamp: sendable.timestamp /*, TODO: plus other things like sync stuff */))
+                results.append(self.sendSync(signalContent: contentProto, timestamp: sendable.timestamp, threadId: sendable.payload.threadId))
             }
             
             return when(fulfilled: results)
         }
     }
     
+    private func sendSync(signalContent: Signal_Content,
+                          timestamp: Date,
+                          threadId: UUID? = nil,
+                          expirationStartTimestamp: Date? = nil) -> Promise<MessageSender.TransmissionInfo> {
+        let dataMessage = signalContent.dataMessage
+        
+        var sentMessage = Signal_SyncMessage.Sent()
+        sentMessage.message = dataMessage
+        sentMessage.timestamp = timestamp.millisecondsSince1970
+        if threadId != nil {
+            sentMessage.destination = threadId!.lcString
+        }
+        if expirationStartTimestamp != nil {
+            sentMessage.expirationStartTimestamp = expirationStartTimestamp!.millisecondsSince1970
+        }
+        
+        var syncMessage = Signal_SyncMessage()
+        syncMessage.sent = sentMessage
+        
+        var content = Signal_Content()
+        content.syncMessage = syncMessage
+        
+        guard let userId = self.signalClient.signalAddress?.userId else {
+            return Promise<MessageSender.TransmissionInfo>.init(error: ForstaError(.configuration, "my own userId isn't available"))
+        }
+        
+        do {
+            var paddedClearData = try content.serializedData()
+            pad(&paddedClearData)
+            return self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: timestamp)
+        } catch let error {
+            return Promise<MessageSender.TransmissionInfo>.init(error: ForstaError("couldn't serialize content", cause: error))
+        }
+    }
+
     /// Fetch prekey bundle for address and process it
     func updatePrekeysForUser(_ userId: UUID) -> Promise<Void> {
         return self.updatePrekeysForUser(userId: userId.lcString)
@@ -92,9 +135,14 @@ public class MessageSender {
     
     /// Fetch prekey bundles for address (either all devices for the address, or only a specific device) and process them
     func updatePrekeysForUser(userId: String, deviceId: UInt32? = nil) -> Promise<Void> {
+        guard let myUserIdString = self.signalClient.signalAddress?.userId.lcString,
+            let myDeviceId = self.signalClient.signalAddress?.deviceId else {
+            return Promise<Void>.init(error: ForstaError(.configuration, "own address isn't available"))
+        }
         return self.signalClient.getKeysForAddr(addr: userId, deviceId: deviceId)
             .map { bundles in
-                for bundle in bundles {
+                let devices = bundles.filter { !(userId == myUserIdString && $0.deviceId == myDeviceId) }
+                for bundle in devices {
                     let addr = SignalAddress(name: userId, deviceId: bundle.deviceId)
                     try SessionBuilder(for: addr, in: self.signalClient.store).process(preKeyBundle: bundle)
                 }
@@ -200,16 +248,19 @@ public class MessageSender {
                         for extra in json["extraDevices"].arrayValue {
                             let deviceId = extra.uInt32Value
                             let _ = self.signalClient.store.sessionStore.deleteSession(for: SignalAddress(userId: userId, deviceId: deviceId))
+                            print("removed extra device \(deviceId)")
                         }
                     } else {
                         // close open sessions on stale devices
                         for extra in json["staleDevices"].arrayValue {
                             let deviceId = extra.uInt32Value
                             let _ = self.signalClient.store.sessionStore.deleteSession(for: SignalAddress(userId: userId, deviceId: deviceId))
+                            print("removed stale device \(deviceId)")
                         }
                     }
                     
                     // no optimization for now -- just update all of the device keys for the user
+                    print("updating prekeys for user \(userId)")
                     return self.updatePrekeysForUser(userId).then {
                         self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: timestamp, allowRetries: statusCode == 409)
                     }

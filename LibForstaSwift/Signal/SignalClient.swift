@@ -334,7 +334,6 @@ public class SignalClient {
             self.provisioningCipher = ProvisioningCipher()
             
             self.wsr = WebSocketResource(requestHandler: { request in
-                print("got WS request: \(request.verb) \(request.path)")
                 if request.body == nil { self.waitSeal.reject(ForstaError(.unknown, "provisioning ws request \(request.verb) \(request.path) has no body")) }
                 if request.path == "/v1/address" && request.verb == "PUT" {
                     do {
@@ -369,16 +368,17 @@ public class SignalClient {
         }
         
         deinit {
-            print("destroying autoprovision-task")
+            print("(destroying autoprovision-task)")
         }
         
-        /// Cancel an autoprovision registration that is underway.
+        /// Cancel a device registration that is underway.
         public func cancel() {
-            wsr?.disconnect()
             waitSeal.reject(ForstaError(.canceled, "registerDevice was canceled by caller"))
+            wsr?.disconnect()
+            wsr = nil
         }
         
-        /// A `Promise<Void>` that resolves when the autoprovision device registration task is complete.
+        /// A `Promise<Void>` that resolves when device registration is complete.
         public var complete: Promise<Void> {
             var registrationId: UInt32
             var userId: UUID?
@@ -480,9 +480,8 @@ public class SignalClient {
     /// existing device to this new one.
     ///
     /// - parameter deviceLabel: This device's public name to store in the Signal server.
-    /// - returns: An `AutoprovisionTask` that the caller can wait to `.complete`,
-    ///            and can optionally `.cancel()`.
-    ///            (Both yield a `Promise<Void>` to indicate completion.)
+    /// - returns: An `AutoprovisionTask` that the caller can then wait
+    ///            to `.complete` (a `Promise<Void>`), or optionally `.cancel()`.
     ///
     public func registerDevice(deviceLabel: String) -> AutoprovisionTask {
         return AutoprovisionTask(deviceLabel: deviceLabel, signalClient: self)

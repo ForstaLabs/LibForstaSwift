@@ -827,4 +827,47 @@ class SignalClientTests: XCTestCase {
             XCTFail("outer surprising error \(error)")
         }
     }
+    
+    func testRegisterDeviceAndSyncSend() {
+        
+        do {
+            let forsta = try Forsta(MemoryKVStore())
+            forsta.atlas.serverUrl = "https://atlas-dev.forsta.io"
+            
+            let sentified = XCTestExpectation()
+            forsta.atlas.authenticateViaPassword(userTag: "@greg1:forsta", password: "asdfasdf24")
+                .map { stuff in
+                    forsta.signal.registerDevice(deviceLabel: "test register and sync send")
+                }
+                .then { task in
+                    task.complete
+                }
+                .map {
+                    let _ = print("registered")
+                }
+                .then { _ in
+                    forsta.send(Message(threadId: UUID(uuidString: "e4652d6e-20f1-49d5-a22c-caefa5e4306f")!,
+                                        threadExpression: "(<8745c66c-518e-48b0-b3a7-d1d6cbe85059>+<e4faa7e0-5670-4436-a1b5-afd673e58298>)",
+                                        threadType: .conversation,
+                                        bodyPlain: "Sync this!"),
+                                to: [MessageRecipient.user(UUID(uuidString: "b1d29795-d40e-4ee3-9f76-f6dd07d94bcb")!)])
+                }
+                .done { results in
+                    let _ = print("sent")
+                    let _ = print(results)
+                    sentified.fulfill()
+                }
+                .catch { error in
+                    if let e = error as? ForstaError {
+                        print(e)
+                    } else {
+                        print(error)
+                    }
+                    XCTFail(error.localizedDescription)
+            }
+            wait(for: [sentified], timeout: 6*10.0)
+        } catch let error {
+            XCTFail("surprising error \(error)")
+        }
+    }
 }
