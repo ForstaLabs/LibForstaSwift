@@ -293,6 +293,28 @@ public class SignalClient {
             parameters: parameters)
     }
     
+    /// Fetch an (encrypted) attachment by Signal attachment ID
+    func fetchEncryptedAttachment(id: UInt64) -> Promise<Data> {
+        return self.request(.attachment, urlParameters: "/\(id)")
+            .map { (code, json) in
+                if code < 300 { return json["location"].stringValue }
+                throw ForstaError(.requestRejected, json)
+            }
+            .then { location in
+                self.request(location, headers: ["Content-Type": "application/octet-stream"])
+            }
+            .map { (code, data) in
+                if code < 300 { return data }
+                throw ForstaError(.requestRejected, String(data: data, encoding: .utf8)!)
+        }
+    }
+    
+    /// Fetch an attachment (uses an `AttachmentInfo` `.id` for retrieval and `.key` for decryption)
+    public func fetchAttachment(_ attachmentInfo: AttachmentInfo) -> Promise<Data> {
+        return self.fetchEncryptedAttachment(id: attachmentInfo.id)
+            .map { data in try SignalCommonCrypto.decryptAttachment(data: data, keys: attachmentInfo.key) }
+    }
+
     /// Get prekey bundle for a specific device
     func getKeysForAddr(_ addr: SignalAddress) -> Promise<[SessionPreKeyBundle]> {
         return getKeysForAddr(addr: addr.name, deviceId: UInt32(addr.deviceId))
@@ -359,7 +381,7 @@ public class SignalClient {
         }
     }
     
-    /// Internal: Basic Signal Server http request that returns a `Promise` of `(statuscode, JSON)`
+    /// Internal: Basic Signal Server http request
     private func request(_ call: ServerCall, urlParameters: String = "", method: HTTPMethod = .get, parameters: Parameters? = nil) -> Promise<(Int, JSON)> {
         guard serverUrl != nil else {
             return Promise(error: ForstaError(.configuration, "No signal server url available."))
@@ -374,6 +396,22 @@ public class SignalClient {
                     case .success(let data):
                         let json = JSON(data)
                         seal.fulfill((statusCode, json))
+                    case .failure(let error):
+                        return seal.reject(ForstaError(.requestFailure, cause: error))
+                    }
+            }
+        }
+    }
+    
+    /// Internal: Basic http request for raw data
+    private func request(_ url: String, headers: [String: String], method: HTTPMethod = .get, parameters: Parameters? = nil) -> Promise<(Int, Data)> {
+        return Promise { seal in
+            Alamofire.request(url, method: method, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+                .responseData { response in
+                    let statusCode = response.response?.statusCode ?? 500
+                    switch response.result {
+                    case .success(let data):
+                        seal.fulfill((statusCode, data))
                     case .failure(let error):
                         return seal.reject(ForstaError(.requestFailure, cause: error))
                     }
@@ -608,7 +646,7 @@ public class SignalClient {
         case devices = "/v1/devices"
         case keys = "/v2/keys"
         case messages = "/v1/messages"
-        case attachment = "/v2/attachments"
+        case attachment = "/v1/attachments"
         case provisioning = "/v1/provisioning"
     }
     

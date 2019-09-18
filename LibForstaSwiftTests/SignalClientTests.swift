@@ -520,7 +520,7 @@ class SignalClientTests: XCTestCase {
                 queue: nil) { notification in
                     let inbound = notification.userInfo?["inboundMessage"] as? InboundMessage
                     if inbound?.payload.messageType! == .content {
-                        let words = inbound!.payload.body![0].raw
+                        let words = inbound!.payload.bodyPlain ?? ""
                         if words == "end" {
                             theEnd.fulfill()
                         }
@@ -866,6 +866,69 @@ class SignalClientTests: XCTestCase {
                     XCTFail(error.localizedDescription)
             }
             wait(for: [sentified], timeout: 6*10.0)
+        } catch let error {
+            XCTFail("surprising error \(error)")
+        }
+    }
+
+    func testAttachmentEncryptDecrypt() throws {
+        do {
+            let keys = try SignalCommonCrypto.random(bytes: 64)
+            let iv = try SignalCommonCrypto.random(bytes: 16)
+            
+            let content = "Hello, world!".toData()
+            
+            let encrypted = try SignalCommonCrypto.encryptAttachment(data: content, keys: keys, iv: iv)
+            let decrypted = try SignalCommonCrypto.decryptAttachment(data: encrypted, keys: keys)
+            
+            XCTAssert(decrypted == content)
+        } catch let error {
+            XCTFail("surprising error \(error)")
+        }
+    }
+    
+    func testFetchAttachment() {
+        let attachmentInfo = AttachmentInfo(
+            name: "hello.txt",
+            size: 14,
+            type: "text/plain",
+            mtime: Date(),
+            id: 8734968899990206249,
+            key: Data(base64Encoded: "Oq1v9Fwyle9FPxKLWKgBg4kUMjmy0+P+pATdZMmPI36i4n7KlGYgm5BAEDvOlRcc7tYQsAH6vstgKvbNpzxF9Q==")!
+        )
+
+        do {
+            let forsta = try Forsta(MemoryKVStore())
+            forsta.atlas.serverUrl = "https://atlas-dev.forsta.io"
+            
+            let allDone = XCTestExpectation()
+            forsta.atlas.authenticateViaPassword(userTag: "@greg1:forsta", password: "asdfasdf24")
+                .map { stuff in
+                    forsta.signal.registerDevice(deviceLabel: "test register and sync send")
+                }
+                .then { task in
+                    task.complete
+                }
+                .map {
+                    let _ = print("registered")
+                }
+                .then { _ in
+                    forsta.signal.fetchAttachment(attachmentInfo)
+                }
+                .done { fileData in
+                    XCTAssert(fileData.count == attachmentInfo.size)
+                    let _ = print("Here's the content:", String(data: fileData, encoding: .utf8)!)
+                    allDone.fulfill()
+                }
+                .catch { error in
+                    if let e = error as? ForstaError {
+                        print(e)
+                    } else {
+                        print(error)
+                    }
+                    XCTFail(error.localizedDescription)
+            }
+            wait(for: [allDone], timeout: 6*10.0)
         } catch let error {
             XCTFail("surprising error \(error)")
         }

@@ -17,9 +17,9 @@ import SignalProtocol
 public class ReadSyncReceipt: CustomStringConvertible {
     // -MARK: Attributes
     
-    /// the read message's sender's userId
+    /// the read-message's sender's userId
     public let sender: UUID
-    /// the read message's timestamp (used to identify messages in Signal)
+    /// the read-message's timestamp (used to identify messages in Signal)
     public let timestamp: Date
     
     /// init with sender and timestamp
@@ -32,7 +32,7 @@ public class ReadSyncReceipt: CustomStringConvertible {
     
     /// human-readable string for this receipt
     public var description: String {
-        return "ReadSyncReceipt(\(self.sender) @ \(self.timestamp.millisecondsSince1970 ))"
+        return "ReadSyncReceipt(\(self.sender) @ \(self.timestamp.millisecondsSince1970))"
     }
 }
 
@@ -40,7 +40,7 @@ public class ReadSyncReceipt: CustomStringConvertible {
 public class DeliveryReceipt: CustomStringConvertible {
     // -MARK: Attributes
     
-    /// the device that retrieved a sent message
+    /// the device that retrieved a message we sent from the Signal server
     public let address: SignalAddress
     /// the timestamp of the sent message (used to identify messages in Signal)
     public let timestamp: Date
@@ -55,7 +55,41 @@ public class DeliveryReceipt: CustomStringConvertible {
     
     /// human-readable string for this receipt
     public var description: String {
-        return "DeliveryReceipt(\(self.address) @ \(self.timestamp.millisecondsSince1970 ))"
+        return "DeliveryReceipt(\(self.address) @ \(self.timestamp.millisecondsSince1970))"
+    }
+}
+
+public class AttachmentInfo: CustomStringConvertible {
+    // -MARK: Attributes
+    /// file name
+    public let name: String
+    /// file size in bytes
+    public let size: UInt32
+    /// file modification time
+    public let mtime: Date
+
+    /// content mime type
+    public let type: String
+    /// the external storage id
+    public let id: UInt64
+    /// the encryption key
+    public let key: Data
+    
+
+    init(name: String, size: UInt32, type: String, mtime: Date, id: UInt64, key: Data) {
+        self.name = name
+        self.size = size
+        self.type = type
+        self.mtime = mtime
+        self.id = id
+        self.key = key
+    }
+    
+    // -MARK: Utilities
+    
+    /// human-readable string for this info
+    public var description: String {
+        return "\(name)<\(type)> \(size) (\(mtime))"
     }
 }
 
@@ -81,6 +115,9 @@ public class InboundMessage: CustomStringConvertible {
     /// A `ForstaPayloadV1` initialized with the the inbound message's envelope body
     public var payload: ForstaPayloadV1
     
+    /// Information about any associated attachments -- use `SignalClient.fetchAttachment()` to retrieve and decrypt them
+    public var attachments: [AttachmentInfo]
+    
     /// Expiration start-time (if there was an expiration and this is a sync message from another of our devices)
     public var expirationStart: Date?
     /// The "destination" set in the sync message container (in Forsta, this is usually the threadId for the message)
@@ -89,11 +126,10 @@ public class InboundMessage: CustomStringConvertible {
     // -MARK: Internal Attributes
     
     /// The Signal envelope body you shouldn't need to look at directly
-    /// because `.payload` will give the information to you in a nice form
+    /// because `.payload` represents the same information in a nice form
     public var signalBody: String
     
     
-    /// Create an `InboundMessage` to be broadcast to interested parties
     init(source: SignalAddress,
          timestamp: Date,
          expiration: TimeInterval? = nil,
@@ -102,6 +138,7 @@ public class InboundMessage: CustomStringConvertible {
          endSessionFlag: Bool = false,
          expirationTimerUpdateFlag: Bool = false,
          signalBody: String,
+         signalAttachments: [Signal_AttachmentPointer] = [],
          expirationStart: Date? = nil,
          destination: String? = nil) {
         self.source = source
@@ -115,6 +152,16 @@ public class InboundMessage: CustomStringConvertible {
         self.payload = ForstaPayloadV1(signalBody)
         self.expirationStart = expirationStart
         self.destination = destination
+        
+        self.attachments = zip(signalAttachments, self.payload.json["data"]["attachments"].arrayValue).map {
+            let (signal, forsta) = $0
+            return AttachmentInfo(name: forsta["name"].stringValue,
+                                  size: forsta["size"].uInt32Value,
+                                  type: signal.contentType,
+                                  mtime: Date(millisecondsSince1970: forsta["mtime"].uInt64 ?? Date().millisecondsSince1970),
+                                  id: signal.id,
+                                  key: signal.key)
+        }
     }
     
     // -MARK: Utilities
@@ -219,7 +266,6 @@ public class MessageReceiver {
         if dm != nil {
             let expirationTimerUpdateFlag = dm!.hasFlags && (dm!.flags & UInt32(Signal_DataMessage.Flags.expirationTimerUpdate.rawValue)) != 0
             let endSessionFlag = dm!.hasFlags && (dm!.flags & UInt32(Signal_DataMessage.Flags.endSession.rawValue)) != 0
-            // let bodyJson =  try JSON(string: dm!.body ?? "[]")
             let msg = InboundMessage(source: SignalAddress(userId: envelope.source, deviceId: envelope.sourceDevice),
                                      timestamp: Date(millisecondsSince1970: envelope.timestamp),
                                      expiration: dm!.hasExpireTimer
@@ -230,6 +276,7 @@ public class MessageReceiver {
                                      endSessionFlag: endSessionFlag,
                                      expirationTimerUpdateFlag: expirationTimerUpdateFlag,
                                      signalBody: dm!.hasBody ? dm!.body : "",
+                                     signalAttachments: dm!.attachments,
                                      expirationStart: (sent?.hasExpirationStartTimestamp ?? false)
                                         ? Date(millisecondsSince1970: sent!.expirationStartTimestamp)
                                         : nil,

@@ -21,7 +21,7 @@ public enum MessageRecipient {
 
 /// Protocol for a sendable message
 public protocol Sendable {
-    /// The message timestamp
+    /// The message timestamp (used to identify messages in Signal)
     var timestamp: Date { get }
 
     /// Message expiration (number of seconds after read)

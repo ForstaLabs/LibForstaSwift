@@ -623,5 +623,8 @@ public class ForstaPayloadV1: CustomStringConvertible {
         
         /// Control message providing WebRTC call ICE candidates to establish a connection with a device
         case callICECandidates = "callICECandidates"
+        
+        /// Indicates that a call is ongoing with the recipient, from the sender's perspective
+        case callHeartbeat = "callHeartbeat"
     }
 }

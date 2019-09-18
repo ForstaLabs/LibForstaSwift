@@ -385,4 +385,44 @@ extension SignalCommonCrypto {
         
         return KeyPair(publicKey: Data([5]) + pubKeyData, privateKey: privateKeyData)
     }
+    
+    /// Decrypt attachment data
+    static public func decryptAttachment(data: Data, keys: Data) throws -> Data {
+        if (keys.count != 64) {
+            throw ForstaError(.invalidLength, "Got invalid length attachment keys")
+        }
+        if (data.count < 16 + 32) {
+            throw ForstaError(.invalidLength, "Got invalid length attachment")
+        }
+        
+        let aes_key = keys[0...31]
+        let mac_key = keys[32...63]
+        
+        let iv = data[0...15]
+        let ciphertext = data[16..<(data.count-32)]
+        let ivAndCiphertext = data[0..<(data.count-32)]
+        let mac = data[(data.count-32)..<data.count]
+        
+        try verifyMAC(data: ivAndCiphertext, key: mac_key, expectedMAC: mac)
+        return try decrypt(message: ciphertext, key: aes_key, iv: iv)
+    }
+    
+    /// Encrypt attachment data
+    static public func encryptAttachment(data: Data, keys: Data, iv: Data) throws -> Data {
+        if (keys.count != 64) {
+            throw ForstaError(.invalidLength, "Got invalid length attachment keys")
+        }
+        if (iv.count != 16) {
+            throw ForstaError(.invalidLength, "Got invalid length attachment iv")
+        }
+        
+        let aes_key = keys[0...31]
+        let mac_key = keys[32...63]
+        
+        let ciphertext = try encrypt(message: data, key: aes_key, iv: iv)
+        let ivAndCiphertext = iv + ciphertext
+
+        let mac = calculateMAC(key: mac_key, data: ivAndCiphertext)
+        return ivAndCiphertext + mac
+    }
 }
