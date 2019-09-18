@@ -24,8 +24,12 @@ import JWTDecode
 /// login sessions across invocations, etc.
 ///
 public class AtlasClient {
+    // -MARK: Attributes
+
     static let defaultPublicOrg = "forsta"
     static let defaultServerUrl = "https://atlas-dev.forsta.io"
+
+    var kvstore: KVStorageProtocol
     
     private var _defaultOrg: KVBacked<String>
     /// The default public organization name (added to unqualified login tags)
@@ -40,9 +44,6 @@ public class AtlasClient {
         get { return _serverUrl.value }
         set(value) { _serverUrl.value = value }
     }
-
-    var kvstore: KVStorageProtocol
-    
 
     /// The current authenticated user UUID
     public var authenticatedUserId: UUID?
@@ -61,6 +62,8 @@ public class AtlasClient {
             if value != nil { maintainJwt() }
         }
     }
+    
+    // -MARK: Constructors
 
     ///
     /// Initialize this Atlas client.
@@ -78,24 +81,6 @@ public class AtlasClient {
         if let jwt = self.authenticatedUserJwt { self.authenticatedUserJwt = jwt }
     }
     
-    // -MARK: Public types for dealing with AtlasClient
-    
-    /// A user's current method of interactive authentication
-    public enum AuthenticationMethod {
-        /// Authenticate by providing a code that has sent by SMS: `authenticateViaCode(...)`
-        case sms
-        
-        /// Authenticate by providing a password: `authenticateViaPassword(...)`
-        case password
-        
-        /// Authenticate by providing a password and an authenticator code: `authenticateViaPasswordOtp(...)`
-        case passwordOtp
-    }
-    
-    /// The JSON blob detailing an authenticated user on Atlas
-    public typealias AuthenticatedUser = JSON
-    
-
     // -MARK: Authentication and JWT Maintenance
     
     ///
@@ -597,7 +582,7 @@ public class AtlasClient {
         }
     }
 
-    // -MARK: Utility Routines
+    // -MARK: Utilities
     
     ///
     /// Breaks a tag into (normalized) user and org slug parts.
@@ -674,4 +659,23 @@ public class AtlasClient {
         self.authenticatedUserId = nil
         NotificationCenter.broadcast(.atlasCredentialExpired, nil)
     }
+    
+    // -MARK: Related Subtypes
+    
+    /// A user's current method of interactive authentication
+    public enum AuthenticationMethod {
+        /// Authenticate by providing a code that has sent by SMS: `authenticateViaCode(...)`
+        case sms
+        
+        /// Authenticate by providing a password: `authenticateViaPassword(...)`
+        case password
+        
+        /// Authenticate by providing a password and an authenticator code: `authenticateViaPasswordOtp(...)`
+        case passwordOtp
+    }
+    
+    /// The JSON blob detailing an authenticated user on Atlas
+    public typealias AuthenticatedUser = JSON
+    
+
 }

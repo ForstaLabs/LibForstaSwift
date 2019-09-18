@@ -11,8 +11,10 @@ import PromiseKit
 import SwiftyJSON
 import SignalProtocol
 
-/// A top-level helper class for using LibForstaSwift
+/// This is THE top-level helper class for using LibForstaSwift.
 public class Forsta {
+    // -MARK: Attributes
+    
     /// An Atlas client for all Forsta Atlas server operations.
     /// This will restore from the kvstore and continue using an authenticated session if possible.
     public let atlas: AtlasClient
@@ -25,6 +27,8 @@ public class Forsta {
     private let receiver: MessageReceiver
     private let sender: MessageSender
     
+    // -MARK: Constructors
+    
     /// Initialize with a `KVStorageProtocol`
     public init(_ kvstore: KVStorageProtocol) throws {
         self.atlas = AtlasClient(kvstore: kvstore)
@@ -34,7 +38,7 @@ public class Forsta {
         self.sender = MessageSender(signalClient: signal)
     }
     
-    // -MARK: Pass-throughs for everything not in the Atlas and Signal clients
+    // -MARK: Pass-throughs for everything outside the Atlas and Signal clients
     
     /// Connect the Signal Server web socket for messaging.
     public func connect() throws {

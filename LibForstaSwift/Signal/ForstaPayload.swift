@@ -14,9 +14,6 @@ import SwiftyJSON
 /// A convenience wrapper for v1 of the Forsta message exchange payload
 /// (see https://bit.ly/forsta-payload for details)
 public class ForstaPayloadV1: CustomStringConvertible {
-    /// The underlying payload JSON that is being manipulated/reflected
-    public var json: JSON
-    
     // -MARK: Constructors
     
     /// Initialize with an (optional) JSON string
@@ -28,77 +25,18 @@ public class ForstaPayloadV1: CustomStringConvertible {
             }
         }
     }
+    
     /// Initialize with existing payload object
     public init(_ payload: ForstaPayloadV1) {
         self.json = payload.json
     }
+    
     /// Initialize with `JSON` object
     public init(_ json: JSON) {
         self.json = json
     }
     
-    // -MARK: Utilities
-    
-    /// The current underlying `JSON` object encoded as a JSON string
-    var jsonString: String {
-        return json.rawString([.castNilToNSNull: true]) ?? "<malformed JSON>"
-    }
-    
-    /// A pretty-printed version of the current payload's JSON string
-    public var description: String {
-        return json.description
-    }
-    
-    /// Throw an error if mandatory fields are missing, etc.
-    public func sanityCheck() throws {
-        // check that mandatory fields are present
-        if json["version"].int == nil { throw ForstaError(.invalidPayload, "missing version") }
-        if messageId == nil { throw ForstaError(.invalidPayload, "missing messageId") }
-        if messageType == nil { throw ForstaError(.invalidPayload, "missing messageType") }
-        if threadId == nil { throw ForstaError(.invalidPayload, "missing threadId") }
-        if threadExpression == nil { throw ForstaError(.invalidPayload, "missing threadExpression") }
-        
-        // check basic coherence between control messages and specifying a control message type
-        if messageType == .control && controlType == nil {
-            throw ForstaError(.invalidPayload, "control message is missing control type")
-        }
-        if controlType != nil && messageType != .control {
-            throw ForstaError(.invalidPayload, "control type specified in non-control message")
-        }
-        
-        // check basic coherence on body contents
-        if bodyHtml != nil && bodyPlain == nil {
-            throw ForstaError(.invalidPayload, "plain body text is required if there is html body text")
-        }
-    }
-    
-    /// Internal: ensure this (dictionary) path exists
-    private func ensurePath(_ path: ArraySlice<String>) {
-        func ensure(_ dict: inout JSON, _ path: ArraySlice<String>) {
-            if path.count > 0 {
-                if !dict[path.first!].exists() { dict[path.first!] = [:] }
-                ensure(&(dict[path.first!]), path.dropFirst())
-            }
-        }
-        
-        ensure(&json, path)
-    }
-    
-    /// Internal: clear the key at this path (removing empty dictionaries)
-    private func clearKey(_ path: ArraySlice<String>) {
-        func clear(_ dict: inout JSON, _ path: ArraySlice<String>) {
-            if path.count > 0 {
-                clear(&(dict[path.first!]), path.dropFirst())
-                if path.count == 1 || dict[path.first!].dictionaryValue.count == 0 {
-                    dict.dictionaryObject?.removeValue(forKey: path.first!)
-                }
-            }
-        }
-        
-        clear(&json, path)
-    }
-    
-    // -MARK: Accessor properties for the underlying JSON
+    // -MARK: Accessors for the underlying payload JSON
     
     /// The message's globally-unique ID (required)
     public var messageId: UUID? {
@@ -497,9 +435,74 @@ public class ForstaPayloadV1: CustomStringConvertible {
     public var provisioningUuidString: String? {
         return json["data"]["uuid"].string
     }
+    
+    // -MARK: Internal Attributes
+    
+    /// The underlying payload JSON that is being manipulated/reflected
+    public var json: JSON
 
+    // -MARK: Utilities
+    
+    /// The current underlying `JSON` object encoded as a JSON string
+    var jsonString: String {
+        return json.rawString([.castNilToNSNull: true]) ?? "<malformed JSON>"
+    }
+    
+    /// A pretty-printed version of the current payload's JSON string
+    public var description: String {
+        return json.description
+    }
+    
+    /// Throw an error if mandatory fields are missing, etc.
+    public func sanityCheck() throws {
+        // check that mandatory fields are present
+        if json["version"].int == nil { throw ForstaError(.invalidPayload, "missing version") }
+        if messageId == nil { throw ForstaError(.invalidPayload, "missing messageId") }
+        if messageType == nil { throw ForstaError(.invalidPayload, "missing messageType") }
+        if threadId == nil { throw ForstaError(.invalidPayload, "missing threadId") }
+        if threadExpression == nil { throw ForstaError(.invalidPayload, "missing threadExpression") }
+        
+        // check basic coherence between control messages and specifying a control message type
+        if messageType == .control && controlType == nil {
+            throw ForstaError(.invalidPayload, "control message is missing control type")
+        }
+        if controlType != nil && messageType != .control {
+            throw ForstaError(.invalidPayload, "control type specified in non-control message")
+        }
+        
+        // check basic coherence on body contents
+        if bodyHtml != nil && bodyPlain == nil {
+            throw ForstaError(.invalidPayload, "plain body text is required if there is html body text")
+        }
+    }
+    
+    /// Internal: ensure this (dictionary) path exists
+    private func ensurePath(_ path: ArraySlice<String>) {
+        func ensure(_ dict: inout JSON, _ path: ArraySlice<String>) {
+            if path.count > 0 {
+                if !dict[path.first!].exists() { dict[path.first!] = [:] }
+                ensure(&(dict[path.first!]), path.dropFirst())
+            }
+        }
+        
+        ensure(&json, path)
+    }
+    
+    /// Internal: clear the key at this path (removing empty dictionaries)
+    private func clearKey(_ path: ArraySlice<String>) {
+        func clear(_ dict: inout JSON, _ path: ArraySlice<String>) {
+            if path.count > 0 {
+                clear(&(dict[path.first!]), path.dropFirst())
+                if path.count == 1 || dict[path.first!].dictionaryValue.count == 0 {
+                    dict.dictionaryObject?.removeValue(forKey: path.first!)
+                }
+            }
+        }
+        
+        clear(&json, path)
+    }
 
-    // - MARK: Related Enums
+    // - MARK: Related Subtypes
     
     /// A `.content` message's `body` is represented by an array of `BodyItem`
     public enum BodyItem: CustomStringConvertible {

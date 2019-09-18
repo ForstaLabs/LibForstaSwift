@@ -17,7 +17,8 @@ import SignalProtocol
 ///  encrypted messages and the brokering of public keys.
 ///
 public class SignalClient {
-    let crypto = SignalCommonCrypto()
+    // -MARK: Attributes
+    
     var atlasClient: AtlasClient
     var store: SignalStore
 
@@ -67,6 +68,7 @@ public class SignalClient {
     }
     private var _deviceLabel: KVBacked<String>
     
+    // -MARK: Constructors
     
     ///
     /// Initialize this Signal client.
@@ -93,63 +95,17 @@ public class SignalClient {
             senderKeyStore: nil)
     }
     
-    private func generatePassword() throws -> String {
-        return try String(SignalCommonCrypto.random(bytes: 16).base64EncodedString().dropLast(2))
-    }
-    
-    private func generateSignalingKey() throws -> Data {
-        return try SignalCommonCrypto.random(bytes: 32 + 20)
-    }
-    
-    private class ProvisioningCipher {
-        private var keyPair: KeyPair?
+    // -MARK: Registration
 
-        func getPublicKey() throws -> Data {
-            if keyPair == nil { self.keyPair = try Signal.generateIdentityKeyPair() }
-            return self.keyPair!.publicKey
-        }
-        
-        func decrypt(publicKey: Data, message: Data) throws -> Data {
-            if keyPair == nil { throw SignalError.invalidKey }
-            
-            let version = message[0]
-            let iv = message[1...16]
-            let ivAndCyphertext = message[...(message.count-33)]
-            let ciphertext = message[17...(message.count-33)]
-            let mac = message[(message.count-32)...]
-            
-            if version != 1 { throw SignalError.invalidVersion }
-            
-            let ecRes = try SignalCommonCrypto.calculateAgreement(publicKeyData: publicKey.dropFirst(), privateKeyData: self.keyPair!.privateKey)
-            let keys = try SignalCommonCrypto.deriveSecrets(input: ecRes, info: "TextSecure Provisioning Message".toData())
-            try SignalCommonCrypto.verifyMAC(data: ivAndCyphertext, key: keys[1], expectedMAC: mac)
-            let plaintext = try SignalCommonCrypto.decrypt(message: ciphertext, key: keys[0], iv: iv)
-            
-            return plaintext
-        }
-        
-        public func encrypt(theirPublicKey: Data, plaintext: Data) throws -> (Data, Data) {
-            let ourKeyPair = try Signal.generateIdentityKeyPair()
-            let sharedSecret = try SignalCommonCrypto.calculateAgreement(publicKeyData: theirPublicKey, privateKeyData: ourKeyPair.privateKey)
-            let derivedSecret = try SignalCommonCrypto.deriveSecrets(input: sharedSecret, info: "TextSecure Provisioning Message".toData())
-            let iv = try SignalCommonCrypto.random(bytes: 16)
-            let encryptedMsg = try SignalCommonCrypto.encrypt(message: plaintext, key: derivedSecret[0], iv: iv)
-
-            let data = Data([1]) + iv + encryptedMsg
-            let mac = SignalCommonCrypto.calculateMAC(key: derivedSecret[1], data: data)
-            
-            return (data + mac, ourKeyPair.publicKey)
-        }
-    }
-
-    
-    /// Create a new identity key and create or replace the signal account.
-    /// Note that any existing devices asssociated with your account will be
-    /// purged as a result of this action.  This should only be used for new
-    /// accounts or when you need to start over.
     ///
-    /// - parameter deviceLabel: The public name to store in the Signal server.
+    /// Create a new identity key and create or replace the Signal server account.
+    /// *Note that any existing devices asssociated with your account will be
+    /// purged as a result of this action.  This should only be used for new
+    /// accounts or when you need to start over.*
+    ///
+    /// - parameter deviceLabel: The public device name to store in the Signal server
     /// - returns: A Promise to indicate completion or an error condition
+    ///
     public func registerAccount(deviceLabel: String) -> Promise<Void> {
         self.deviceLabel = deviceLabel
         var registrationId: UInt32
@@ -238,6 +194,78 @@ public class SignalClient {
         }
     }
     
+    ///
+    /// Register a new device with an existing Signal server account.
+    /// This uses Forsta's "autoprovisioning" procedure to
+    /// safely transfer the private key information from a user's
+    /// existing device to this new one.
+    ///
+    /// - parameter deviceLabel: This device's public name to store in the Signal server.
+    /// - returns: An `AutoprovisionTask` that the caller can then wait
+    ///            to `.complete` (a `Promise<Void>`), or optionally `.cancel()`.
+    ///
+    public func registerDevice(deviceLabel: String) -> AutoprovisionTask {
+        return AutoprovisionTask(deviceLabel: deviceLabel, signalClient: self)
+    }
+
+    ///
+    /// Respond positively to a provision request from a new foreign device.
+    /// *WARNING: This will deliver your private identity key to the
+    ///           requesting device!*
+    ///
+    /// - parameters:
+    ///     - uuidString: the UUID (string-encoded) provided for provisioning
+    ///     - ephemeralPublicKey: the ephemeral public key (32 bytes) provided by the new device
+    ///     - userAgent: our own user agent string
+    ///
+    /// - returns: A `Promise<Bool>` that resolves upon completion.
+    ///            (A resolution of `true` means our information was used;
+    ///            `false` means another device handled it first.)
+    ///
+    public func linkDevice(uuidString: String, ephemeralPublicKey: Data, userAgent: String = "LibRelaySwift") -> Promise<Bool> {
+        let ourIdentity = self.store.identityKeyStore.identityKeyPair()
+        let ourAddress = self.signalAddress
+        
+        return self.request(.devices, urlParameters: "/provisioning/code")
+            .then { result -> Promise<(Int, JSON)> in
+                let (code, json) = result
+                if code != 200 {
+                    throw ForstaError(.requestRejected, json)
+                }
+                if ourIdentity == nil || ourAddress == nil {
+                    throw ForstaError(.configuration, "identity or address not available")
+                }
+                
+                var message = Signal_ProvisionMessage()
+                message.identityKeyPrivate = ourIdentity!.privateKey
+                message.addr = ourAddress!.userId.lcString
+                message.userAgent = userAgent
+                message.provisioningCode = json["verificationCode"].stringValue
+                
+                let provisioningCipher = ProvisioningCipher()
+                let (body, myEphemeralPublicKey) = try provisioningCipher.encrypt(theirPublicKey: ephemeralPublicKey,
+                                                                                  plaintext: message.serializedData())
+                var envelope = Signal_ProvisionEnvelope()
+                envelope.body = body
+                envelope.publicKey = myEphemeralPublicKey
+                
+                return self.request(.provisioning, urlParameters: "/\(uuidString)", method: .put,
+                                    parameters: ["body": try envelope.serializedData().base64EncodedString()])
+            }
+            .map { result in
+                let (code, json) = result
+                
+                let handledByMe = code == 204
+                
+                // 404 means someone else handled it already.
+                if !handledByMe && code != 404 {
+                    throw ForstaError(.requestRejected, json)
+                }
+                
+                return handledByMe
+        }
+    }
+    
     
     /// Request delivery of an encrypted message to a specific device
     func deliverToDevice(address: SignalAddress, messageBundle: [String: Any]) -> Promise<(Int, JSON)> {
@@ -320,6 +348,108 @@ public class SignalClient {
         }
     }
     
+    /// Internal: Generate authorization header for Signal Server requests
+    private func authHeader() -> [String: String] {
+        if signalServerUsername != nil && signalServerPassword != nil {
+            let up64 = "\(signalServerUsername!):\(signalServerPassword!)".data(using: .utf8)!.base64EncodedString()
+            let auth = "Basic " + up64
+            return ["Authorization": auth]
+        } else {
+            return [:]
+        }
+    }
+    
+    /// Internal: Basic Signal Server http request that returns a `Promise` of `(statuscode, JSON)`
+    private func request(_ call: ServerCall, urlParameters: String = "", method: HTTPMethod = .get, parameters: Parameters? = nil) -> Promise<(Int, JSON)> {
+        guard serverUrl != nil else {
+            return Promise(error: ForstaError(.configuration, "No signal server url available."))
+        }
+        
+        return Promise { seal in
+            let headers = authHeader()
+            Alamofire.request("\(serverUrl!)\(call.rawValue)\(urlParameters)", method: method, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+                .responseJSON { response in
+                    let statusCode = response.response?.statusCode ?? 500
+                    switch response.result {
+                    case .success(let data):
+                        let json = JSON(data)
+                        seal.fulfill((statusCode, json))
+                    case .failure(let error):
+                        return seal.reject(ForstaError(.requestFailure, cause: error))
+                    }
+            }
+        }
+    }
+    
+    // -MARK: Utilities
+    
+    /// URL for the Signal server encrypted messaging socket
+    func messagingSocketUrl() throws -> String {
+        guard self.serverUrl != nil, self.signalServerUsername != nil, self.signalServerPassword != nil else {
+            throw ForstaError(.configuration , "no server url, username, or password")
+        }
+        return "\(self.serverUrl!)/v1/websocket/?login=\(self.signalServerUsername!)&password=\(self.signalServerPassword!)"
+    }
+    
+    /// URL for the Signal server provisioning socket
+    func provisioningSocketUrl() throws -> String {
+        guard self.serverUrl != nil else {
+            throw ForstaError(.configuration , "no server url")
+        }
+        return "\(self.serverUrl!)/v1/websocket/provisioning/"
+    }
+    
+    private func generatePassword() throws -> String {
+        return try String(SignalCommonCrypto.random(bytes: 16).base64EncodedString().dropLast(2))
+    }
+    
+    private func generateSignalingKey() throws -> Data {
+        return try SignalCommonCrypto.random(bytes: 32 + 20)
+    }
+
+    // -MARK: Related Subtypes
+    
+    private class ProvisioningCipher {
+        private var keyPair: KeyPair?
+        
+        func getPublicKey() throws -> Data {
+            if keyPair == nil { self.keyPair = try Signal.generateIdentityKeyPair() }
+            return self.keyPair!.publicKey
+        }
+        
+        func decrypt(publicKey: Data, message: Data) throws -> Data {
+            if keyPair == nil { throw SignalError.invalidKey }
+            
+            let version = message[0]
+            let iv = message[1...16]
+            let ivAndCyphertext = message[...(message.count-33)]
+            let ciphertext = message[17...(message.count-33)]
+            let mac = message[(message.count-32)...]
+            
+            if version != 1 { throw SignalError.invalidVersion }
+            
+            let ecRes = try SignalCommonCrypto.calculateAgreement(publicKeyData: publicKey.dropFirst(), privateKeyData: self.keyPair!.privateKey)
+            let keys = try SignalCommonCrypto.deriveSecrets(input: ecRes, info: "TextSecure Provisioning Message".toData())
+            try SignalCommonCrypto.verifyMAC(data: ivAndCyphertext, key: keys[1], expectedMAC: mac)
+            let plaintext = try SignalCommonCrypto.decrypt(message: ciphertext, key: keys[0], iv: iv)
+            
+            return plaintext
+        }
+        
+        public func encrypt(theirPublicKey: Data, plaintext: Data) throws -> (Data, Data) {
+            let ourKeyPair = try Signal.generateIdentityKeyPair()
+            let sharedSecret = try SignalCommonCrypto.calculateAgreement(publicKeyData: theirPublicKey, privateKeyData: ourKeyPair.privateKey)
+            let derivedSecret = try SignalCommonCrypto.deriveSecrets(input: sharedSecret, info: "TextSecure Provisioning Message".toData())
+            let iv = try SignalCommonCrypto.random(bytes: 16)
+            let encryptedMsg = try SignalCommonCrypto.encrypt(message: plaintext, key: derivedSecret[0], iv: iv)
+            
+            let data = Data([1]) + iv + encryptedMsg
+            let mac = SignalCommonCrypto.calculateMAC(key: derivedSecret[1], data: data)
+            
+            return (data + mac, ourKeyPair.publicKey)
+        }
+    }
+    
     /// Manage a requested autoprovision registration task for a new device
     public class AutoprovisionTask {
         private let provisioningCipher: ProvisioningCipher
@@ -327,7 +457,7 @@ public class SignalClient {
         private var userId: UUID? = nil
         private let signalClient: SignalClient
         private var wsr: WebSocketResource? = nil
-
+        
         init(deviceLabel: String, signalClient: SignalClient) {
             self.signalClient = signalClient
             self.signalClient.deviceLabel = deviceLabel
@@ -382,7 +512,7 @@ public class SignalClient {
         public var complete: Promise<Void> {
             var registrationId: UInt32
             var userId: UUID?
-
+            
             do {
                 self.signalClient.signalingKey = try self.signalClient.generateSignalingKey()
                 self.signalClient.signalServerPassword = try self.signalClient.generatePassword()
@@ -401,7 +531,7 @@ public class SignalClient {
                     if self.signalClient.serverUrl == nil {
                         throw ForstaError(.invalidPayload, "no serverUrl in account info")
                     }
-
+                    
                     self.wsr?.connect(url: try self.signalClient.provisioningSocketUrl())
                     print("connected provisioning socket")
                     userId = UUID(uuidString: accountInfo["userId"].stringValue)
@@ -425,7 +555,7 @@ public class SignalClient {
                     }
                     if self.signalClient.signalingKey == nil { throw ForstaError(.configuration, "Signaling key not available.") }
                     let provisioningCode = provisionMessage.provisioningCode
-
+                    
                     let parms: [String: Any] = [
                         "signalingKey": self.signalClient.signalingKey!.base64EncodedString(),
                         "supportsSms": false,
@@ -437,8 +567,8 @@ public class SignalClient {
                     print("sending provision request for new device")
                     return self.signalClient.request(.devices,
                                                      urlParameters: "/\(provisioningCode)",
-                                                     method: .put,
-                                                     parameters: parms)
+                        method: .put,
+                        parameters: parms)
                 }
                 .map { (code, json) in
                     guard code == 200, let deviceId = json["deviceId"].uInt32 else {
@@ -473,113 +603,6 @@ public class SignalClient {
         }
     }
     
-    ///
-    /// Register a new device with an existing Signal server account.
-    /// This uses Forsta's "autoprovisioning" procedure to
-    /// safely transfer the private key information from a user's
-    /// existing device to this new one.
-    ///
-    /// - parameter deviceLabel: This device's public name to store in the Signal server.
-    /// - returns: An `AutoprovisionTask` that the caller can then wait
-    ///            to `.complete` (a `Promise<Void>`), or optionally `.cancel()`.
-    ///
-    public func registerDevice(deviceLabel: String) -> AutoprovisionTask {
-        return AutoprovisionTask(deviceLabel: deviceLabel, signalClient: self)
-    }
-    
-    
-    ///
-    /// Respond positively to a provision request from a new foreign device.
-    /// *WARNING: This will deliver your private identity key to the
-    ///           requesting device!*
-    ///
-    /// - parameters:
-    ///     - uuidString: the UUID (string-encoded) provided for provisioning
-    ///     - ephemeralPublicKey: the ephemeral public key (32 bytes) provided by the new device
-    ///     - userAgent: our own user agent string
-    ///
-    /// - returns: A `Promise<Bool>` that resolves upon completion.
-    ///            (A resolution of `true` means our information was used;
-    ///            `false` means another device handled it first.)
-    ///
-    public func linkDevice(uuidString: String, ephemeralPublicKey: Data, userAgent: String = "LibRelaySwift") -> Promise<Bool> {
-        let ourIdentity = self.store.identityKeyStore.identityKeyPair()
-        let ourAddress = self.signalAddress
-        
-        return self.request(.devices, urlParameters: "/provisioning/code")
-            .then { result -> Promise<(Int, JSON)> in
-                let (code, json) = result
-                if code != 200 {
-                    throw ForstaError(.requestRejected, json)
-                }
-                if ourIdentity == nil || ourAddress == nil {
-                    throw ForstaError(.configuration, "identity or address not available")
-                }
-                
-                var message = Signal_ProvisionMessage()
-                message.identityKeyPrivate = ourIdentity!.privateKey
-                message.addr = ourAddress!.userId.lcString
-                message.userAgent = userAgent
-                message.provisioningCode = json["verificationCode"].stringValue
-                
-                let provisioningCipher = ProvisioningCipher()
-                let (body, myEphemeralPublicKey) = try provisioningCipher.encrypt(theirPublicKey: ephemeralPublicKey,
-                                                                                  plaintext: message.serializedData())
-                var envelope = Signal_ProvisionEnvelope()
-                envelope.body = body
-                envelope.publicKey = myEphemeralPublicKey
-
-                return self.request(.provisioning, urlParameters: "/\(uuidString)", method: .put,
-                                    parameters: ["body": try envelope.serializedData().base64EncodedString()])
-            }
-            .map { result in
-                let (code, json) = result
-                
-                let handledByMe = code == 204
-                
-                // 404 means someone else handled it already.
-                if !handledByMe && code != 404 {
-                    throw ForstaError(.requestRejected, json)
-                }
-                
-                return handledByMe
-        }
-    }
-    
-
-    /// Internal: Generate authorization header for Signal Server requests
-    private func authHeader() -> [String: String] {
-        if signalServerUsername != nil && signalServerPassword != nil {
-            let up64 = "\(signalServerUsername!):\(signalServerPassword!)".data(using: .utf8)!.base64EncodedString()
-            let auth = "Basic " + up64
-            return ["Authorization": auth]
-        } else {
-            return [:]
-        }
-    }
-    
-    /// Internal: Basic Signal Server http request that returns a `Promise` of `(statuscode, JSON)`
-    private func request(_ call: ServerCall, urlParameters: String = "", method: HTTPMethod = .get, parameters: Parameters? = nil) -> Promise<(Int, JSON)> {
-        guard serverUrl != nil else {
-            return Promise(error: ForstaError(.configuration, "No signal server url available."))
-        }
-        
-        return Promise { seal in
-            let headers = authHeader()
-            Alamofire.request("\(serverUrl!)\(call.rawValue)\(urlParameters)", method: method, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
-                .responseJSON { response in
-                    let statusCode = response.response?.statusCode ?? 500
-                    switch response.result {
-                    case .success(let data):
-                        let json = JSON(data)
-                        seal.fulfill((statusCode, json))
-                    case .failure(let error):
-                        return seal.reject(ForstaError(.requestFailure, cause: error))
-                    }
-            }
-        }
-    }
-    
     enum ServerCall: String {
         case accounts = "/v1/accounts"
         case devices = "/v1/devices"
@@ -589,19 +612,4 @@ public class SignalClient {
         case provisioning = "/v1/provisioning"
     }
     
-    /// URL for the Signal server encrypted messaging socket
-    func messagingSocketUrl() throws -> String {
-        guard self.serverUrl != nil, self.signalServerUsername != nil, self.signalServerPassword != nil else {
-            throw ForstaError(.configuration , "no server url, username, or password")
-        }
-        return "\(self.serverUrl!)/v1/websocket/?login=\(self.signalServerUsername!)&password=\(self.signalServerPassword!)"
-    }
-    
-    /// URL for the Signal server provisioning socket
-    func provisioningSocketUrl() throws -> String {
-        guard self.serverUrl != nil else {
-            throw ForstaError(.configuration , "no server url")
-        }
-        return "\(self.serverUrl!)/v1/websocket/provisioning/"
-    }
 }

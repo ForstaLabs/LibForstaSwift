@@ -18,35 +18,14 @@ public class MessageSender {
     /// the `SignalClient` that is being used by this sender
     let signalClient: SignalClient
 
+    // -MARK: Constructors
+    
     /// init with a `SignalClient`
     public init(signalClient: SignalClient) {
         self.signalClient = signalClient
     }
     
-    /// Information from the Signal server about a message transmission activity
-    public class TransmissionInfo: CustomStringConvertible {
-        /// time it was received
-        public let received: Date
-        /// whether it needs sync
-        public let needsSync: Bool
-        /// the recipient it was sent to
-        public let recipient: MessageRecipient
-        /// the number of devices involved (useful when the recipient was a `.user`)
-        public let deviceCount: Int
-        
-        /// init with recipient, device count, and Signal server response JSON
-        init(recipient: MessageRecipient, deviceCount: Int, json: JSON) {
-            self.received = Date(millisecondsSince1970: json["received"].uInt64Value)
-            self.needsSync = json["needsSync"].boolValue
-            self.recipient = recipient
-            self.deviceCount = deviceCount
-        }
-        
-        /// human-readable rendering of the info
-        public var description: String {
-            return "<<\(self.recipient) [\(self.deviceCount)] @ \(self.received.millisecondsSince1970), \(self.needsSync ? "needs sync" : "no sync needed")>>"
-        }
-    }
+    // -MARK: Methods
     
     /// Transmit a `Sendable` (i.e., a message) to a list of `MessageRecipient`
     /// (specific devices and/or users' whole collections of devices)
@@ -278,5 +257,32 @@ public class MessageSender {
         var thePad = Data(count: partSize + 1 - ((plaintext.count + 1) % partSize))
         thePad[0] = terminator
         plaintext.append(thePad)
+    }
+    
+    // -MARK: Related Subtypes
+    
+    /// Information from the Signal server about a message transmission activity
+    public class TransmissionInfo: CustomStringConvertible {
+        /// time it was received
+        public let received: Date
+        /// whether it needs sync
+        public let needsSync: Bool
+        /// the recipient it was sent to
+        public let recipient: MessageRecipient
+        /// the number of devices involved (useful when the recipient was a `.user`)
+        public let deviceCount: Int
+        
+        /// init with recipient, device count, and Signal server response JSON
+        init(recipient: MessageRecipient, deviceCount: Int, json: JSON) {
+            self.received = Date(millisecondsSince1970: json["received"].uInt64Value)
+            self.needsSync = json["needsSync"].boolValue
+            self.recipient = recipient
+            self.deviceCount = deviceCount
+        }
+        
+        /// human-readable rendering of the info
+        public var description: String {
+            return "<<\(self.recipient) [\(self.deviceCount)] @ \(self.received.millisecondsSince1970), \(self.needsSync ? "needs sync" : "no sync needed")>>"
+        }
     }
 }

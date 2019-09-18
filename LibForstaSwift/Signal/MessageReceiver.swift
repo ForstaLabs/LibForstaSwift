@@ -15,6 +15,8 @@ import SignalProtocol
 
 /// Read-receipt sync message from another of our devices
 public class ReadSyncReceipt: CustomStringConvertible {
+    // -MARK: Attributes
+    
     /// the read message's sender's userId
     public let sender: UUID
     /// the read message's timestamp (used to identify messages in Signal)
@@ -26,6 +28,8 @@ public class ReadSyncReceipt: CustomStringConvertible {
         self.timestamp = timestamp
     }
     
+    // -MARK: Utilities
+    
     /// human-readable string for this receipt
     public var description: String {
         return "ReadSyncReceipt(\(self.sender) @ \(self.timestamp.millisecondsSince1970 ))"
@@ -34,6 +38,8 @@ public class ReadSyncReceipt: CustomStringConvertible {
 
 /// Signal server delivery receipt for a message being received by a recipient's device
 public class DeliveryReceipt: CustomStringConvertible {
+    // -MARK: Attributes
+    
     /// the device that retrieved a sent message
     public let address: SignalAddress
     /// the timestamp of the sent message (used to identify messages in Signal)
@@ -45,6 +51,8 @@ public class DeliveryReceipt: CustomStringConvertible {
         self.timestamp = timestamp
     }
     
+    // -MARK: Utilities
+    
     /// human-readable string for this receipt
     public var description: String {
         return "DeliveryReceipt(\(self.address) @ \(self.timestamp.millisecondsSince1970 ))"
@@ -53,6 +61,8 @@ public class DeliveryReceipt: CustomStringConvertible {
 
 /// An inbound message (whether from another user or as a sync message from self)
 public class InboundMessage: CustomStringConvertible {
+    // -MARK: Attributes
+    
     /// Device that send the message (note that this would be one of ours if it is a sync message)
     public var source: SignalAddress
     /// Timestamp of the sent message
@@ -68,15 +78,20 @@ public class InboundMessage: CustomStringConvertible {
     /// Whether the expiration-timer-update flag was set in the envelope
     public var expirationTimerUpdateFlag: Bool
     
-    /// The Signal envelope body (for Forsta messages, this will be the Forsta message exchange payload JSON string)
-    public var signalBody: String
-    /// A `ForstaPayloadV1` initialized with the signalBody (finding and expressing the v1 payload if available)
+    /// A `ForstaPayloadV1` initialized with the the inbound message's envelope body
     public var payload: ForstaPayloadV1
     
     /// Expiration start-time (if there was an expiration and this is a sync message from another of our devices)
     public var expirationStart: Date?
     /// The "destination" set in the sync message container (in Forsta, this is usually the threadId for the message)
     public var destination: String?
+    
+    // -MARK: Internal Attributes
+    
+    /// The Signal envelope body you shouldn't need to look at directly
+    /// because `.payload` will give the information to you in a nice form
+    public var signalBody: String
+    
     
     /// Create an `InboundMessage` to be broadcast to interested parties
     init(source: SignalAddress,
@@ -102,6 +117,8 @@ public class InboundMessage: CustomStringConvertible {
         self.destination = destination
     }
     
+    // -MARK: Utilities
+    
     /// human-readable string to get the gist of this `InboundMessage`
     public var description: String {
         return """
@@ -121,12 +138,15 @@ public class MessageReceiver {
     /// The `WebSocketResource` to listen to
     let wsr: WebSocketResource
     
+    // -MARK: Constructors
+    
     /// Init with `SignalClient` and an optional `WebSocketResource` to use (it will make its own if not provided)
     public init(signalClient: SignalClient, webSocketResource: WebSocketResource? = nil) {
         self.signalClient = signalClient
         self.wsr = webSocketResource ?? WebSocketResource()
         self.wsr.requestHandler = self.handleRequest
     }
+    
     
     /// Handle an incoming websocket request (/queue/empty or /message), decoding and decrypting for this device
     private func handleRequest(request: IncomingWSRequest) {

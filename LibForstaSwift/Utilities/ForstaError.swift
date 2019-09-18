@@ -163,7 +163,7 @@ public final class ForstaError: CustomStringConvertible, Error {
         return JSON(string: self.message ?? "{\"message\": \"<empty>\"}") ?? JSON(["message": self.message ?? "<empty>"])
     }
     
-    //-MARK: Related Types
+    //-MARK: Related Subypes
     
     /// The different types of errors that LibForstaSwift can throw.
     public enum ErrorType: String {
