@@ -10,6 +10,7 @@ import Foundation
 import PromiseKit
 import Starscream
 import SignalProtocol
+import SwiftyJSON
 
 /// Address for specifying recipients for sending
 public enum MessageRecipient {
@@ -32,6 +33,8 @@ public protocol Sendable {
     /// The Signal envelope expiration-timer update flag
     var expirationTimerUpdateFlag: Bool { get }
 
+    /// Information about uploaded attachments (use `SignalClient`.`uploadAttachment(...)` to do this)
+    var attachments: [AttachmentInfo] { get }
     /// The Forsta message payload
     var payload: ForstaPayloadV1 { get }
 }
@@ -42,15 +45,31 @@ extension Sendable {
     /// INTERNAL: the Signal_Content protobuf encoding for this `Sendable`
     var contentProto: Signal_Content {
         get {
+            var json = payload.json
+            if !json["data"].exists() { json["data"] = JSON([:]) }
+            json["data"]["attachments"] = JSON(attachments.map { info in [
+                "name": info.name,
+                "size": info.size,
+                "type": info.type,
+                "mtime": info.mtime.millisecondsSince1970
+                ]
+            })
+            
             var dm = Signal_DataMessage()
-            dm.body = "[\(payload.jsonString)]"
+            dm.body = "[\(json.rawString([.castNilToNSNull: true]) ?? "<malformed JSON>")]"
             if self.expiration != nil { dm.expireTimer = UInt32(self.expiration!.milliseconds) }
             var flags: UInt32 = 0
             if self.endSessionFlag { flags |= UInt32(Signal_DataMessage.Flags.endSession.rawValue) }
             if self.expirationTimerUpdateFlag { flags |= UInt32(Signal_DataMessage.Flags.expirationTimerUpdate.rawValue) }
             if flags != 0 { dm.flags = flags }
 
-            // TODO: set .attachments based on some sort of attachment pointers...
+            dm.attachments = attachments.map { info -> Signal_AttachmentPointer in
+                var pointer = Signal_AttachmentPointer()
+                pointer.id = info.id
+                pointer.contentType = info.type
+                pointer.key = info.key
+                return pointer
+            }
 
             var content = Signal_Content()
             content.dataMessage = dm

@@ -59,24 +59,25 @@ public class DeliveryReceipt: CustomStringConvertible {
     }
 }
 
+/// Information about an attached file that has been encrypted and uploaded
 public class AttachmentInfo: CustomStringConvertible {
     // -MARK: Attributes
-    /// file name
+    /// The file name
     public let name: String
-    /// file size in bytes
-    public let size: UInt32
-    /// file modification time
+    /// The file size in bytes
+    public let size: Int
+    /// The file modification time
     public let mtime: Date
 
-    /// content mime type
+    /// The file content mime type
     public let type: String
-    /// the external storage id
+    /// The storage id used to download the encrypted file contents
     public let id: UInt64
-    /// the encryption key
+    /// The key used to encrypt the file contents before upload
     public let key: Data
     
 
-    init(name: String, size: UInt32, type: String, mtime: Date, id: UInt64, key: Data) {
+    init(name: String, size: Int, type: String, mtime: Date, id: UInt64, key: Data) {
         self.name = name
         self.size = size
         self.type = type
@@ -87,9 +88,9 @@ public class AttachmentInfo: CustomStringConvertible {
     
     // -MARK: Utilities
     
-    /// human-readable string for this info
+    /// A human-readable summary of this info
     public var description: String {
-        return "\(name)<\(type)> \(size) (\(mtime))"
+        return "<\(id): \(name), \(type), \(size) bytes>"
     }
 }
 
@@ -156,7 +157,7 @@ public class InboundMessage: CustomStringConvertible {
         self.attachments = zip(signalAttachments, self.payload.json["data"]["attachments"].arrayValue).map {
             let (signal, forsta) = $0
             return AttachmentInfo(name: forsta["name"].stringValue,
-                                  size: forsta["size"].uInt32Value,
+                                  size: forsta["size"].intValue,
                                   type: signal.contentType,
                                   mtime: Date(millisecondsSince1970: forsta["mtime"].uInt64 ?? Date().millisecondsSince1970),
                                   id: signal.id,
