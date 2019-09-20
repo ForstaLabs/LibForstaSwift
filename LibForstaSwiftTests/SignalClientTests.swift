@@ -74,7 +74,7 @@ class SignalClientTests: XCTestCase {
     func testPayload() {
         var payload = ForstaPayloadV1()
         
-        XCTAssert(payload.jsonString == "{\"version\": 1}")
+        XCTAssert(payload.jsonString == "{\"version\":1}")
         
         let messageId = UUID()
         XCTAssert(payload.messageId == nil)
@@ -96,7 +96,7 @@ class SignalClientTests: XCTestCase {
         payload.callOriginator = originator
         XCTAssert(payload.callOriginator! == originator)
 
-        let offer = "some sdp call offer string"
+        let offer = "some sdp call \n offer string"
         XCTAssert(payload.sdpOffer == nil)
         payload.sdpOffer = offer
         XCTAssert(payload.sdpOffer! == offer)
@@ -748,7 +748,7 @@ class SignalClientTests: XCTestCase {
                     }
             }
             
-            wait(for: [theEnd], timeout: 60.0 * 60.0)
+            wait(for: [theEnd], timeout: 4 * 60.0 * 60.0)
             forsta.disconnect()
         } catch let error {
             XCTFail("surprising error \(error)")

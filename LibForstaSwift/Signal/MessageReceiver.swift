@@ -60,6 +60,7 @@ public class DeliveryReceipt: CustomStringConvertible {
 }
 
 /// Information about an attached file that has been encrypted and uploaded
+/// (use `SignalClient`.`uploadAttachment(...)` to get these)
 public class AttachmentInfo: CustomStringConvertible {
     // -MARK: Attributes
     /// The file name

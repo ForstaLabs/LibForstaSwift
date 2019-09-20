@@ -445,7 +445,9 @@ public class ForstaPayloadV1: CustomStringConvertible {
     
     /// The current underlying `JSON` object encoded as a JSON string
     var jsonString: String {
-        return json.rawString([.castNilToNSNull: true]) ?? "<malformed JSON>"
+        let jsonData = try! JSONEncoder().encode(self.json)
+        let jsonString = String(data: jsonData, encoding: .utf8)!
+        return jsonString
     }
     
     /// A pretty-printed version of the current payload's JSON string
