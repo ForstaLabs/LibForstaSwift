@@ -35,6 +35,9 @@ public class MessageSender {
     ///     - recipients: the list of recipients (optional) -- empty means only send sync to self
     ///     - syncToSelf: whether or not to sync to our other devices (defaults to `true`)
     ///
+    /// - returns: a `Promise<[TransmissionInfo]>` with information
+    ///            about the transmission to each of the recipients
+    ///
     /// Note: References to self (our specific `.device`, or all of our devices in the case of
     ///       our `.user`) are ignored in the list of recipients.
     ///
@@ -72,7 +75,7 @@ public class MessageSender {
     func sendSync(signalContent: Signal_Content,
                           timestamp: Date,
                           threadId: UUID? = nil,
-                          expirationStartTimestamp: Date? = nil) -> Promise<MessageSender.TransmissionInfo> {
+                          expirationStartTimestamp: Date? = nil) -> Promise<TransmissionInfo> {
         let dataMessage = signalContent.dataMessage
         
         var sentMessage = Signal_SyncMessage.Sent()
@@ -92,7 +95,7 @@ public class MessageSender {
         content.syncMessage = syncMessage
         
         guard let userId = self.signalClient.signalAddress?.userId else {
-            return Promise<MessageSender.TransmissionInfo>.init(error: ForstaError(.configuration, "my own userId isn't available"))
+            return Promise<TransmissionInfo>.init(error: ForstaError(.configuration, "my own userId isn't available"))
         }
         
         do {
@@ -100,7 +103,40 @@ public class MessageSender {
             pad(&paddedClearData)
             return self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: timestamp)
         } catch let error {
-            return Promise<MessageSender.TransmissionInfo>.init(error: ForstaError("couldn't serialize content", cause: error))
+            return Promise<TransmissionInfo>.init(error: ForstaError("couldn't serialize content", cause: error))
+        }
+    }
+    
+    ///
+    /// Send a sync message of a list of `SyncReadReceipt` to our other devices to indicate specific messages having been read.
+    ///
+    /// - parameters:
+    ///     - receipts: the list of read-receipts for messages from others
+    ///
+    /// - returns:a `Promise<TransmissionInfo>` indicating the success of the transmission
+    ///
+    public func sendSyncReadReceipts(_ receipts: [SyncReadReceipt]) -> Promise<TransmissionInfo> {
+        var syncMessage = Signal_SyncMessage()
+        syncMessage.read = receipts.map {
+            var receipt = Signal_SyncMessage.Read()
+            receipt.timestamp = $0.timestamp.millisecondsSince1970
+            receipt.sender = $0.sender.lcString
+            return receipt
+        }
+        
+        var content = Signal_Content()
+        content.syncMessage = syncMessage
+        
+        guard let userId = self.signalClient.signalAddress?.userId else {
+            return Promise<TransmissionInfo>.init(error: ForstaError(.configuration, "my own userId isn't available"))
+        }
+        
+        do {
+            var paddedClearData = try content.serializedData()
+            pad(&paddedClearData)
+            return self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: Date.timestamp)
+        } catch let error {
+            return Promise<TransmissionInfo>.init(error: ForstaError("couldn't serialize content", cause: error))
         }
     }
 

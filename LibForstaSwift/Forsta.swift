@@ -8,18 +8,16 @@
 
 import Foundation
 import PromiseKit
-import SwiftyJSON
-import SignalProtocol
 
 /// This is THE top-level helper class for using LibForstaSwift.
 public class Forsta {
     // -MARK: Attributes
     
-    /// An Atlas client for all Forsta Atlas server operations.
+    /// An Atlas client for Forsta Atlas server operations.
     /// This will restore from the kvstore and continue using an authenticated session if possible.
     public let atlas: AtlasClient
     
-    /// A Signal client for all Forsta Signal server operations.
+    /// A Signal client for Forsta Signal server operations.
     /// This uses the kvstore to maintain cryptographic messaging keys and sessions, and remote account/device identities.
     public let signal: SignalClient
     
@@ -38,14 +36,14 @@ public class Forsta {
         self.sender = MessageSender(signalClient: signal)
     }
     
-    // -MARK: Pass-throughs for everything outside the Atlas and Signal clients
+    // -MARK: Pass-throughs for operations outside the Atlas and Signal clients
     
-    /// Connect the Signal Server web socket for messaging.
+    /// Connect the Signal server web socket for messaging.
     public func connect() throws {
         self.wsr.connect(url: try self.signal.messagingSocketUrl())
     }
     
-    /// Disconnect the Signal Server web socket.
+    /// Disconnect the Signal server web socket.
     public func disconnect() {
         self.wsr.disconnect()
     }
@@ -56,7 +54,10 @@ public class Forsta {
     /// - parameters:
     ///     - sendable: the `Sendable` message
     ///     - recipients: the list of recipients (optional) -- empty means only send sync to self
-    ///     - syncToSelf: whether or not to sync to our other devices (defaults to `true`)
+    ///     - syncToSelf: whether or not to send this message to our other devices (defaults to `true`)
+    ///
+    /// - returns: a `Promise<[MessageSender.TransmissionInfo]>` with information
+    ///            about the transmission to each of the recipients
     ///
     /// Note: References to self (our specific `.device`, or all of our devices in the case of
     ///       our `.user`) are ignored in the list of recipients.
@@ -65,5 +66,17 @@ public class Forsta {
                      to recipients: [MessageRecipient] = [],
                      syncToSelf: Bool = true) -> Promise<[MessageSender.TransmissionInfo]> {
         return self.sender.send(sendable, to: recipients, syncToSelf: syncToSelf)
+    }
+    
+    ///
+    /// Send a sync message of a list of `SyncReadReceipt` to our other devices to indicate specific messages having been read.
+    ///
+    /// - parameters:
+    ///     - receipts: the list of read-receipts for messages from others
+    ///
+    /// - returns:a `Promise<MessageSender.TransmissionInfo>` indicating the success of the transmission
+    ///
+    public func sendSyncReadReceipts(_ receipts: [SyncReadReceipt]) -> Promise<MessageSender.TransmissionInfo> {
+        return self.sender.sendSyncReadReceipts(receipts)
     }
 }

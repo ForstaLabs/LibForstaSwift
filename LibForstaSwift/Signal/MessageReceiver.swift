@@ -13,8 +13,8 @@ import Starscream
 import SignalProtocol
 
 
-/// Read-receipt sync message from another of our devices
-public class ReadSyncReceipt: CustomStringConvertible {
+/// Read-receipt to indicate *among our own devices* what messages have been read by the user
+public class SyncReadReceipt: CustomStringConvertible {
     // -MARK: Attributes
     
     /// the read-message's sender's userId
@@ -32,7 +32,7 @@ public class ReadSyncReceipt: CustomStringConvertible {
     
     /// human-readable string for this receipt
     public var description: String {
-        return "ReadSyncReceipt(\(self.sender) @ \(self.timestamp.millisecondsSince1970))"
+        return "SyncReadReceipt(\(self.sender) @ \(self.timestamp.millisecondsSince1970))"
     }
 }
 
@@ -253,16 +253,16 @@ public class MessageReceiver {
             dm = content.dataMessage
         } else if content.hasSyncMessage && content.syncMessage.read.count > 0 {
             // receiving a collection of read-receipts from another device for this account
-            var receipts = [ReadSyncReceipt]()
+            var receipts = [SyncReadReceipt]()
             for r in content.syncMessage.read {
                 guard let sender: UUID = UUID(uuidString: r.sender) else {
                     throw ForstaError(.invalidMessage, "Synced read-receipt has malformed sender: \(r.sender)")
                 }
                 let timestamp: Date = Date(millisecondsSince1970: r.timestamp)
-                receipts.append(ReadSyncReceipt(sender, timestamp))
+                receipts.append(SyncReadReceipt(sender, timestamp))
             }
             happy = true
-            NotificationCenter.broadcast(.signalReadSyncReceipts, ["readSyncReceipts": receipts])
+            NotificationCenter.broadcast(.signalSyncReadReceipts, ["syncReadReceipts": receipts])
         }
         
         if dm != nil {

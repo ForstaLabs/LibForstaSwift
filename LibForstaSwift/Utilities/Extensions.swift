@@ -33,8 +33,8 @@ public extension Notification.Name {
     static let signalInboundMessage = Notification.Name("signalInboundMessage")
     
     /// Incoming read receipts
-    /// -- includes "readSyncReceipts" of type [ReadSyncReceipt]
-    static let signalReadSyncReceipts = Notification.Name("signalReadSyncReceipts")
+    /// -- includes "syncReadReceipts" of type [SyncReadReceipt]
+    static let signalSyncReadReceipts = Notification.Name("signalSyncReadReceipts")
 
     /// Incoming queue is now empty
     /// -- includes no extra data

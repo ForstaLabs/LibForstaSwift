@@ -372,10 +372,10 @@ class SignalClientTests: XCTestCase {
         }
         
         let _ = NotificationCenter.default.addObserver(
-            forName: .signalReadSyncReceipts,
+            forName: .signalSyncReadReceipts,
             object: nil,
             queue: nil) { notification in
-                let receipts = notification.userInfo?["readSyncReceipts"] as! [ReadSyncReceipt]
+                let receipts = notification.userInfo?["syncReadReceipts"] as! [SyncReadReceipt]
                 print("\n>>>", receipts)
         }
         
@@ -731,19 +731,25 @@ class SignalClientTests: XCTestCase {
                     let inbound = notification.userInfo?["inboundMessage"] as? InboundMessage
                     if inbound?.payload.messageType! == .content {
                         if inbound!.payload.bodyPlain == "end" { theEnd.fulfill() }
-                        self.buildResponse(to: inbound!, using: forsta)
-                            .map { outbound in
-                                print("\n>>>", outbound)
-                                return outbound
-                            }
-                            .then { outbound in
-                                forsta.send(outbound, to: [.user(inbound!.source.userId)])
-                            }
-                            .map { response in
-                                print("send result:", response)
-                            }
-                            .catch { error in
-                                XCTFail("send error \(error)")
+                        forsta.sendSyncReadReceipts([SyncReadReceipt(inbound!.source.userId, inbound!.timestamp)])
+                            .map { results in
+                                let _ = print("sent sync read receipts", results)
+                        }
+                        .then {
+                            self.buildResponse(to: inbound!, using: forsta)
+                        }
+                        .map { outbound in
+                            print("\n>>>", outbound)
+                            return outbound
+                        }
+                        .then { outbound in
+                            forsta.send(outbound, to: [.user(inbound!.source.userId)])
+                        }
+                        .map { response in
+                            print("send result:", response)
+                        }
+                        .catch { error in
+                            XCTFail("send error \(error)")
                         }
                     }
             }
