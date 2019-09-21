@@ -735,6 +735,22 @@ class SignalClientTests: XCTestCase {
                             .map { results in
                                 let _ = print("sent sync read receipts", results)
                         }
+                        .map { _ in
+                            let msg = Message(
+                                messageType: .control,
+                                threadId: inbound!.payload.threadId!,
+                                threadExpression: inbound!.payload.threadExpression!
+                            )
+                            msg.payload.controlType = .readMark
+                            msg.payload.readMark = inbound!.timestamp
+                            return msg
+                        }
+                        .then { readMark in
+                            forsta.send(readMark, to: [.user(inbound!.source.userId)])
+                        }
+                        .map { results in
+                            let _ = print("\nsent a readMark", results)
+                        }
                         .then {
                             self.buildResponse(to: inbound!, using: forsta)
                         }
@@ -790,7 +806,6 @@ class SignalClientTests: XCTestCase {
                                threadExpression: inbound.payload.threadExpression!,
                                bodyPlain: outText,
                                attachments: attachments)
-                
         }
     }
     

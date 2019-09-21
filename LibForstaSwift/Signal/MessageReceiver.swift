@@ -23,7 +23,7 @@ public class SyncReadReceipt: CustomStringConvertible {
     public let timestamp: Date
     
     /// init with sender and timestamp
-    init(_ sender: UUID, _ timestamp: Date) {
+    public init(_ sender: UUID, _ timestamp: Date) {
         self.sender = sender
         self.timestamp = timestamp
     }
