@@ -294,14 +294,14 @@ public class ForstaPayloadV1: CustomStringConvertible {
     /// callVersion (only relevant for call-related `.control` messages)
     public var callVersion: Int? {
         get {
-            return json["data"]["callVersion"].int
+            return json["data"]["version"].int
         }
         set(value) {
             if value == nil {
-                clearKey(["data", "callVersion"])
+                clearKey(["data", "version"])
             } else {
                 ensurePath(["data"])
-                json["data"]["callVersion"].int = value!
+                json["data"]["version"].int = value!
             }
         }
     }
