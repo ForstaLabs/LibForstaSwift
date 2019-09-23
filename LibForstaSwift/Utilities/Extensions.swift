@@ -180,4 +180,18 @@ public extension String {
     func indentWith(_ prefix: String) -> String {
         return prefix + self.replacingOccurrences(of: "\n", with: "\n" + prefix)
     }
+    
+    var lowercasedJsonUuidValues: String {
+        let input = self as NSString
+        var output = self
+        
+        if let regex = try? NSRegularExpression(pattern: #""[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}""#) {
+            for match in regex.matches(in: self, options: [], range:NSRange(location: 0, length: input.length)) {
+                let range = Range(match.range, in: output)
+                output = output.replacingCharacters(in: range!, with: output[range!].lowercased())
+            }
+        }
+        
+        return output
+    }
 }
