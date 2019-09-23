@@ -216,7 +216,7 @@ public class SignalClient {
     ///
     /// - parameters:
     ///     - uuidString: the UUID (string-encoded) provided for provisioning
-    ///     - ephemeralPublicKey: the ephemeral public key (32 bytes) provided by the new device
+    ///     - ephemeralPublicKey: the ephemeral public key (33 bytes) provided by the new device
     ///     - userAgent: our own user agent string
     ///
     /// - returns: A `Promise<Bool>` that resolves upon completion.
@@ -536,7 +536,7 @@ public class SignalClient {
         
         public func encrypt(theirPublicKey: Data, plaintext: Data) throws -> (Data, Data) {
             let ourKeyPair = try Signal.generateIdentityKeyPair()
-            let sharedSecret = try SignalCommonCrypto.calculateAgreement(publicKeyData: theirPublicKey, privateKeyData: ourKeyPair.privateKey)
+            let sharedSecret = try SignalCommonCrypto.calculateAgreement(publicKeyData: theirPublicKey.dropFirst(), privateKeyData: ourKeyPair.privateKey)
             let derivedSecret = try SignalCommonCrypto.deriveSecrets(input: sharedSecret, info: "TextSecure Provisioning Message".toData())
             let iv = try SignalCommonCrypto.random(bytes: 16)
             let encryptedMsg = try SignalCommonCrypto.encrypt(message: plaintext, key: derivedSecret[0], iv: iv)
@@ -697,6 +697,4 @@ public class SignalClient {
         case attachment = "/v1/attachments"
         case provisioning = "/v1/provisioning"
     }
-    
-    public typealias ProgressHandler = (Progress) -> Void
 }

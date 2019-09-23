@@ -74,7 +74,7 @@ class SignalClientTests: XCTestCase {
     func testPayload() {
         var payload = ForstaPayloadV1()
         
-        XCTAssert(payload.jsonString == "{\"version\":1}")
+        XCTAssert(payload.json() == "[{\"version\":1}]")
         
         let messageId = UUID()
         XCTAssert(payload.messageId == nil)
@@ -88,8 +88,9 @@ class SignalClientTests: XCTestCase {
         
         let sender = SignalAddress(userId: UUID(), deviceId: Int32(42))
         XCTAssert(payload.sender == nil)
-        payload.sender = sender
-        XCTAssert(payload.sender! == sender)
+        payload.sender = sender.payloadSchema
+        XCTAssert(payload.sender!.device == sender.payloadSchema.device)
+        XCTAssert(payload.sender!.userId == sender.payloadSchema.userId)
         
         let originator = UUID()
         XCTAssert(payload.callOriginator == nil)
@@ -121,19 +122,15 @@ class SignalClientTests: XCTestCase {
         payload.controlType = controlType
         XCTAssert(payload.controlType! == controlType)
         
-        let body: [ForstaPayloadV1.BodyItem] = [.plain("yo baby")]
-        XCTAssert(payload.body == nil)
+        XCTAssert(payload.data?.body == nil)
         XCTAssert(payload.bodyPlain == nil)
         XCTAssert(payload.bodyHtml == nil)
-        payload.body = body
-        XCTAssert(payload.body != nil)
+        payload.bodyPlain = "plain stuff"
+        payload.bodyHtml = "html stuff"
+        XCTAssert(payload.data?.body != nil)
         XCTAssert(payload.bodyPlain != nil)
-        XCTAssert(payload.bodyHtml == nil)
-        switch payload.body![0] {
-        case .plain(let string): XCTAssert(string == "yo baby")
-        default: XCTFail()
-        }
-        XCTAssert(payload.bodyPlain == "yo baby")
+        XCTAssert(payload.bodyHtml != nil)
+        XCTAssert(payload.bodyPlain == "plain stuff")
         
         let threadExpression = "@foo + @bar"
         XCTAssert(payload.threadExpression == nil)
@@ -160,7 +157,7 @@ class SignalClientTests: XCTestCase {
         payload.userAgent = userAgent
         XCTAssert(payload.userAgent! == userAgent)
         
-        print("filled:", payload.jsonString)
+        print("filled:", payload)
         
         payload.messageId = nil
         XCTAssert(payload.messageId == nil)
@@ -189,10 +186,11 @@ class SignalClientTests: XCTestCase {
         payload.callMembers = nil
         XCTAssert(payload.callMembers == nil)
         
-        payload.body = nil
-        XCTAssert(payload.body == nil)
+        payload.bodyPlain = nil
+        payload.bodyHtml = nil
         XCTAssert(payload.bodyPlain == nil)
         XCTAssert(payload.bodyHtml == nil)
+        XCTAssert(payload.data?.body?.count == nil)
         
         payload.threadExpression = nil
         XCTAssert(payload.threadExpression == nil)
@@ -209,9 +207,9 @@ class SignalClientTests: XCTestCase {
         payload.userAgent = nil
         XCTAssert(payload.userAgent == nil)
         
-        XCTAssert(payload.json["version"] == 1)
-        XCTAssert(!(payload.json["data"].exists()))
-        
+        print("emptied:", payload)
+        XCTAssert(payload.version == 1)
+
         payload = ForstaPayloadV1()
         XCTAssert(payload.threadUpdateExpression == nil)
         payload.threadUpdateExpression = "@a + @b"
@@ -224,6 +222,7 @@ class SignalClientTests: XCTestCase {
         XCTAssert(payload.threadUpdateTitle == "a title")
         payload.threadUpdateTitle = nil
         XCTAssert(payload.threadUpdateTitle == nil)
+        print("emptied2:", payload)
         
         let now = Date.timestamp
         XCTAssert(payload.readMark == nil)
