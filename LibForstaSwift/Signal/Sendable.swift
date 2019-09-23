@@ -54,9 +54,9 @@ extension Sendable {
                 "mtime": info.mtime.millisecondsSince1970
                 ]
             })
-            
+
             var dm = Signal_DataMessage()
-            dm.body = "[\(json.rawString([.castNilToNSNull: true]) ?? "<malformed JSON>")]"
+            dm.body = "[\(ForstaPayloadV1(json).jsonString)]"
             if self.expiration != nil { dm.expireTimer = UInt32(self.expiration!.milliseconds) }
             var flags: UInt32 = 0
             if self.endSessionFlag { flags |= UInt32(Signal_DataMessage.Flags.endSession.rawValue) }

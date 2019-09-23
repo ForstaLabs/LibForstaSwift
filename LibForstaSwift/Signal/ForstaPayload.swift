@@ -445,7 +445,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
     
     /// The current underlying `JSON` object encoded as a JSON string
     var jsonString: String {
-        let jsonData = try! JSONEncoder().encode(self.json)
+        let jsonData = (try? JSONEncoder().encode(self.json)) ?? "<json ecoding error>".toData()
         let jsonString = String(data: jsonData, encoding: .utf8)!
         return jsonString
     }
