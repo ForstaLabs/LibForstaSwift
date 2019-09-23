@@ -217,12 +217,10 @@ public class AtlasClient {
     
     /// Internal: Request a refreshed JWT token from Atlas.
     private func requestJwtRefresh(_ jwt: String) -> Promise<String> {
-        print("requesting refresh")
         return request("/v1/api-token-refresh/", method: .post, parameters: ["token": jwt])
             .map { (statusCode, json) in
                 if statusCode == 200 {
                     if let jwt = json["token"].string {
-                        print("got new jwt")
                         return jwt
                     } else {
                         throw ForstaError(.malformedResponse, "missing JWT in refresh response")

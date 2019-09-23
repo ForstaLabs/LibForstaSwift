@@ -572,9 +572,6 @@ public class SignalClient {
                         }
                         self.signalClient.atlasClient.provisionSignalDevice(uuidString: proto.uuid,
                                                                             pubKeyString: try self.provisioningCipher.getPublicKey().base64EncodedString())
-                            .done { _ in
-                                print("(request to send provisioning help succeeded)")
-                            }
                             .catch { error in
                                 self.waitSeal.reject(ForstaError("request to provision device failed", cause: error))
                         }
@@ -593,10 +590,6 @@ public class SignalClient {
                     self.waitSeal.reject(ForstaError(.unknown, "unexpected websocket request \(request.verb) \(request.path)"))
                 }
             })
-        }
-        
-        deinit {
-            print("(destroying autoprovision-task)")
         }
         
         /// Cancel a device registration that is underway.
@@ -621,7 +614,6 @@ public class SignalClient {
             
             return self.signalClient.atlasClient.getSignalAccountInfo()
                 .then { accountInfo -> Promise<Signal_ProvisionEnvelope> in
-                    print("retrieved account info")
                     guard accountInfo["devices"].arrayValue.count > 0 else {
                         throw ForstaError(ForstaError.ErrorType.configuration, "must use registerAccount for first device")
                     }
@@ -631,16 +623,15 @@ public class SignalClient {
                     }
                     
                     self.wsr?.connect(url: try self.signalClient.provisioningSocketUrl())
-                    print("connected provisioning socket")
                     userId = UUID(uuidString: accountInfo["userId"].stringValue)
                     if userId == nil {
                         throw ForstaError(.invalidPayload, "no userId in account info")
                     }
-                    print("waiting on help to arrive...")
+                    print("(waiting on provisioning help to arrive)")
                     return self.waiter
                 }
                 .then { envelope -> Promise<(Int, JSON)> in
-                    print("help has arrived!")
+                    print("(provisioning help arrived)")
                     let plaintext = try self.provisioningCipher.decrypt(publicKey: envelope.publicKey, message: envelope.body)
                     let provisionMessage = try Signal_ProvisionMessage(serializedData: plaintext)
                     let identity = try SignalCommonCrypto.generateKeyPairFromPrivateKey(privateKeyData: provisionMessage.identityKeyPrivate)
@@ -662,7 +653,6 @@ public class SignalClient {
                         "name": self.signalClient.deviceLabel ?? "no device label??"
                     ]
                     self.signalClient.signalServerUsername = self.userId!.lcString
-                    print("sending provision request for new device")
                     return self.signalClient.request(.devices,
                                                      urlParameters: "/\(provisioningCode)",
                         method: .put,
@@ -672,7 +662,6 @@ public class SignalClient {
                     guard code == 200, let deviceId = json["deviceId"].uInt32 else {
                         throw ForstaError(.requestRejected, json)
                     }
-                    print("success, got new deviceId", deviceId)
                     self.signalClient.signalAddress = SignalAddress(userId: userId!, deviceId: deviceId)
                     self.signalClient.signalServerUsername = self.signalClient.signalAddress?.description
                     guard let myPubKey = self.signalClient.store.identityKeyStore.identityKeyPair()?.publicKey else {
@@ -684,7 +673,6 @@ public class SignalClient {
                         throw ForstaError(.storageError, "unable to store self identity key")
                     }
                     
-                    print("killing socket")
                     self.wsr?.disconnect()
                     self.wsr = nil
                 }

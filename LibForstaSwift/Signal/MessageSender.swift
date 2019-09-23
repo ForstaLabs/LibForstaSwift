@@ -266,19 +266,16 @@ public class MessageSender {
                         for extra in json["extraDevices"].arrayValue {
                             let deviceId = extra.uInt32Value
                             let _ = self.signalClient.store.sessionStore.deleteSession(for: SignalAddress(userId: userId, deviceId: deviceId))
-                            print("removed extra device \(deviceId)")
                         }
                     } else {
                         // close open sessions on stale devices
                         for extra in json["staleDevices"].arrayValue {
                             let deviceId = extra.uInt32Value
                             let _ = self.signalClient.store.sessionStore.deleteSession(for: SignalAddress(userId: userId, deviceId: deviceId))
-                            print("removed stale device \(deviceId)")
                         }
                     }
                     
                     // no optimization for now -- just update all of the device keys for the user
-                    print("updating prekeys for user \(userId)")
                     return self.updatePrekeysForUser(userId).then {
                         self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: timestamp, allowRetries: statusCode == 409)
                     }

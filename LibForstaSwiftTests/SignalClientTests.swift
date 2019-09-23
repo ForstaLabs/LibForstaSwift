@@ -686,7 +686,7 @@ class SignalClientTests: XCTestCase {
         XCTAssert(expected == result)
     }
     
-    func testNewDeviceConversation() {
+    func testNew_DEVICE_Conversation() {
         do {
             watchEverything()
             let forsta = try Forsta(MemoryKVStore())

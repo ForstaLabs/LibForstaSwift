@@ -119,10 +119,7 @@ public class WebSocketResource: WebSocketDelegate {
     public init(requestHandler: WSRequestHandler? = nil) {
         self.requestHandler = requestHandler != nil ? requestHandler! : fallbackRequestHandler
     }
-    deinit {
-        print("destroying websocket")
-    }
-    
+
     /// connect with our Atlas-designated Signal server using our pre-negotiated credentials
     public func connect(url: String) {
         self.url = url
@@ -162,15 +159,13 @@ public class WebSocketResource: WebSocketDelegate {
                 let message = x.response.hasMessage ? x.response.message : ""
                 let status = x.response.hasStatus ? x.response.status : 500
                 
-                print("got a ws response! (\(status), \(message))")
-                
                 guard let request = outgoingRequests[id] else {
-                    print("... but it has no matching request.")
+                    print("ws response \(status), \(message) has no matching request.")
                     return
                 }
                 outgoingRequests.removeValue(forKey: id)
                 if let callback: WSResponseHandler = (status >= 200 && status < 300) ? request.onSuccess : request.onError {
-                    print("... and there is a callback for status \(status).")
+                    print("got a ws response! (\(status), \(message)), and there is a callback for status \(status).")
                     callback(request, status, message, body)
                 }
             } else {
