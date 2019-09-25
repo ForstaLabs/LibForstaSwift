@@ -35,6 +35,8 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             print("WAS TRYING TO DECODE:", jsonString ?? "")
         }
     }
+    
+    // -MARK: Attributes
 
     /// The Forsta message exchange payload version
     public var version: Int?
@@ -45,48 +47,43 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
     /// A reference to another message, by ID (useful for message replies, or survey responses)
     public var messageRef: UUID?
 
-    /// The schema for `.sender`
-    public struct AddressSchema: Codable {
-        /// User ID
-        public var userId: UUID
-        /// Device ID
-        public var device: UInt32?
-    }
     /// Optionally override the origin of the message if different from source
-    public var sender: AddressSchema?
+    public var sender: Address?
 
     /// The type of payload this is (required)
     public var messageType: MessageType?
-
-    /// The schema for the `.data` in a message exchange payload
-    public struct DataSchema: Codable {
-        /// The ephemeral public key provided by a new device for provisioning (only relevant for `.control` messages of type `.provisionRequest`)
-        public var key: Data?
-        /// Provisioning UUID, string-encoded in a form we will use as-is (only relevant for `.control` messages of type `.provisionRequest`)
-        public var uuid: String?
-        
-        /// The schema for `.data` `.body` entries
-        public struct BodySchema: Codable {
-            /// Either "text/plain" or "text/html" (sorry, this isn't a sensible enum because the "/" currently gets encoded/decoded inappropriately)
-            public var type: String
-            /// The text of said type
-            public var value: String
-        }
+    
+    /// Any relevant details for this message
+    public var data: DataElement?
+    
+    /// The message's distribution (required)
+    public var distribution: Distribution?
+    
+    /// The globally-unique thread ID (required)
+    public var threadId: UUID?
+    /// The thread title (optional)
+    public var threadTitle: String?
+    /// The thread type
+    public var threadType: ThreadType?
+    
+    /// The user agent sending this message (optional)
+    public var userAgent: String?
+    
+    // -MARK: Substructure Schema
+    
+    /// The schema for the `.data` attribute in a message exchange payload
+    public struct DataElement: Codable {
         /// Representations of the message body (plain text, html)
-        public var body: [BodySchema]?
+        public var body: [Body]?
+        
         /// The control-message type (only relevant for messages of type `.control`)
         public var control: ControlType?
+        
         /// The timestamp of the most recently read message by the sender (only relevant for `.control` messages of type `.readMark`)
         public var readMark: Date?
-        /// The schema for `.data` `.threadUpdate` in a message exchange payload
-        public struct ThreadUpdateSchema: Codable {
-            /// New thread title
-            public var threadTitle: String?
-            /// New distribution tag-math expression
-            public var expression: String?
-        }
+        
         /// Information to update regarding this thread (only relevant for `.control` messages of type `.threadUpdate`)
-        public var threadUpdate: ThreadUpdateSchema?
+        public var threadUpdate: ThreadUpdate?
         
         /// Call version (only relevant in call-related `.control` messages)
         public var version: Int?
@@ -99,90 +96,112 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         /// Call peer ID (only relevant in call-related `.control` messages)
         public var peerId: UUID?
         
-        /// Types of media a peer could send/receive
-        public enum StreamType:String, Codable {
-            /// Audio stream
-            case audio = "audio"
-            /// Video stream
-            case video = "video"
-        }
-        /// Stream types the peer expects to send
+        /// Stream types the peer expects to send (only relevant in call-related `.control` messages)
         public var sends: [StreamType]?
-        /// Stream types the peer expects to receive
+        /// Stream types the peer expects to receive (only relevant in call-related `.control` messages)
         public var receives: [StreamType]?
 
-        /// The schema for `.data` `.icecandidates` elements
-        public typealias IceCandidate = [String: String]
         /// ICE candidates (only relevant for `.control` messages of type `.callICECandidates`)
         public var icecandidates: [IceCandidate]?
         
-        /// The schema for `.data` `.offer`
-        public struct SdpOfferSchema: Codable {
-            /// Fixed type == "offer"
-            public var type: String = "offer"
-            /// The actual SDP string
-            public var sdp: String?
-        }
         /// SDP offer details (only relevant for `.control` messages of type `.callOffer`)
-        public var offer: SdpOfferSchema?
+        public var offer: SdpOffer?
         
-        /// The schema for `.data` `.answer`
-        public struct SdpAnswerSchema: Codable {
-            /// Fixed type == "answer"
-            public var type: String = "answer"
-            /// The actual SDP string
-            public var sdp: String?
-        }
         /// SDP answer details (only relevant for `.control` messages of type `.callAcceptOffer`)
-        var answer: SdpAnswerSchema?
+        var answer: SdpAnswer?
 
-        /// The schema for `.data` `.attachments`
-        struct AttachmentSchema: Codable {
-            /// The file name
-            public var name: String
-            /// The file size in bytes
-            public var size: Int
-            /// The file mime-type
-            public var type: String
-            /// The file modification-time
-            public var mtime: Date
-            
-            init(from info: AttachmentInfo) {
-                self.name = info.name
-                self.size = info.size
-                self.type = info.type
-                self.mtime = info.mtime
-            }
-        }
         /// Further details about the attachments specified in the Signal envelope
-        var attachments: [AttachmentSchema]?
+        var attachments: [Attachment]?
+        
+        /// The ephemeral public key provided by a new device for provisioning (only relevant for `.control` messages of type `.provisionRequest`)
+        public var key: Data?
+        /// Provisioning UUID, string-encoded in a form we will use as-is (only relevant for `.control` messages of type `.provisionRequest`)
+        public var uuid: String?
+        
+    }
+
+    /// The schema for `.sender`
+    public struct Address: Codable {
+        /// User ID
+        public var userId: UUID
+        /// Device ID
+        public var device: UInt32?
     }
     
-    /// Any relevant details for this message
-    public var data: DataSchema?
+    /// The schema for `.data` `.body` entries
+    public struct Body: Codable {
+        /// Either "text/plain" or "text/html" (sorry, this isn't a sensible enum because the "/" currently gets encoded/decoded inappropriately)
+        public var type: String
+        /// The text of said type
+        public var value: String
+    }
     
+    /// The schema for `.data` `.threadUpdate` in a message exchange payload
+    public struct ThreadUpdate: Codable {
+        /// New thread title
+        public var threadTitle: String?
+        /// New distribution tag-math expression
+        public var expression: String?
+    }
+    
+    /// Types of media a peer could send/receive
+    public enum StreamType:String, Codable {
+        /// Audio stream
+        case audio = "audio"
+        /// Video stream
+        case video = "video"
+    }
+    
+    /// The schema for `.data` `.icecandidates` elements
+    public struct IceCandidate: Codable {
+        public var candidate: String
+        public var sdpMid: String
+        public var sdpMLineIndex: Int32
+    }
+    
+    /// The schema for `.data` `.offer`
+    public struct SdpOffer: Codable {
+        /// Fixed type == "offer"
+        public var type: String = "offer"
+        /// The actual SDP string
+        public var sdp: String?
+    }
+    
+    /// The schema for `.data` `.answer`
+    public struct SdpAnswer: Codable {
+        /// Fixed type == "answer"
+        public var type: String = "answer"
+        /// The actual SDP string
+        public var sdp: String?
+    }
+    
+    /// The schema for `.data` `.attachments`
+    struct Attachment: Codable {
+        /// The file name
+        public var name: String
+        /// The file size in bytes
+        public var size: Int
+        /// The file mime-type
+        public var type: String
+        /// The file modification-time
+        public var mtime: Date
+        
+        init(from info: AttachmentInfo) {
+            self.name = info.name
+            self.size = info.size
+            self.type = info.type
+            self.mtime = info.mtime
+        }
+    }
+
     /// The schema for `.distribution`
-    public struct DistributionSchema: Codable {
+    public struct Distribution: Codable {
         /// The tag-math distribution expression for this message (required)
         public var expression: String?
         /// The user IDs that `.expression` resolves to (optional)
         public var users: [UUID]?
     }
-    /// The message's distribution (required)
-    public var distribution: DistributionSchema?
     
-    /// The globally-unique thread ID (required)
-    public var threadId: UUID?
-    
-    /// The thread title (optional)
-    public var threadTitle: String?
-    
-    /// The thread type
-    public var threadType: ThreadType?
-    
-    /// The user agent sending this message (optional)
-    public var userAgent: String?
-
     // -MARK: Helper Accessors
     
     /// Directly manipulate the (presumed only) plain-text entry in the `.data` `.body` array
@@ -193,9 +212,9 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         set(value) {
             var ary = (data?.body ?? []).filter({ $0.type != "text/plain" })
             if value != nil {
-                ary.append(DataSchema.BodySchema(type: "text/plain", value: value!))
+                ary.append(Body(type: "text/plain", value: value!))
             }
-            if data == nil { data = DataSchema() }
+            if data == nil { data = DataElement() }
             data!.body = ary.count > 0 ? ary : nil
         }
     }
@@ -208,9 +227,9 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         set(value) {
             var ary = (data?.body ?? []).filter({ $0.type != "text/html" })
             if value != nil {
-                ary.append(DataSchema.BodySchema(type: "text/html", value: value!))
+                ary.append(Body(type: "text/html", value: value!))
             }
-            if data == nil { data = DataSchema() }
+            if data == nil { data = DataElement() }
             data!.body = ary.count > 0 ? ary : nil
         }
     }
@@ -221,7 +240,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             return data?.control
         }
         set(value) {
-            if data == nil { data = DataSchema() }
+            if data == nil { data = DataElement() }
             data!.control = value
         }
     }
@@ -233,7 +252,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         }
         set(value) {
             if distribution == nil {
-                distribution = DistributionSchema(expression: value!, users: nil)
+                distribution = Distribution(expression: value!, users: nil)
             } else {
                 distribution!.expression = value
             }
@@ -249,7 +268,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             return data?.readMark
         }
         set(value) {
-            if data == nil { data = DataSchema() }
+            if data == nil { data = DataElement() }
             data!.readMark = value
         }
     }
@@ -263,8 +282,8 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             if value == nil {
                 data?.threadUpdate?.threadTitle = nil
             } else {
-                if data == nil { data = DataSchema() }
-                if data!.threadUpdate == nil { data!.threadUpdate = DataSchema.ThreadUpdateSchema() }
+                if data == nil { data = DataElement() }
+                if data!.threadUpdate == nil { data!.threadUpdate = ThreadUpdate() }
                 data!.threadUpdate!.threadTitle = value
             }
             if data?.threadUpdate?.threadTitle == nil && data?.threadUpdate?.expression == nil {
@@ -282,8 +301,8 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             if value == nil {
                 data?.threadUpdate?.expression = nil
             } else {
-                if data == nil { data = DataSchema() }
-                if data!.threadUpdate == nil { data!.threadUpdate = DataSchema.ThreadUpdateSchema() }
+                if data == nil { data = DataElement() }
+                if data!.threadUpdate == nil { data!.threadUpdate = ThreadUpdate() }
                 data!.threadUpdate!.expression = value
             }
             if data?.threadUpdate?.threadTitle == nil && data?.threadUpdate?.expression == nil {
@@ -301,7 +320,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             if value == nil {
                 data?.version = nil
             } else {
-                if data == nil { data = DataSchema() }
+                if data == nil { data = DataElement() }
                 data!.version = value
             }
         }
@@ -316,7 +335,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             if value == nil {
                 data?.callId = nil
             } else {
-                if data == nil { data = DataSchema() }
+                if data == nil { data = DataElement() }
                 data!.callId = value
             }
         }
@@ -331,7 +350,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             if value == nil {
                 data?.peerId = nil
             } else {
-                if data == nil { data = DataSchema() }
+                if data == nil { data = DataElement() }
                 data!.peerId = value
             }
         }
@@ -346,7 +365,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             if value == nil {
                 data?.originator = nil
             } else {
-                if data == nil { data = DataSchema() }
+                if data == nil { data = DataElement() }
                 data!.originator = value
             }
         }
@@ -361,7 +380,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             if value == nil {
                 data?.members = nil
             } else {
-                if data == nil { data = DataSchema() }
+                if data == nil { data = DataElement() }
                 data!.members = value
             }
         }
@@ -376,8 +395,8 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             if value == nil {
                 data?.offer = nil
             } else {
-                if data == nil { data = DataSchema() }
-                if data!.offer == nil { data!.offer = DataSchema.SdpOfferSchema() }
+                if data == nil { data = DataElement() }
+                if data!.offer == nil { data!.offer = SdpOffer() }
                 data!.offer!.sdp = value
             }
         }
@@ -392,15 +411,15 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             if value == nil {
                 data?.answer = nil
             } else {
-                if data == nil { data = DataSchema() }
-                if data!.answer == nil { data!.answer = DataSchema.SdpAnswerSchema() }
+                if data == nil { data = DataElement() }
+                if data!.answer == nil { data!.answer = SdpAnswer() }
                 data!.answer!.sdp = value
             }
         }
     }
     
     /// Alias for `.data` `.icecandidates` (only relevant for `.control` messages of type `.callICECandidates`)
-    public var iceCandidates: [DataSchema.IceCandidate]? {
+    public var iceCandidates: [IceCandidate]? {
         get {
             return data?.icecandidates
         }
@@ -408,14 +427,14 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             if value == nil {
                 data?.icecandidates = nil
             } else {
-                if data == nil { data = DataSchema() }
+                if data == nil { data = DataElement() }
                 data!.icecandidates = value
             }
         }
     }
     
     /// Alias for `.data` `.sends` (only relevant for call-related `.control` messages)
-    public var callSends: [DataSchema.StreamType]? {
+    public var callSends: [StreamType]? {
         get {
             return data?.sends
         }
@@ -423,14 +442,14 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             if value == nil {
                 data?.sends = nil
             } else {
-                if data == nil { data = DataSchema() }
+                if data == nil { data = DataElement() }
                 data!.sends = value
             }
         }
     }
     
     /// Alias for `.data` `.receives` (only relevant for call-related `.control` messages)
-    public var callReceives: [DataSchema.StreamType]? {
+    public var callReceives: [StreamType]? {
         get {
             return data?.receives
         }
@@ -438,7 +457,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             if value == nil {
                 data?.receives = nil
             } else {
-                if data == nil { data = DataSchema() }
+                if data == nil { data = DataElement() }
                 data!.receives = value
             }
         }
@@ -455,7 +474,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
     }
     
     /// Alias for `.data` `.attachments` (be sure that these correspond 1:1 with Signal envelope attachement information!)
-    var attachments: [DataSchema.AttachmentSchema]? {
+    var attachments: [Attachment]? {
         get {
             return data?.attachments
         }
@@ -463,7 +482,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             if value == nil {
                 data?.attachments = nil
             } else {
-                if data == nil { data = DataSchema() }
+                if data == nil { data = DataElement() }
                 data!.attachments = value
             }
         }

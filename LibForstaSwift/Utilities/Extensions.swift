@@ -152,9 +152,9 @@ extension SignalAddress: CustomStringConvertible {
         return "\(self.name).\(self.deviceId)"
     }
     
-    /// conversion from SignalAddress to the AddressSchema we use in the Forsta payload
-    public var payloadSchema: ForstaPayloadV1.AddressSchema {
-        return ForstaPayloadV1.AddressSchema(userId: self.userId, device: UInt32(self.deviceId))
+    /// conversion from SignalAddress to the Address we use in the Forsta payload
+    public var payloadAddress: ForstaPayloadV1.Address {
+        return ForstaPayloadV1.Address(userId: self.userId, device: UInt32(self.deviceId))
     }
 }
 

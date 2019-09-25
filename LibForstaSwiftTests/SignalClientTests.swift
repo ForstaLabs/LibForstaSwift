@@ -88,9 +88,9 @@ class SignalClientTests: XCTestCase {
         
         let sender = SignalAddress(userId: UUID(), deviceId: Int32(42))
         XCTAssert(payload.sender == nil)
-        payload.sender = sender.payloadSchema
-        XCTAssert(payload.sender!.device == sender.payloadSchema.device)
-        XCTAssert(payload.sender!.userId == sender.payloadSchema.userId)
+        payload.sender = sender.payloadAddress
+        XCTAssert(payload.sender!.device == sender.payloadAddress.device)
+        XCTAssert(payload.sender!.userId == sender.payloadAddress.userId)
         
         let originator = UUID()
         XCTAssert(payload.callOriginator == nil)

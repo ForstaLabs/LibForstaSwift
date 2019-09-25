@@ -47,7 +47,7 @@ extension Sendable {
         get {
             var payloadCopy = payload
             payloadCopy.attachments = attachments.map {
-                return ForstaPayloadV1.DataSchema.AttachmentSchema(from: $0)
+                return ForstaPayloadV1.Attachment(from: $0)
             }
 
             var dm = Signal_DataMessage()
