@@ -315,7 +315,7 @@ public class MessageSender {
         
         /// human-readable rendering of the info
         public var description: String {
-            return "<<\(self.recipient) [\(self.deviceCount)] @ \(self.received.millisecondsSince1970), \(self.needsSync ? "needs sync" : "no sync needed")>>"
+            return "<\(self.recipient) [\(self.deviceCount)] @ \(self.received.millisecondsSince1970), \(self.needsSync ? "needs sync" : "no sync needed")>"
         }
     }
 }

@@ -30,10 +30,10 @@ public protocol Sendable {
     
     /// The Signal envelope end-session flag
     var endSessionFlag: Bool { get }
-    /// The Signal envelope expiration-timer update flag
+    /// The Signal envelope expiration-timer-update flag
     var expirationTimerUpdateFlag: Bool { get }
 
-    /// Information about uploaded attachments (use `SignalClient`.`uploadAttachment(...)` to do this)
+    /// Information about uploaded attachments (use `SignalClient`.`uploadAttachment(...)` to upload them)
     var attachments: [AttachmentInfo] { get }
     /// The Forsta message payload
     var payload: ForstaPayloadV1 { get }
@@ -76,10 +76,11 @@ extension Sendable {
     /// Pretty-printed version of this `Sendable`
     public var description: String {
         return """
-        Sendable @ \(timestamp.millisecondsSince1970) \
-        \(expiration != nil ? "EXPIRATION \(expiration!)": "") \
-        \(endSessionFlag ? "\n>>> END SESSION FLAG" : "") \
-        \(expirationTimerUpdateFlag ? "\n>>> EXPIRATION TIMER UPDATE FLAG" : "")
+        SENDABLE @ \(timestamp.millisecondsSince1970) \
+        \(expiration != nil ? "\n>>> Expiration of \(expiration!) seconds": "") \
+        \(endSessionFlag ? "\n>>> END-SESSION flag set" : "") \
+        \(expirationTimerUpdateFlag ? "\n>>> EXPIRATION-TIMER-UPDATE flag set" : "") \
+        \(attachments.count > 0 ? "\n>>> Attachments \(attachments.map { $0.description })" : "")
         \(payload.description.indentWith(">>> "))
         """
     }
