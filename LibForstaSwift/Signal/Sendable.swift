@@ -45,18 +45,13 @@ extension Sendable {
     /// INTERNAL: the Signal_Content protobuf encoding for this `Sendable`
     var contentProto: Signal_Content {
         get {
-            var json = payload.json
-            if !json["data"].exists() { json["data"] = JSON([:]) }
-            json["data"]["attachments"] = JSON(attachments.map { info in [
-                "name": info.name,
-                "size": info.size,
-                "type": info.type,
-                "mtime": info.mtime.millisecondsSince1970
-                ]
-            })
+            var payloadCopy = payload
+            payloadCopy.attachments = attachments.map {
+                return ForstaPayloadV1.DataSchema.AttachmentSchema(from: $0)
+            }
 
             var dm = Signal_DataMessage()
-            dm.body = "[\(ForstaPayloadV1(json).jsonString)]"
+            dm.body = payloadCopy.json() ?? "<json encoding error>"
             if self.expiration != nil { dm.expireTimer = UInt32(self.expiration!.milliseconds) }
             var flags: UInt32 = 0
             if self.endSessionFlag { flags |= UInt32(Signal_DataMessage.Flags.endSession.rawValue) }

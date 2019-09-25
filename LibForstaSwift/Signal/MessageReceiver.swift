@@ -155,12 +155,15 @@ public class InboundMessage: CustomStringConvertible {
         self.expirationStart = expirationStart
         self.destination = destination
         
-        self.attachments = zip(signalAttachments, self.payload.json["data"]["attachments"].arrayValue).map {
+        if signalAttachments.count != self.payload.attachments?.count ?? 0 {
+            print("WARNING: envelope attachment count \(signalAttachments.count) doesn't match payload attachment count \(self.payload.attachments?.count ?? 0)")
+        }
+        self.attachments = zip(signalAttachments, self.payload.attachments ?? []).map {
             let (signal, forsta) = $0
-            return AttachmentInfo(name: forsta["name"].stringValue,
-                                  size: forsta["size"].intValue,
+            return AttachmentInfo(name: forsta.name,
+                                  size: forsta.size,
                                   type: signal.contentType,
-                                  mtime: Date(millisecondsSince1970: forsta["mtime"].uInt64 ?? Date().millisecondsSince1970),
+                                  mtime: forsta.mtime,
                                   id: signal.id,
                                   key: signal.key)
         }

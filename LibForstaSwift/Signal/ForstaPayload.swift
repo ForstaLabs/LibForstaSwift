@@ -8,457 +8,495 @@
 
 import Foundation
 import SignalProtocol
-import SwiftyJSON
 
-
-/// A convenience wrapper for v1 of the Forsta message exchange payload
-/// (see https://bit.ly/forsta-payload for details)
-public class ForstaPayloadV1: CustomStringConvertible {
+/// A convenience wrapper for consuming/producing v1 of the
+/// Forsta message exchange JSON payload (see https://bit.ly/forsta-payload for details)
+public struct ForstaPayloadV1: CustomStringConvertible, Codable {
     // -MARK: Constructors
     
-    /// Initialize with an (optional) JSON string
+    /// Initialize with an (optional) JSON payload string
     public init(_ jsonString: String? = nil) {
-        self.json = JSON(string: jsonString ?? "[{\"version\": 1}]") ?? JSON([["version": 1]])
-        for item in json.arrayValue {
-            if item["version"].intValue == 1 {
-                json = item
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .millisecondsSince1970
+        decoder.dataDecodingStrategy = .base64
+
+        do {
+            let data = (jsonString ?? "[{\"version\": 1}]").toData()
+            // let ary = (try? decoder.decode([ForstaPayloadV1].self, from: data)) ?? []
+            let ary = try decoder.decode([ForstaPayloadV1].self, from: data)
+            
+            for item in ary {
+                if item.version == 1 {
+                    self = item
+                }
             }
+        } catch let error {
+            print("ERROR:", error)
+            print("WAS TRYING TO DECODE:", jsonString ?? "")
         }
     }
-    
-    /// Initialize with existing payload object
-    public init(_ payload: ForstaPayloadV1) {
-        self.json = payload.json
-    }
-    
-    /// Initialize with `JSON` object
-    public init(_ json: JSON) {
-        self.json = json
-    }
-    
-    // -MARK: Accessors for the underlying payload JSON
-    
+
+    /// The Forsta message exchange payload version
+    public var version: Int?
+
     /// The message's globally-unique ID (required)
-    public var messageId: UUID? {
-        get {
-            return UUID(uuidString: json["messageId"].stringValue)
-        }
-        set(value) {
-            if value == nil {
-                clearKey(["messageId"])
-            } else {
-                json["messageId"].string = value!.lcString
-            }
-        }
-    }
-    
+    public var messageId: UUID?
+
     /// A reference to another message, by ID (useful for message replies, or survey responses)
-    public var messageRef: UUID? {
-        get {
-            return UUID(uuidString: json["messageRef"].stringValue)
-        }
-        set(value) {
-            if value == nil {
-                clearKey(["messageRef"])
-            } else {
-                json["messageRef"].string = value!.lcString
-            }
-        }
+    public var messageRef: UUID?
+
+    /// The schema for `.sender`
+    public struct AddressSchema: Codable {
+        /// User ID
+        public var userId: UUID
+        /// Device ID
+        public var device: UInt32?
     }
-    
     /// Optionally override the origin of the message if different from source
-    public var sender: SignalAddress? {
-        get {
-            guard
-                let userId = json["sender"]["userId"].string,
-                let deviceId = json["sender"]["device"].uInt32 else {
-                    return nil
-            }
-            return SignalAddress(userId: userId, deviceId: deviceId)
-        }
-        set(value) {
-            if value == nil {
-                clearKey(["sender"])
-            } else {
-                json["sender"] = ["userId": value!.name, "device": value!.deviceId]
-            }
-        }
-    }
-    
+    public var sender: AddressSchema?
+
     /// The type of payload this is (required)
-    public var messageType: MessageType? {
-        get {
-            return MessageType(rawValue: json["messageType"].stringValue)
+    public var messageType: MessageType?
+
+    /// The schema for the `.data` in a message exchange payload
+    public struct DataSchema: Codable {
+        /// The ephemeral public key provided by a new device for provisioning (only relevant for `.control` messages of type `.provisionRequest`)
+        public var key: Data?
+        /// Provisioning UUID, string-encoded in a form we will use as-is (only relevant for `.control` messages of type `.provisionRequest`)
+        public var uuid: String?
+        
+        /// The schema for `.data` `.body` entries
+        public struct BodySchema: Codable {
+            /// Either "text/plain" or "text/html" (sorry, this isn't a sensible enum because the "/" currently gets encoded/decoded inappropriately)
+            public var type: String
+            /// The text of said type
+            public var value: String
         }
-        set(value) {
-            if value == nil {
-                clearKey(["messageType"])
-            } else {
-                json["messageType"].string = value!.rawValue
+        /// Representations of the message body (plain text, html)
+        public var body: [BodySchema]?
+        /// The control-message type (only relevant for messages of type `.control`)
+        public var control: ControlType?
+        /// The timestamp of the most recently read message by the sender (only relevant for `.control` messages of type `.readMark`)
+        public var readMark: Date?
+        /// The schema for `.data` `.threadUpdate` in a message exchange payload
+        public struct ThreadUpdateSchema: Codable {
+            /// New thread title
+            public var threadTitle: String?
+            /// New distribution tag-math expression
+            public var expression: String?
+        }
+        /// Information to update regarding this thread (only relevant for `.control` messages of type `.threadUpdate`)
+        public var threadUpdate: ThreadUpdateSchema?
+        
+        /// Call version (only relevant in call-related `.control` messages)
+        public var version: Int?
+        /// Call members (only relevant for `.control` of type `.callJoin`)
+        public var members: [UUID]?
+        /// Call originator (only relevant for `.control` of type `.callJoin`)
+        public var originator: UUID?
+        /// Call ID (only relevant in call-related `.control` messages)
+        public var callId: UUID?
+        /// Call peer ID (only relevant in call-related `.control` messages)
+        public var peerId: UUID?
+        
+        /// Types of media a peer could send/receive
+        public enum StreamType:String, Codable {
+            /// Audio stream
+            case audio = "audio"
+            /// Video stream
+            case video = "video"
+        }
+        /// Stream types the peer expects to send
+        public var sends: [StreamType]?
+        /// Stream types the peer expects to receive
+        public var receives: [StreamType]?
+
+        /// The schema for `.data` `.icecandidates` elements
+        public typealias IceCandidate = [String: String]
+        /// ICE candidates (only relevant for `.control` messages of type `.callICECandidates`)
+        public var icecandidates: [IceCandidate]?
+        
+        /// The schema for `.data` `.offer`
+        public struct SdpOfferSchema: Codable {
+            /// Fixed type == "offer"
+            public var type: String = "offer"
+            /// The actual SDP string
+            public var sdp: String?
+        }
+        /// SDP offer details (only relevant for `.control` messages of type `.callOffer`)
+        public var offer: SdpOfferSchema?
+        
+        /// The schema for `.data` `.answer`
+        public struct SdpAnswerSchema: Codable {
+            /// Fixed type == "answer"
+            public var type: String = "answer"
+            /// The actual SDP string
+            public var sdp: String?
+        }
+        /// SDP answer details (only relevant for `.control` messages of type `.callAcceptOffer`)
+        var answer: SdpAnswerSchema?
+
+        /// The schema for `.data` `.attachments`
+        struct AttachmentSchema: Codable {
+            /// The file name
+            public var name: String
+            /// The file size in bytes
+            public var size: Int
+            /// The file mime-type
+            public var type: String
+            /// The file modification-time
+            public var mtime: Date
+            
+            init(from info: AttachmentInfo) {
+                self.name = info.name
+                self.size = info.size
+                self.type = info.type
+                self.mtime = info.mtime
             }
         }
+        /// Further details about the attachments specified in the Signal envelope
+        var attachments: [AttachmentSchema]?
     }
     
-    /// Array of message `BodyItem`, required for `.content` message types
-    public var body: [BodyItem]? {
-        get {
-            if !json["data"]["body"].exists() { return nil }
-            return json["data"]["body"].arrayValue.map {
-                switch $0["type"].stringValue {
-                case "text/plain": return .plain($0["value"].stringValue)
-                case "text/html": return .html($0["value"].stringValue)
-                default: return .unknown($0["value"].stringValue)
-                }
-            }
-        }
-        set(value) {
-            if value == nil {
-                clearKey(["data", "body"])
-            } else {
-                let ary:[[String: String]] = value!.map {
-                    switch $0 {
-                    case .plain(let value): return ["type": "text/plain", "value": value]
-                    case .html(let value): return ["type": "text/plain", "value": value]
-                    case .unknown(let value): return ["type": "text/unknown", "value": value]
-                    }
-                }
-                ensurePath(["data"])
-                json["data"]["body"] = JSON(ary)
-            }
-        }
-    }
+    /// Any relevant details for this message
+    public var data: DataSchema?
     
-    /// Directly manipulate the (presumed singular) `.plain` entry in the `body` array
-    public var bodyPlain: String? {
-        get {
-            let ary = (body ?? []).filter({ switch $0 { case .plain: return true; default: return false }})
-            return ary.count > 0 ? ary[0].raw : nil
-        }
-        set(value) {
-            var ary = (body ?? []).filter({ switch $0 { case .plain: return false; default: return true }})
-            if value != nil {
-                ary.append(.html(value!))
-            }
-            body = ary.count > 0 ? ary : nil
-        }
+    /// The schema for `.distribution`
+    public struct DistributionSchema: Codable {
+        /// The tag-math distribution expression for this message (required)
+        public var expression: String?
+        /// The user IDs that `.expression` resolves to (optional)
+        public var users: [UUID]?
     }
-    
-    /// Directly manipulate the (presumed singular) `.html` entry in the `body` array
-    public var bodyHtml: String? {
-        get {
-            let ary = (body ?? []).filter({ switch $0 { case .html: return true; default: return false }})
-            return ary.count > 0 ? ary[0].raw : nil
-        }
-        set(value) {
-            var ary = (body ?? []).filter({ switch $0 { case .html: return false; default: return true }})
-            if value != nil {
-                ary.append(.html(value!))
-            }
-            body = ary.count > 0 ? ary : nil
-        }
-    }
-    
-    /// Control message type (meaningful only for `.control` messages)
-    public var controlType: ControlType? {
-        get {
-            return ControlType(rawValue: json["data"]["control"].stringValue)
-        }
-        set(value) {
-            if value == nil {
-                clearKey(["data", "control"])
-            } else {
-                ensurePath(["data"])
-                json["data"]["control"].string = value!.rawValue
-            }
-        }
-    }
-    
-    /// The tag-math distribution expression for this message (required)
-    public var threadExpression: String? {
-        get {
-            return json["distribution"]["expression"].string
-        }
-        set(value) {
-            if value == nil {
-                clearKey(["distribution", "expression"])
-            } else {
-                json["distribution"] = ["expression": value!]
-            }
-        }
-    }
+    /// The message's distribution (required)
+    public var distribution: DistributionSchema?
     
     /// The globally-unique thread ID (required)
-    public var threadId: UUID? {
-        get {
-            return UUID(uuidString: json["threadId"].stringValue)
-        }
-        set(value) {
-            if value == nil {
-                clearKey(["threadId"])
-            } else {
-                json["threadId"].string = value!.lcString
-            }
-        }
-    }
+    public var threadId: UUID?
     
-    /// The thread title (optional; provide this if you wish to change the thread title)
-    public var threadTitle: String? {
-        get {
-            return json["threadTitle"].string
-        }
-        set(value) {
-            if value == nil {
-                clearKey(["threadTitle"])
-            } else {
-                json["threadTitle"].string = value!
-            }
-        }
-    }
+    /// The thread title (optional)
+    public var threadTitle: String?
     
     /// The thread type
-    public var threadType: ThreadType? {
-        get {
-            return ThreadType(rawValue: json["threadType"].stringValue)
-        }
-        set(value) {
-            if value == nil {
-                clearKey(["threadType"])
-            } else {
-                json["threadType"].string = value!.rawValue
-            }
-        }
-    }
+    public var threadType: ThreadType?
     
     /// The user agent sending this message (optional)
-    public var userAgent: String? {
+    public var userAgent: String?
+
+    // -MARK: Helper Accessors
+    
+    /// Directly manipulate the (presumed only) plain-text entry in the `.data` `.body` array
+    public var bodyPlain: String? {
         get {
-            return json["userAgent"].string
+            return (data?.body ?? []).first(where: { $0.type == "text/plain" })?.value
         }
         set(value) {
-            if value == nil {
-                clearKey(["userAgent"])
+            var ary = (data?.body ?? []).filter({ $0.type != "text/plain" })
+            if value != nil {
+                ary.append(DataSchema.BodySchema(type: "text/plain", value: value!))
+            }
+            if data == nil { data = DataSchema() }
+            data!.body = ary.count > 0 ? ary : nil
+        }
+    }
+    
+    /// Directly manipulate the (presumed only) HTML entry in the `.data` `.body` array
+    public var bodyHtml: String? {
+        get {
+            return (data?.body ?? []).first(where: { $0.type == "text/html" })?.value
+        }
+        set(value) {
+            var ary = (data?.body ?? []).filter({ $0.type != "text/html" })
+            if value != nil {
+                ary.append(DataSchema.BodySchema(type: "text/html", value: value!))
+            }
+            if data == nil { data = DataSchema() }
+            data!.body = ary.count > 0 ? ary : nil
+        }
+    }
+    
+    /// Alias for `.data` `.control` -- the type of this control message (meaningful only for `.control` messages)
+    public var controlType: ControlType? {
+        get {
+            return data?.control
+        }
+        set(value) {
+            if data == nil { data = DataSchema() }
+            data!.control = value
+        }
+    }
+    
+    /// Alias for `.distribution` `.expression` -- the tag-math distribution expression for this message (required)
+    public var threadExpression: String? {
+        get {
+            return distribution?.expression
+        }
+        set(value) {
+            if distribution == nil {
+                distribution = DistributionSchema(expression: value!, users: nil)
             } else {
-                json["userAgent"].string = value!
+                distribution!.expression = value
+            }
+            if distribution?.expression == nil && distribution?.users == nil {
+                distribution = nil
             }
         }
     }
 
-    /// readMark timestamp (only relevant for `.control` messages of type `.readMark`)
+    /// Alias for `.data` `.readMark` (only relevant for `.control` messages of type `.readMark`)
     public var readMark: Date? {
         get {
-            guard let timestamp = json["data"]["readMark"].uInt64 else {
-                return nil
-            }
-            return Date(millisecondsSince1970: timestamp)
+            return data?.readMark
         }
         set(value) {
-            if value == nil {
-                clearKey(["data", "readMark"])
-            } else {
-                ensurePath(["data"])
-                json["data"]["readMark"].uInt64 = value!.millisecondsSince1970
-            }
+            if data == nil { data = DataSchema() }
+            data!.readMark = value
         }
     }
     
-    /// threadUpdate.threadTitle (only relevant for `.control` messages of type `.threadUpdate`)
+    /// Alias for `.data` `.threadUpdate` `.threadTitle` (only relevant for `.control` messages of type `.threadUpdate`)
     public var threadUpdateTitle: String? {
         get {
-            return json["data"]["threadUpdate"]["threadTitle"].string
+            return data?.threadUpdate?.threadTitle
         }
         set(value) {
             if value == nil {
-                clearKey(["data", "threadUpdate", "threadTitle"])
+                data?.threadUpdate?.threadTitle = nil
             } else {
-                ensurePath(["data", "threadUpdate"])
-                json["data"]["threadUpdate"]["threadTitle"].string = value!
+                if data == nil { data = DataSchema() }
+                if data!.threadUpdate == nil { data!.threadUpdate = DataSchema.ThreadUpdateSchema() }
+                data!.threadUpdate!.threadTitle = value
+            }
+            if data?.threadUpdate?.threadTitle == nil && data?.threadUpdate?.expression == nil {
+                data?.threadUpdate = nil
             }
         }
     }
     
-    /// threadUpdate.expression (only relevant for `.control` messages of type `.threadUpdate`)
+    /// Alias for `.data` `.threadUpdate` `.expression` (only relevant for `.control` messages of type `.threadUpdate`)
     public var threadUpdateExpression: String? {
         get {
-            return json["data"]["threadUpdate"]["expression"].string
+            return data?.threadUpdate?.expression
         }
         set(value) {
             if value == nil {
-                clearKey(["data", "threadUpdate", "expression"])
+                data?.threadUpdate?.expression = nil
             } else {
-                ensurePath(["data", "threadUpdate"])
-                json["data"]["threadUpdate"]["expression"].string = value!
+                if data == nil { data = DataSchema() }
+                if data!.threadUpdate == nil { data!.threadUpdate = DataSchema.ThreadUpdateSchema() }
+                data!.threadUpdate!.expression = value
+            }
+            if data?.threadUpdate?.threadTitle == nil && data?.threadUpdate?.expression == nil {
+                data?.threadUpdate = nil
             }
         }
     }
 
-    /// callVersion (only relevant for call-related `.control` messages)
+    /// Alias for `.data` `.version` (only relevant for call-related `.control` messages)
     public var callVersion: Int? {
         get {
-            return json["data"]["version"].int
+            return data?.version
         }
         set(value) {
             if value == nil {
-                clearKey(["data", "version"])
+                data?.version = nil
             } else {
-                ensurePath(["data"])
-                json["data"]["version"].int = value!
+                if data == nil { data = DataSchema() }
+                data!.version = value
             }
         }
     }
-    
-    
-    /// callId (only relevant for call-related `.control` messages)
+
+    /// Alias for `.data` `.callId` (only relevant for call-related `.control` messages)
     public var callId: UUID? {
         get {
-            return UUID(uuidString: json["data"]["callId"].stringValue)
+            return data?.callId
         }
         set(value) {
             if value == nil {
-                clearKey(["data", "callId"])
+                data?.callId = nil
             } else {
-                ensurePath(["data"])
-                json["data"]["callId"].string = value!.lcString
+                if data == nil { data = DataSchema() }
+                data!.callId = value
             }
         }
     }
-    
-    /// peerId (only relevant for call-related `.control` messages)
+
+    /// Alias for `.data` `.peerId` (only relevant for call-related `.control` messages)
     public var peerId: UUID? {
         get {
-            return UUID(uuidString: json["data"]["peerId"].stringValue)
+            return data?.peerId
         }
         set(value) {
             if value == nil {
-                clearKey(["data", "peerId"])
+                data?.peerId = nil
             } else {
-                ensurePath(["data"])
-                json["data"]["peerId"].string = value!.lcString
+                if data == nil { data = DataSchema() }
+                data!.peerId = value
             }
         }
     }
-    
-    /// callOriginator (only relevant for `.control` of type `.callJoin`)
+
+    /// Alias for `.data` `.originator` (only relevant for `.control` of type `.callJoin`)
     public var callOriginator: UUID? {
         get {
-            return UUID(uuidString: json["data"]["originator"].stringValue)
+            return data?.originator
         }
         set(value) {
             if value == nil {
-                clearKey(["data", "originator"])
+                data?.originator = nil
             } else {
-                ensurePath(["data"])
-                json["data"]["originator"].string = value!.lcString
+                if data == nil { data = DataSchema() }
+                data!.originator = value
             }
         }
     }
     
-    /// callMembers (only relevant for `.control` of type `.callJoin`)
+    /// Alias for `.data` `.members` (only relevant for `.control` of type `.callJoin`)
     public var callMembers: [UUID]? {
         get {
-            guard let ary = json["data"]["members"].array else {
-                return nil
-            }
-            return ary
-                .map { UUID(uuidString: $0.stringValue) }
-                .filter { $0 != nil }
-                .map { $0! }
+            return data?.members
         }
         set(value) {
             if value == nil {
-                clearKey(["data", "members"])
+                data?.members = nil
             } else {
-                ensurePath(["data"])
-                json["data"]["members"] = JSON(value!.map { $0.lcString })
+                if data == nil { data = DataSchema() }
+                data!.members = value
             }
         }
     }
     
-    /// Call offer sdp string (only relevant for `.control` messages of type `.callOffer`)
+    /// Alias for `.data` `.offer` `.sdp` (only relevant for `.control` messages of type `.callOffer`)
     public var sdpOffer: String? {
         get {
-            return json["data"]["offer"]["sdp"].string
+            return data?.offer?.sdp
         }
         set(value) {
             if value == nil {
-                clearKey(["data", "offer"])
+                data?.offer = nil
             } else {
-                ensurePath(["data"])
-                json["data"]["offer"] = JSON(["type": "offer", "sdp": value!])
+                if data == nil { data = DataSchema() }
+                if data!.offer == nil { data!.offer = DataSchema.SdpOfferSchema() }
+                data!.offer!.sdp = value
             }
         }
     }
     
-    /// Call answer sdp string (only relevant for `.control` messages of type `.callAcceptOffer`)
+    /// Alias for `.data` `.answer` `.sdp` (only relevant for `.control` messages of type `.callAcceptOffer`)
     public var sdpAnswer: String? {
         get {
-            return json["data"]["answer"]["sdp"].string
+            return data?.answer?.sdp
         }
         set(value) {
             if value == nil {
-                clearKey(["data", "answer"])
+                data?.answer = nil
             } else {
-                ensurePath(["data"])
-                json["data"]["answer"] = JSON(["type": "answer", "sdp": value!])
+                if data == nil { data = DataSchema() }
+                if data!.answer == nil { data!.answer = DataSchema.SdpAnswerSchema() }
+                data!.answer!.sdp = value
             }
         }
     }
     
-    /// iceCandidates (only relevant for `.control` messages of type `.callICECandidates`)
-    public var iceCandidates: [JSON]? {
+    /// Alias for `.data` `.icecandidates` (only relevant for `.control` messages of type `.callICECandidates`)
+    public var iceCandidates: [DataSchema.IceCandidate]? {
         get {
-            return json["data"]["icecandidates"].array
+            return data?.icecandidates
         }
         set(value) {
             if value == nil {
-                clearKey(["data", "icecandidates"])
+                data?.icecandidates = nil
             } else {
-                ensurePath(["data"])
-                json["data"]["icecandidates"] = JSON(value!)
+                if data == nil { data = DataSchema() }
+                data!.icecandidates = value
             }
         }
     }
     
-    /// The ephemeral public key provided by a new device for provisioning
-    /// (only relevant for `.control` messages of type `.provisionRequest`)
-    public var provisioningKey: Data? {
-        guard
-            let b64Key = json["data"]["key"].string,
-            let key = Data(base64Encoded: b64Key),
-            key.count == 33 else {
-                return nil
+    /// Alias for `.data` `.sends` (only relevant for call-related `.control` messages)
+    public var callSends: [DataSchema.StreamType]? {
+        get {
+            return data?.sends
         }
-        return key.dropFirst()
+        set(value) {
+            if value == nil {
+                data?.sends = nil
+            } else {
+                if data == nil { data = DataSchema() }
+                data!.sends = value
+            }
+        }
     }
     
-    /// The uuid (string-encoded) provided for provisioning a new device
-    /// (only relevant for `.control` messages of type `.provisionRequest`)
+    /// Alias for `.data` `.receives` (only relevant for call-related `.control` messages)
+    public var callReceives: [DataSchema.StreamType]? {
+        get {
+            return data?.receives
+        }
+        set(value) {
+            if value == nil {
+                data?.receives = nil
+            } else {
+                if data == nil { data = DataSchema() }
+                data!.receives = value
+            }
+        }
+    }
+
+    /// Alias for `.data` `.key` (only relevant for `.control` messages of type `.provisionRequest`)
+    public var provisioningKey: Data? {
+        return data?.key
+    }
+    
+    /// Alias for `.data` `.uuid` (only relevant for `.control` messages of type `.provisionRequest`)
     public var provisioningUuidString: String? {
-        return json["data"]["uuid"].string
+        return data?.uuid
     }
     
-    // -MARK: Internal Attributes
-    
-    /// The underlying payload JSON that is being manipulated/reflected
-    public var json: JSON
+    /// Alias for `.data` `.attachments` (be sure that these correspond 1:1 with Signal envelope attachement information!)
+    var attachments: [DataSchema.AttachmentSchema]? {
+        get {
+            return data?.attachments
+        }
+        set(value) {
+            if value == nil {
+                data?.attachments = nil
+            } else {
+                if data == nil { data = DataSchema() }
+                data!.attachments = value
+            }
+        }
+    }
 
     // -MARK: Utilities
     
-    /// The current underlying `JSON` object encoded as a JSON string
-    var jsonString: String {
-        let jsonData = (try? JSONEncoder().encode(self.json)) ?? "<json ecoding error>".toData()
-        let jsonString = String(data: jsonData, encoding: .utf8)!
-        return jsonString
+    /// This payload encoded as a JSON string
+    func json(prettyPrint: Bool = false) -> String? {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .millisecondsSince1970
+        encoder.dataEncodingStrategy = .base64
+        if prettyPrint {
+            encoder.outputFormatting = .prettyPrinted
+        }
+        
+        guard
+            let data = try? encoder.encode(self),
+            let string = String(data: data, encoding: .utf8) else {
+                return nil
+        }
+        return "[\(string.lowercasedJsonUuidValues)]"
     }
     
-    /// A pretty-printed version of the current payload's JSON string
+    /// A pretty-printed version of this payload's JSON encoding
     public var description: String {
-        return json.description
+        return json(prettyPrint: true) ?? "<failed to encode payload JSON>"
     }
     
     /// Throw an error if mandatory fields are missing, etc.
     public func sanityCheck() throws {
         // check that mandatory fields are present
-        if json["version"].int == nil { throw ForstaError(.invalidPayload, "missing version") }
+        if version == nil { throw ForstaError(.invalidPayload, "missing version") }
         if messageId == nil { throw ForstaError(.invalidPayload, "missing messageId") }
         if messageType == nil { throw ForstaError(.invalidPayload, "missing messageType") }
         if threadId == nil { throw ForstaError(.invalidPayload, "missing threadId") }
@@ -478,59 +516,10 @@ public class ForstaPayloadV1: CustomStringConvertible {
         }
     }
     
-    /// Internal: ensure this (dictionary) path exists
-    private func ensurePath(_ path: ArraySlice<String>) {
-        func ensure(_ dict: inout JSON, _ path: ArraySlice<String>) {
-            if path.count > 0 {
-                if !dict[path.first!].exists() { dict[path.first!] = [:] }
-                ensure(&(dict[path.first!]), path.dropFirst())
-            }
-        }
-        
-        ensure(&json, path)
-    }
-    
-    /// Internal: clear the key at this path (removing empty dictionaries)
-    private func clearKey(_ path: ArraySlice<String>) {
-        func clear(_ dict: inout JSON, _ path: ArraySlice<String>) {
-            if path.count > 0 {
-                clear(&(dict[path.first!]), path.dropFirst())
-                if path.count == 1 || dict[path.first!].dictionaryValue.count == 0 {
-                    dict.dictionaryObject?.removeValue(forKey: path.first!)
-                }
-            }
-        }
-        
-        clear(&json, path)
-    }
-
     // - MARK: Related Subtypes
-    
-    /// A `.content` message's `body` is represented by an array of `BodyItem`
-    public enum BodyItem: CustomStringConvertible {
-        /// Plain text version of the `.content` message (required)
-        case plain(_ value: String)
-        /// Html version of the `.content` message (optional)
-        case html(_ value: String)
-        /// Unknown body element
-        case unknown(_ value: String)
-        
-        /// String encoding of the item
-        public var description: String {
-            return "\"\(self.raw)\""
-        }
-        /// Raw data for the item
-        public var raw: String {
-            switch self {
-            case .plain(let str): return str
-            case .html(let str): return str
-            default: return "<bad item>"
-            }
-        }
-    }
 
     /// Forsta message types
-    public enum MessageType: String {
+    public enum MessageType: String, Codable {
         /// A control message -- see `ControlType`
         case control = "control"
         /// A content message (i.e., plain/html text)
@@ -542,7 +531,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
     }
 
     /// Forsta thread types
-    public enum ThreadType: String {
+    public enum ThreadType: String, Codable {
         /// A thread where anybody can send to the group
         case conversation = "conversation"
         /// A thread where it is a broadcast
@@ -550,7 +539,7 @@ public class ForstaPayloadV1: CustomStringConvertible {
     }
 
     /// Forsta control message types (used in the Forsta message exchange payload)
-    public enum ControlType: String {
+    public enum ControlType: String, Codable {
         /// Update thread metadata -- key/value dict in `threadUpdates`
         case threadUpdate = "threadUpdate"
         

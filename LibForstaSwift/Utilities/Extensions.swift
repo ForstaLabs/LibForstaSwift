@@ -151,6 +151,11 @@ extension SignalAddress: CustomStringConvertible {
     public var description: String {
         return "\(self.name).\(self.deviceId)"
     }
+    
+    /// conversion from SignalAddress to the AddressSchema we use in the Forsta payload
+    public var payloadSchema: ForstaPayloadV1.AddressSchema {
+        return ForstaPayloadV1.AddressSchema(userId: self.userId, device: UInt32(self.deviceId))
+    }
 }
 
 public extension JSON {
@@ -166,7 +171,7 @@ public extension JSON {
 }
 
 public extension UUID {
-    /// the lowercased string form of this `UUID`
+    /// The lowercased string form of this `UUID`
     /// (Forsta uses the lowercase string exclusively in message payloads and user addresses)
     var lcString: String {
         get {
@@ -176,11 +181,12 @@ public extension UUID {
 }
 
 public extension String {
-    /// utility for prefixing every line in a `String` with some string
+    /// Utility for prefixing every line in a `String` with some string
     func indentWith(_ prefix: String) -> String {
         return prefix + self.replacingOccurrences(of: "\n", with: "\n" + prefix)
     }
     
+    /// Fix any UUID values in a JSON string to be lowercased (all of our other clients depend on this)
     var lowercasedJsonUuidValues: String {
         let input = self as NSString
         var output = self
