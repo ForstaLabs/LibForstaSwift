@@ -31,7 +31,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
                 }
             }
         } catch let error {
-            print("ERROR:", error)
+            print("JSON DECODING ERROR:", error)
             print("WAS TRYING TO DECODE:", jsonString ?? "")
         }
     }
@@ -130,7 +130,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
     
     /// The schema for `.data` `.body` entries
     public struct Body: Codable {
-        /// Either "text/plain" or "text/html" (sorry, this isn't a sensible enum because the "/" currently gets encoded/decoded inappropriately)
+        /// Either "text/plain" or "text/html" (this isn't a sensible enum because the "/" currently gets encoded/decoded inappropriately)
         public var type: String
         /// The text of said type
         public var value: String
@@ -142,14 +142,6 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         public var threadTitle: String?
         /// New distribution tag-math expression
         public var expression: String?
-    }
-    
-    /// Types of media a peer could send/receive
-    public enum StreamType:String, Codable {
-        /// Audio stream
-        case audio = "audio"
-        /// Video stream
-        case video = "video"
     }
     
     /// The schema for `.data` `.icecandidates` elements
@@ -536,105 +528,88 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
     }
     
     // - MARK: Related Subtypes
+    
+    /// Types of media a peer could send/receive
+    public enum StreamType: String, Codable {
+        /// Audio stream
+        case audio
+        /// Video stream
+        case video
+    }
 
     /// Forsta message types
     public enum MessageType: String, Codable {
         /// A control message -- see `ControlType`
-        case control = "control"
-        /// A content message (i.e., plain/html text)
-        case content = "content"
+        case control
+        /// A content message (i.e., plain text and optional html)
+        case content
         /// A poll message (defines prescribed responses)
-        case poll = "poll"
+        case poll
         /// A poll response message (provides prescribed responses to a poll message)
-        case pollResponse = "pollResponse"
+        case pollResponse
     }
 
     /// Forsta thread types
     public enum ThreadType: String, Codable {
         /// A thread where anybody can send to the group
-        case conversation = "conversation"
+        case conversation
         /// A thread where it is a broadcast
-        case announcement = "announcement"
+        case announcement
     }
 
     /// Forsta control message types (used in the Forsta message exchange payload)
     public enum ControlType: String, Codable {
-        /// Update thread metadata -- key/value dict in `threadUpdates`
-        case threadUpdate = "threadUpdate"
-        
+        /// Update thread metadata -- any attributes set in `.data` `.threadUpdate` will be used
+        case threadUpdate
         /// Clear history of current thread across my devices
-        case threadClear = "threadClear"
-        
+        case threadClear
         /// Archive thread across my devices (WITHOUT leaving the distribution)
-        case threadArchive = "threadArchive"
-        
+        case threadArchive
         /// Restore/unarchive thread across my devices
-        case threadRestore = "threadRestore"
-        
+        case threadRestore
         /// Delete the thread (leaving the distribution) across my devices
-        case threadDelete = "threadDelete"
-        
+        case threadDelete
         /// Indicate to thread participants where your read-position is
-        case readMark = "readMark"
-        
+        case readMark
         /// Indicate that user is actively typing a message for the thread
-        case pendingMessage = "pendingMessage"
-        
+        case pendingMessage
         /// Stop notifications, etc. for a period.  See `snoozeUntil` in the payload.
-        case snooze = "snooze"
-        
+        case snooze
         /// Request to assist in provisioning a new device
-        case provisionRequest = "provisionRequest"
-        
+        case provisionRequest
         /// Request synchronization with a device's own peers (self devices)
-        case syncRequest = "syncRequest"
-        
+        case syncRequest
         /// Respond to `.syncRequest`
-        case syncResponse = "syncResponse"
-        
+        case syncResponse
         /// Discover threads from peers
-        case discoverRequest = "discoverRequest"
-        
+        case discoverRequest
         /// Response to `.discoverRequest`
-        case discoverResponse = "discoverResponse"
-        
+        case discoverResponse
         /// Ask a client for any pre-messages it has for the sender
-        case preMessageCheck = "preMessageCheck"
-        
+        case preMessageCheck
         /// Client prompting a bot to perform an ACL operation
-        case aclRequest = "aclRequest"
-        
+        case aclRequest
         /// Bot responding to `.aclRequest`
-        case aclResponse = "aclResponse"
-        
+        case aclResponse
         /// Block a user by ID
-        case userBlock = "userBlock"
-        
+        case userBlock
         /// Unblock a user by ID
-        case userUnblock = "userUnblock"
-        
+        case userUnblock
         /// Initiate contact with peers
-        case beacon = "beacon"
-        
+        case beacon
         /// Extended metadata for a message using the END_SESSION flag
-        case closeSession = "closeSession"
-        
+        case closeSession
         /// A broadcast offer of or intent to participate in an WebRTC call
-        case callJoin = "callJoin"
-        
+        case callJoin
         /// A broadcast leaving/rejecting of a WebRTC call
-        case callLeave = "callLeave"
-        
+        case callLeave
         /// Offering a WebRTC connection to a specific device in a call
-        case callOffer = "callOffer"
-        
+        case callOffer
         /// Accepting a connection offer from a specific device in a call
-        case callAcceptOffer = "callAcceptOffer"
-        
+        case callAcceptOffer
         /// Control message providing WebRTC call ICE candidates to establish a connection with a device
-        case callICECandidates = "callICECandidates"
-        
+        case callICECandidates
         /// Indicates that a call is ongoing with the recipient, from the sender's perspective
-        case callHeartbeat = "callHeartbeat"
+        case callHeartbeat
     }
 }
