@@ -76,6 +76,12 @@ class SignalClientTests: XCTestCase {
         
         XCTAssert(payload.json() == "[{\"version\":1}]")
         
+        payload.iceCandidates = nil
+        XCTAssert(payload.iceCandidates == nil)
+        payload.iceCandidates = [ForstaPayloadV1.IceCandidate(candidate: "yo", sdpMid: "baby", sdpMLineIndex: 42)]
+        XCTAssert(payload.iceCandidates != nil)
+        XCTAssert(payload.iceCandidates?.count == 1)
+        
         let messageId = UUID()
         XCTAssert(payload.messageId == nil)
         payload.messageId = messageId
@@ -197,6 +203,9 @@ class SignalClientTests: XCTestCase {
         
         payload.threadId = nil
         XCTAssert(payload.threadId == nil)
+        
+        payload.iceCandidates = nil
+        XCTAssert(payload.iceCandidates == nil)
         
         payload.threadTitle = nil
         XCTAssert(payload.threadTitle == nil)

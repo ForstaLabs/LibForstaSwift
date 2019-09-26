@@ -147,8 +147,9 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
     /// The schema for `.data` `.icecandidates` elements
     public struct IceCandidate: Codable {
         public var candidate: String
-        public var sdpMid: String
+        public var sdpMid: String?
         public var sdpMLineIndex: Int32
+        public var serverUrl: String?
     }
     
     /// The schema for `.data` `.offer`
