@@ -105,10 +105,10 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         public var icecandidates: [IceCandidate]?
         
         /// SDP offer details (only relevant for `.control` messages of type `.callOffer`)
-        public var offer: SdpOffer?
+        public var offer: SDP?
         
         /// SDP answer details (only relevant for `.control` messages of type `.callAcceptOffer`)
-        var answer: SdpAnswer?
+        public var answer: SDP?
 
         /// Further details about the attachments specified in the Signal envelope
         var attachments: [Attachment]?
@@ -178,29 +178,20 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         }
     }
     
-    /// The schema for `.data` `.offer`
-    public struct SdpOffer: Codable {
-        /// Fixed type == "offer"
-        public var type: String = "offer"
-        /// The actual SDP string
-        public var sdp: String
-        
-        /// Initialize from components
-        public init(type: String = "offer", _ sdp: String) {
-            self.type = type
-            self.sdp = sdp
+    /// The schema for `.data` `.answer` and `.offer`
+    public struct SDP: Codable {
+        /// types of SDP
+        public enum SdpType: String, Codable {
+            case answer
+            case offer
         }
-    }
-    
-    /// The schema for `.data` `.answer`
-    public struct SdpAnswer: Codable {
-        /// Fixed type == "answer"
-        public var type: String = "answer"
-        /// The actual SDP string
+        /// SDP type
+        public var type: SdpType
+        /// The SDP string
         public var sdp: String
         
         /// Initialize from components
-        public init(type: String = "answer", _ sdp: String) {
+        public init(type: SdpType, sdp: String) {
             self.type = type
             self.sdp = sdp
         }
@@ -436,7 +427,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             } else {
                 if data == nil { data = DataElement() }
                 if data!.offer == nil {
-                    data!.offer = SdpOffer(value!)
+                    data!.offer = SDP(type: .offer, sdp: value!)
                 } else {
                     data!.offer!.sdp = value!
                 }
@@ -455,7 +446,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             } else {
                 if data == nil { data = DataElement() }
                 if data!.answer == nil {
-                    data!.answer = SdpAnswer(value!)
+                    data!.answer = SDP(type: .answer, sdp: value!)
                 } else {
                     data!.answer!.sdp = value!
                 }
