@@ -126,14 +126,26 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         public var userId: UUID
         /// Device ID
         public var device: UInt32?
+        
+        /// Initialize from a SignalAddress
+        public init(_ address: SignalAddress) {
+            self.userId = address.userId
+            self.device = UInt32(address.deviceId)
+        }
     }
     
     /// The schema for `.data` `.body` entries
     public struct Body: Codable {
-        /// Either "text/plain" or "text/html" (this isn't a sensible enum because the "/" currently gets encoded/decoded inappropriately)
+        /// Type is either "text/plain" or "text/html" (this isn't a sensible enum because "/" currently gets encoded/decoded inappropriately)
         public var type: String
         /// The text of said type
         public var value: String
+        
+        /// Initialize from components
+        public init(type: String, value: String) {
+            self.type = type
+            self.value = value
+        }
     }
     
     /// The schema for `.data` `.threadUpdate` in a message exchange payload
@@ -142,6 +154,12 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         public var threadTitle: String?
         /// New distribution tag-math expression
         public var expression: String?
+        
+        /// Initialize from components
+        public init(threadTitle: String? = nil, expression: String? = nil) {
+            self.threadTitle = threadTitle
+            self.expression = expression
+        }
     }
     
     /// The schema for `.data` `.icecandidates` elements
@@ -150,6 +168,14 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         public var sdpMid: String?
         public var sdpMLineIndex: Int32
         public var serverUrl: String?
+        
+        /// Initialize from components
+        public init(candidate: String, sdpMid: String? = nil, sdpMLineIndex: Int32, serverUrl: String? = nil) {
+            self.candidate = candidate
+            self.sdpMid = sdpMid
+            self.sdpMLineIndex = sdpMLineIndex
+            self.serverUrl = serverUrl
+        }
     }
     
     /// The schema for `.data` `.offer`
@@ -157,7 +183,13 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         /// Fixed type == "offer"
         public var type: String = "offer"
         /// The actual SDP string
-        public var sdp: String?
+        public var sdp: String
+        
+        /// Initialize from components
+        public init(type: String = "offer", _ sdp: String) {
+            self.type = type
+            self.sdp = sdp
+        }
     }
     
     /// The schema for `.data` `.answer`
@@ -165,7 +197,13 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         /// Fixed type == "answer"
         public var type: String = "answer"
         /// The actual SDP string
-        public var sdp: String?
+        public var sdp: String
+        
+        /// Initialize from components
+        public init(type: String = "answer", _ sdp: String) {
+            self.type = type
+            self.sdp = sdp
+        }
     }
     
     /// The schema for `.data` `.attachments`
@@ -179,6 +217,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         /// The file modification-time
         public var mtime: Date
         
+        /// Initialize from components
         init(from info: AttachmentInfo) {
             self.name = info.name
             self.size = info.size
@@ -190,9 +229,15 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
     /// The schema for `.distribution`
     public struct Distribution: Codable {
         /// The tag-math distribution expression for this message (required)
-        public var expression: String?
+        public var expression: String
         /// The user IDs that `.expression` resolves to (optional)
         public var users: [UUID]?
+        
+        /// Initialize from components
+        public init(expression: String, users: [UUID]? = nil) {
+            self.expression = expression
+            self.users = users
+        }
     }
     
     // -MARK: Helper Accessors
@@ -244,13 +289,14 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             return distribution?.expression
         }
         set(value) {
-            if distribution == nil {
-                distribution = Distribution(expression: value!, users: nil)
-            } else {
-                distribution!.expression = value
-            }
-            if distribution?.expression == nil && distribution?.users == nil {
+            if value == nil {
                 distribution = nil
+            } else {
+                if distribution == nil {
+                    distribution = Distribution(expression: value!, users: nil)
+                } else {
+                    distribution!.expression = value!
+                }
             }
         }
     }
@@ -389,8 +435,11 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
                 data?.offer = nil
             } else {
                 if data == nil { data = DataElement() }
-                if data!.offer == nil { data!.offer = SdpOffer() }
-                data!.offer!.sdp = value
+                if data!.offer == nil {
+                    data!.offer = SdpOffer(value!)
+                } else {
+                    data!.offer!.sdp = value!
+                }
             }
         }
     }
@@ -405,8 +454,11 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
                 data?.answer = nil
             } else {
                 if data == nil { data = DataElement() }
-                if data!.answer == nil { data!.answer = SdpAnswer() }
-                data!.answer!.sdp = value
+                if data!.answer == nil {
+                    data!.answer = SdpAnswer(value!)
+                } else {
+                    data!.answer!.sdp = value!
+                }
             }
         }
     }

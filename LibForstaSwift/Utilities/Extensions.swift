@@ -154,7 +154,7 @@ extension SignalAddress: CustomStringConvertible {
     
     /// conversion from SignalAddress to the Address we use in the Forsta payload
     public var payloadAddress: ForstaPayloadV1.Address {
-        return ForstaPayloadV1.Address(userId: self.userId, device: UInt32(self.deviceId))
+        return ForstaPayloadV1.Address(self)
     }
 }
 
