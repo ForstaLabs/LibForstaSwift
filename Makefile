@@ -26,6 +26,7 @@ clean:
 	$(XCODE_BUILD) clean | xcpretty
 
 pristine: clean
+	rm -rf Carthage
 	rm -f $(DEPENDENCIES)
 
 docs: $(DEPENDENCIES)
