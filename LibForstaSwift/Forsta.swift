@@ -11,6 +11,7 @@ import PromiseKit
 
 /// This is THE top-level helper class for using LibForstaSwift.
 public class Forsta {
+    /// The `DispatchQueue` that LibForstaSwift will do any asyncronous internal work on (Serial, QoS of Utility)
     static public let workQueue: DispatchQueue = .init(label: "LFS Subwork", qos: .utility)
     
     // -MARK: Attributes
