@@ -17,7 +17,7 @@ import SignalProtocol
 public class MessageSender {
     /// the `SignalClient` that is being used by this sender
     let signalClient: SignalClient
-
+    
     // -MARK: Constructors
     
     /// init with a `SignalClient`
@@ -46,7 +46,7 @@ public class MessageSender {
             try sendable.payload.sanityCheck()
             var results: [Promise<TransmissionInfo>] = []
             let contentProto = sendable.contentProto
-
+            
             var paddedClearData = try contentProto.serializedData()
             pad(&paddedClearData)
             
@@ -73,9 +73,9 @@ public class MessageSender {
     
     /// send sync message to our other devices for an outgoing message
     func sendSync(signalContent: Signal_Content,
-                          timestamp: Date,
-                          threadId: UUID? = nil,
-                          expirationStartTimestamp: Date? = nil) -> Promise<TransmissionInfo> {
+                  timestamp: Date,
+                  threadId: UUID? = nil,
+                  expirationStartTimestamp: Date? = nil) -> Promise<TransmissionInfo> {
         let dataMessage = signalContent.dataMessage
         
         var sentMessage = Signal_SyncMessage.Sent()
@@ -139,7 +139,7 @@ public class MessageSender {
             return Promise<TransmissionInfo>.init(error: ForstaError("couldn't serialize content", cause: error))
         }
     }
-
+    
     /// Fetch prekey bundle for address and process it
     func updatePrekeysForUser(_ userId: UUID) -> Promise<Void> {
         return self.updatePrekeysForUser(userId: userId.lcString)
@@ -155,10 +155,10 @@ public class MessageSender {
     func updatePrekeysForUser(userId: String, deviceId: UInt32? = nil) -> Promise<Void> {
         guard let myUserIdString = self.signalClient.signalAddress?.userId.lcString,
             let myDeviceId = self.signalClient.signalAddress?.deviceId else {
-            return Promise<Void>.init(error: ForstaError(.configuration, "own address isn't available"))
+                return Promise<Void>.init(error: ForstaError(.configuration, "own address isn't available"))
         }
         return self.signalClient.getKeysForAddr(addr: userId, deviceId: deviceId)
-            .map { bundles in
+            .map(on: Forsta.workQueue) { bundles in
                 let devices = bundles.filter { !(userId == myUserIdString && $0.deviceId == myDeviceId) }
                 for bundle in devices {
                     let addr = SignalAddress(name: userId, deviceId: bundle.deviceId)
@@ -184,7 +184,7 @@ public class MessageSender {
                 throw ForstaError("internal error", cause: error)
             }
         } while attempts < 2
-
+        
         throw ForstaError(.untrustedIdentity, "untrusted identity key")
     }
     
@@ -213,26 +213,26 @@ public class MessageSender {
                 } else {
                     return Promise<Void>.value(())
                 }
+        }
+        .map(on: Forsta.workQueue) {
+            try self.encryptWithKeyChangeRecovery(address: address, paddedClearData: paddedClearData)
+        }
+        .map(on: Forsta.workQueue) { (encryptedMessage, remoteRegistrationId) -> [String: Any] in
+            self.messageTransmissionBundle(deviceId: address.deviceId,
+                                           registrationId: remoteRegistrationId,
+                                           encryptedMessage: encryptedMessage, timestamp: timestamp)
+        }
+        .then(on: Forsta.workQueue) { bundle -> Promise<(Int, JSON)> in
+            self.signalClient.deliverToDevice(address: address, messageBundle: bundle)
+        }
+        .then(on: Forsta.workQueue) { (statusCode, json) -> Promise<TransmissionInfo> in
+            if statusCode == 410 && retry {
+                let _ = self.signalClient.store.sessionStore.deleteSession(for: address) // force an updateKeys on retry
+                return self.sendToDevice(address: address, paddedClearData: paddedClearData, timestamp: timestamp, retry: false)
+            } else if statusCode >= 300 {
+                throw ForstaError(.requestRejected, json)
             }
-            .map {
-                try self.encryptWithKeyChangeRecovery(address: address, paddedClearData: paddedClearData)
-            }
-            .map { (encryptedMessage, remoteRegistrationId) -> [String: Any] in
-                self.messageTransmissionBundle(deviceId: address.deviceId,
-                                               registrationId: remoteRegistrationId,
-                                               encryptedMessage: encryptedMessage, timestamp: timestamp)
-            }
-            .then { bundle -> Promise<(Int, JSON)> in
-                self.signalClient.deliverToDevice(address: address, messageBundle: bundle)
-            }
-            .then { (statusCode, json) -> Promise<TransmissionInfo> in
-                if statusCode == 410 && retry {
-                    let _ = self.signalClient.store.sessionStore.deleteSession(for: address) // force an updateKeys on retry
-                    return self.sendToDevice(address: address, paddedClearData: paddedClearData, timestamp: timestamp, retry: false)
-                } else if statusCode >= 300 {
-                    throw ForstaError(.requestRejected, json)
-                }
-                return Promise<TransmissionInfo>.value(TransmissionInfo(recipient:.device(address), deviceCount: 1, json: json))
+            return Promise<TransmissionInfo>.value(TransmissionInfo(recipient:.device(address), deviceCount: 1, json: json))
         }
     }
     
@@ -254,34 +254,34 @@ public class MessageSender {
         }
         return
             self.signalClient.deliverToUser(userId: userId, messageBundles: messageBundles)
-            .then { (statusCode, json) -> Promise<TransmissionInfo> in
-                if statusCode < 300 {
-                    return Promise<TransmissionInfo>.value(TransmissionInfo(recipient:.user(userId), deviceCount: messageBundles.count, json: json))
-                } else if statusCode == 410 || statusCode == 409 {
-                    if (!allowRetries) {
-                        throw ForstaError(.transmissionFailure, "Hit retry limit attempting to reload device list")
-                    }
-                    if (statusCode == 409) {
-                        // remove device IDs for extra devices
-                        for extra in json["extraDevices"].arrayValue {
-                            let deviceId = extra.uInt32Value
-                            let _ = self.signalClient.store.sessionStore.deleteSession(for: SignalAddress(userId: userId, deviceId: deviceId))
+                .then(on: Forsta.workQueue) { (statusCode, json) -> Promise<TransmissionInfo> in
+                    if statusCode < 300 {
+                        return Promise<TransmissionInfo>.value(TransmissionInfo(recipient:.user(userId), deviceCount: messageBundles.count, json: json))
+                    } else if statusCode == 410 || statusCode == 409 {
+                        if (!allowRetries) {
+                            throw ForstaError(.transmissionFailure, "Hit retry limit attempting to reload device list")
+                        }
+                        if (statusCode == 409) {
+                            // remove device IDs for extra devices
+                            for extra in json["extraDevices"].arrayValue {
+                                let deviceId = extra.uInt32Value
+                                let _ = self.signalClient.store.sessionStore.deleteSession(for: SignalAddress(userId: userId, deviceId: deviceId))
+                            }
+                        } else {
+                            // close open sessions on stale devices
+                            for extra in json["staleDevices"].arrayValue {
+                                let deviceId = extra.uInt32Value
+                                let _ = self.signalClient.store.sessionStore.deleteSession(for: SignalAddress(userId: userId, deviceId: deviceId))
+                            }
+                        }
+                        
+                        // no optimization for now -- just update all of the device keys for the user
+                        return self.updatePrekeysForUser(userId).then(on: Forsta.workQueue) {
+                            self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: timestamp, allowRetries: statusCode == 409)
                         }
                     } else {
-                        // close open sessions on stale devices
-                        for extra in json["staleDevices"].arrayValue {
-                            let deviceId = extra.uInt32Value
-                            let _ = self.signalClient.store.sessionStore.deleteSession(for: SignalAddress(userId: userId, deviceId: deviceId))
-                        }
+                        throw ForstaError(.requestRejected, json)
                     }
-                    
-                    // no optimization for now -- just update all of the device keys for the user
-                    return self.updatePrekeysForUser(userId).then {
-                        self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: timestamp, allowRetries: statusCode == 409)
-                    }
-                } else {
-                    throw ForstaError(.requestRejected, json)
-                }
         }
     }
     

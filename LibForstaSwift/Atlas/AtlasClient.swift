@@ -96,7 +96,7 @@ public class AtlasClient {
         let (user, org) = tagParts(userTag)
         
         return request("/v1/login/send/\(org)/\(user)")
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 409 {
                     if json["non_field_errors"].arrayValue.contains("totp auth required") {
                         return .passwordOtp
@@ -192,7 +192,7 @@ public class AtlasClient {
     /// with appropriate credentials for a concrete authentication method.
     private func authenticate(_ credentials: [String: String]) -> Promise<AuthenticatedUser> {
         return request("/v1/login/", method: .post, parameters: credentials)
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 200 {
                     let user = json["user"]
                     self.authenticatedUserJwt = json["token"].stringValue
@@ -218,7 +218,7 @@ public class AtlasClient {
     /// Internal: Request a refreshed JWT token from Atlas.
     private func requestJwtRefresh(_ jwt: String) -> Promise<String> {
         return request("/v1/api-token-refresh/", method: .post, parameters: ["token": jwt])
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 200 {
                     if let jwt = json["token"].string {
                         return jwt
@@ -246,7 +246,7 @@ public class AtlasClient {
     ///
     public func createUser(_ fields: [String: Any]) -> Promise<JSON> {
         return request("/v1/user/", method: .post, parameters: fields)
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 201 { return json }
                 throw ForstaError(.requestRejected, json)
         }
@@ -263,7 +263,7 @@ public class AtlasClient {
     ///
     public func updateUser(_ id: String, _ fields: [String: Any]) -> Promise<JSON> {
         return request("/v1/user/\(id)/", method: .patch, parameters: fields)
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 200 { return json }
                 throw ForstaError(.requestRejected, json)
         }
@@ -284,7 +284,7 @@ public class AtlasClient {
         if description != nil { fields["description"] = description }
         
         return request("/v1/userauthtoken/", method: .post, parameters: fields)
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 200 { return json }
                 throw ForstaError(.requestRejected, json)
         }
@@ -315,7 +315,7 @@ public class AtlasClient {
     public func joinForsta(invitationToken: String? = nil,
                            _ fields: [String: Any]) -> Promise<(String, UUID)> {
         return request("/v1/join/\(invitationToken ?? "")", method: .post, parameters: fields)
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 200,
                     let nameTag = json["nametag"].string,
                     let orgSlug = json["orgslug"].string,
@@ -348,7 +348,7 @@ public class AtlasClient {
     ///
     public func sendInvitation(_ fields: [String: Any]) -> Promise<UUID> {
         return request("/v1/invitation/", method: .post, parameters: fields)
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 200,
                     let userIdStr = json["invited_user_id"].string,
                     let userId = UUID(uuidString: userIdStr) {
@@ -367,7 +367,7 @@ public class AtlasClient {
     ///
     public func revokeInvitation(_ pendingUserId: UUID) -> Promise<Void> {
         return request("/v1/invitation/\(pendingUserId.lcString)", method: .delete)
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 204 { return () }
                 throw ForstaError(.requestRejected, json)
         }
@@ -386,7 +386,7 @@ public class AtlasClient {
     ///
     public func getInvitationInfo(_ invitationToken: String) -> Promise<JSON> {
         return request("/v1/invitation/\(invitationToken)", method: .get)
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 200 { return json }
                 throw ForstaError(.requestRejected, json)
         }
@@ -404,7 +404,7 @@ public class AtlasClient {
     ///
     public func resolveTagExpression(_ expression: String) -> Promise<JSON> {
         return resolveTagExpressionBatch([expression])
-            .map { result in
+            .map(on: Forsta.workQueue) { result in
                 let res = result.arrayValue
                 if res.count > 0 {
                     return res[0]
@@ -425,7 +425,7 @@ public class AtlasClient {
     ///
     public func resolveTagExpressionBatch(_ expressions: [String]) -> Promise<JSON> {
         return request("/v1/tagmath/", method: .post, parameters: ["expressions": expressions])
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 200 { return json["results"] }
                 throw ForstaError(.requestRejected, json)
         }
@@ -451,7 +451,7 @@ public class AtlasClient {
         let idList = userIds.map({ $0.lcString }).joined(separator: ",")
         
         return (onlyPublicDirectory ? Promise.value((200, JSON(["results": []]))) : request("/v1/user/?id_in=" + idList))
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if (statusCode != 200) { throw ForstaError(.requestRejected, json) }
                 for user in json["results"].arrayValue {
                     users.append(user)
@@ -459,12 +459,12 @@ public class AtlasClient {
                         missing.remove(id)
                     }
                 }
-            }.then { () -> Promise<[JSON]> in
+            }.then(on: Forsta.workQueue) { () -> Promise<[JSON]> in
                 if missing.count == 0 {
                     return Promise.value(users)
                 } else {
                     return self.request("/v1/directory/user/?id_in=" + Array(missing).map({ $0.lcString }).joined(separator: ","))
-                        .map { (statusCode, json) in
+                        .map(on: Forsta.workQueue) { (statusCode, json) in
                             if (statusCode != 200) { throw ForstaError(.requestRejected, json) }
                             for user in json["results"].arrayValue {
                                 users.append(user)
@@ -478,7 +478,7 @@ public class AtlasClient {
     /// Internal: get all pages for a url
     private func allResults(url: String, previous: [JSON] = []) -> Promise<[JSON]> {
         return request(url)
-            .then { result -> Promise<[JSON]> in
+            .then(on: Forsta.workQueue) { result -> Promise<[JSON]> in
                 let (statusCode, json) = result
                 if statusCode == 200 {
                     let next = json["next"].string
@@ -535,7 +535,7 @@ public class AtlasClient {
                        method: .post,
                        parameters: [ "uuid": uuidString,
                                      "key": pubKeyString ])
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 200 { return json }
                 throw ForstaError(.requestRejected, json)
         }
@@ -548,7 +548,7 @@ public class AtlasClient {
     ///
     public func provisionSignalAccount(_ fields: [String: Any]) -> Promise<JSON> {
         return request("/v1/provision/account", method: .put, parameters: fields)
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 200 { return json }
                 throw ForstaError(.requestRejected, json)
         }
@@ -561,7 +561,7 @@ public class AtlasClient {
     ///
     public func getSignalAccountInfo() -> Promise<JSON> {
         return request("/v1/provision/account")
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 200 { return json }
                 throw ForstaError(.requestRejected, json)
         }
@@ -574,7 +574,7 @@ public class AtlasClient {
     ///
     public func getRtcTurnServersInfo() -> Promise<[JSON]> {
         return request("/v1/rtc/servers")
-            .map { (statusCode, json) in
+            .map(on: Forsta.workQueue) { (statusCode, json) in
                 if statusCode == 200 { return json.arrayValue }
                 throw ForstaError(.requestRejected, json)
         }
@@ -607,7 +607,7 @@ public class AtlasClient {
             let headers = isAuthenticated ? ["Authorization": "JWT \(authenticatedUserJwt!)"] : nil
             let fullUrl = url.starts(with: "http") ? url : "\(serverUrl!)\(url)"
             Alamofire.request(fullUrl, method: method, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
-                .responseJSON { response in
+                .responseJSON(queue: Forsta.workQueue) { response in
                     let statusCode = response.response?.statusCode ?? 500
                     switch response.result {
                     case .success(let data):

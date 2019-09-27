@@ -97,7 +97,7 @@ public class OutgoingWSRequest: WSRequest {
         
         self.wsr.outgoingRequests[self.id] = self
         
-        return self.wsr.send(msg).then { return promise }
+        return self.wsr.send(msg).then(on: Forsta.workQueue) { return promise }
     }
 }
 
@@ -125,6 +125,7 @@ public class WebSocketResource: WebSocketDelegate {
         self.url = url
         lastConnect = Date()
         socket = WebSocket(url: URL(string: self.url!)!)
+        socket?.callbackQueue = Forsta.workQueue
         socket!.delegate = self
         socket!.connect()
     }

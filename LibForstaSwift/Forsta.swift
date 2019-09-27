@@ -11,6 +11,8 @@ import PromiseKit
 
 /// This is THE top-level helper class for using LibForstaSwift.
 public class Forsta {
+    static public let workQueue: DispatchQueue = .init(label: "LFS Subwork", qos: .utility)
+    
     // -MARK: Attributes
     
     /// An Atlas client for Forsta Atlas server operations.
