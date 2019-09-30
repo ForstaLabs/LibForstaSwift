@@ -121,10 +121,11 @@ public class AtlasClient {
     /// - returns: A `Promise` that resolves to  an `AuthenticatedUser` `JSON` blob for the user
     ///
     public func authenticateViaCode(userTag: String, code: String) -> Promise<AuthenticatedUser> {
-        let (user, org) = tagParts(userTag);
+        let (user, org) = tagParts(userTag)
         let creds = [
             "authtoken": "\(org):\(user):\(code)"
         ]
+        
         return authenticate(creds)
     }
     
@@ -137,8 +138,9 @@ public class AtlasClient {
     /// - returns: A `Promise` that resolves to an `AuthenticatedUser` `JSON` blob for the user
     ///
     public func authenticateViaPassword(userTag: String, password: String) -> Promise<AuthenticatedUser> {
+        let (user, org) = tagParts(userTag)
         let creds = [
-            "fq_tag": userTag,
+            "fq_tag": "\(user):\(org)",
             "password": password
         ]
         return authenticate(creds)
@@ -154,8 +156,9 @@ public class AtlasClient {
     /// - returns: A `Promise` that resolves to an `AuthenticatedUser` `JSON` blob for the user
     ///
     public func authenticateViaPasswordOtp(userTag: String, password: String, otp: String) -> Promise<AuthenticatedUser> {
+        let (user, org) = tagParts(userTag)
         let creds = [
-            "fq_tag": userTag,
+            "fq_tag": "\(user):\(org)",
             "password": password,
             "otp": otp
         ]
@@ -445,7 +448,7 @@ public class AtlasClient {
     /// - returns: A `Promise` resolving to a `JSON` array of the users' information
     ///
     public func getUsers(userIds: [UUID], onlyPublicDirectory: Bool = false) -> Promise<[JSON]> {
-        var missing = Set(userIds);
+        var missing = Set(userIds)
         var users: [JSON] = []
         
         let idList = userIds.map({ $0.lcString }).joined(separator: ",")
