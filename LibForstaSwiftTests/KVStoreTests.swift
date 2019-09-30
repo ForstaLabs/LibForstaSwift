@@ -10,6 +10,7 @@ import Foundation
 import XCTest
 import SwiftyJSON
 import LibForstaSwift
+import SignalProtocol
 
 class MemoryKVStore: KVStorageProtocol {
     var data = [String: [String: Data]]()
@@ -131,5 +132,38 @@ class KVStoreTests: XCTestCase {
         print(toWrongY!)
         // XCTAssert(toWrongX! == fromX)
         // XCTAssert(toWrongY! == fromY)
+    }
+    
+    class BackedStuff {
+        public var signalAddress: SignalAddress? {
+            get { return _signalAddress.value }
+            set(value) { _signalAddress.value = value }
+        }
+        private var _signalAddress: KVBacked<SignalAddress>
+        
+        init(store: KVStorageProtocol) {
+            self._signalAddress = KVBacked(kvstore: store, key: "muh key")
+        }
+    }
+    
+    func setAddr(_ store: KVStorageProtocol, _ addr: SignalAddress?) {
+        let thing = BackedStuff(store: store)
+        thing.signalAddress = addr
+    }
+    func getAddr(_ store: KVStorageProtocol) -> SignalAddress? {
+        let thing = BackedStuff(store: store)
+        return thing.signalAddress
+    }
+    
+    func testKVBacked() {
+        let store = MemoryKVStore()
+        
+        let original = SignalAddress(userId: UUID(), deviceId: UInt32(42))
+        
+        setAddr(store, original)
+        
+        let copy = getAddr(store)
+        
+        XCTAssert(original == copy)
     }
 }
