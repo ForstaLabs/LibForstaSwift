@@ -158,7 +158,7 @@ public class MessageSender {
                 return Promise<Void>.init(error: ForstaError(.configuration, "own address isn't available"))
         }
         return self.signalClient.getKeysForAddr(addr: userId, deviceId: deviceId)
-            .map(on: Forsta.workQueue) { bundles in
+            .map(on: ForstaClient.workQueue) { bundles in
                 let devices = bundles.filter { !(userId == myUserIdString && $0.deviceId == myDeviceId) }
                 for bundle in devices {
                     let addr = SignalAddress(name: userId, deviceId: bundle.deviceId)
@@ -179,6 +179,7 @@ public class MessageSender {
                 return (encryptedMessage, try cipher.remoteRegistrationId())
             } catch SignalError.untrustedIdentity {
                 NotificationCenter.broadcast(.signalIdentityKeyChanged, ["address": address])
+                self.signalClient.delegates.notify { $0.identityKeyChanged(address: address) }
                 let _ = self.signalClient.store.identityKeyStore.save(identity: nil, for: address)
             } catch let error {
                 throw ForstaError("internal error", cause: error)
@@ -214,18 +215,18 @@ public class MessageSender {
                     return Promise<Void>.value(())
                 }
         }
-        .map(on: Forsta.workQueue) {
+        .map(on: ForstaClient.workQueue) {
             try self.encryptWithKeyChangeRecovery(address: address, paddedClearData: paddedClearData)
         }
-        .map(on: Forsta.workQueue) { (encryptedMessage, remoteRegistrationId) -> [String: Any] in
+        .map(on: ForstaClient.workQueue) { (encryptedMessage, remoteRegistrationId) -> [String: Any] in
             self.messageTransmissionBundle(deviceId: address.deviceId,
                                            registrationId: remoteRegistrationId,
                                            encryptedMessage: encryptedMessage, timestamp: timestamp)
         }
-        .then(on: Forsta.workQueue) { bundle -> Promise<(Int, JSON)> in
+        .then(on: ForstaClient.workQueue) { bundle -> Promise<(Int, JSON)> in
             self.signalClient.deliverToDevice(address: address, messageBundle: bundle)
         }
-        .then(on: Forsta.workQueue) { (statusCode, json) -> Promise<TransmissionInfo> in
+        .then(on: ForstaClient.workQueue) { (statusCode, json) -> Promise<TransmissionInfo> in
             if statusCode == 410 && retry {
                 let _ = self.signalClient.store.sessionStore.deleteSession(for: address) // force an updateKeys on retry
                 return self.sendToDevice(address: address, paddedClearData: paddedClearData, timestamp: timestamp, retry: false)
@@ -254,7 +255,7 @@ public class MessageSender {
         }
         return
             self.signalClient.deliverToUser(userId: userId, messageBundles: messageBundles)
-                .then(on: Forsta.workQueue) { (statusCode, json) -> Promise<TransmissionInfo> in
+                .then(on: ForstaClient.workQueue) { (statusCode, json) -> Promise<TransmissionInfo> in
                     if statusCode < 300 {
                         return Promise<TransmissionInfo>.value(TransmissionInfo(recipient:.user(userId), deviceCount: messageBundles.count, json: json))
                     } else if statusCode == 410 || statusCode == 409 {
@@ -276,7 +277,7 @@ public class MessageSender {
                         }
                         
                         // no optimization for now -- just update all of the device keys for the user
-                        return self.updatePrekeysForUser(userId).then(on: Forsta.workQueue) {
+                        return self.updatePrekeysForUser(userId).then(on: ForstaClient.workQueue) {
                             self.sendToUser(userId: userId, paddedClearData: paddedClearData, timestamp: timestamp, allowRetries: statusCode == 409)
                         }
                     } else {

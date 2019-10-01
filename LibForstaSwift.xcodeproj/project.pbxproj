@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DB17A447230EF7F000AEEF73 /* Forsta.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB17A446230EF7F000AEEF73 /* Forsta.swift */; };
+		DB17A447230EF7F000AEEF73 /* ForstaClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB17A446230EF7F000AEEF73 /* ForstaClient.swift */; };
 		DB2B009F22E12CC000B9931A /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009822E12CC000B9931A /* SwiftyJSON.framework */; };
 		DB2B00A022E12CC000B9931A /* Starscream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009922E12CC000B9931A /* Starscream.framework */; };
 		DB2B00A122E12CC000B9931A /* PromiseKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB2B009A22E12CC000B9931A /* PromiseKit.framework */; };
@@ -55,6 +55,8 @@
 		DBE3D57822F89E880016B800 /* MessageSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57722F89E880016B800 /* MessageSender.swift */; };
 		DBE3D57A22F89EB50016B800 /* MessageReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE3D57922F89EB50016B800 /* MessageReceiver.swift */; };
 		DBF5B6EE23182CDD004765FA /* ForstaPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF5B6ED23182CDD004765FA /* ForstaPayload.swift */; };
+		DBF5C5B52343E51C00678EEF /* Delegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF5C5B42343E51C00678EEF /* Delegates.swift */; };
+		DBF5C5B72343F1E000678EEF /* DelegatesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF5C5B62343F1E000678EEF /* DelegatesTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,7 +91,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		DB17A446230EF7F000AEEF73 /* Forsta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Forsta.swift; sourceTree = "<group>"; };
+		DB17A446230EF7F000AEEF73 /* ForstaClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForstaClient.swift; sourceTree = "<group>"; };
 		DB17A448230F168000AEEF73 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		DB2B009822E12CC000B9931A /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/iOS/SwiftyJSON.framework; sourceTree = "<group>"; };
 		DB2B009922E12CC000B9931A /* Starscream.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Starscream.framework; path = Carthage/Build/iOS/Starscream.framework; sourceTree = "<group>"; };
@@ -127,6 +129,8 @@
 		DBE3D57722F89E880016B800 /* MessageSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSender.swift; sourceTree = "<group>"; };
 		DBE3D57922F89EB50016B800 /* MessageReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageReceiver.swift; sourceTree = "<group>"; };
 		DBF5B6ED23182CDD004765FA /* ForstaPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForstaPayload.swift; sourceTree = "<group>"; };
+		DBF5C5B42343E51C00678EEF /* Delegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Delegates.swift; sourceTree = "<group>"; };
+		DBF5C5B62343F1E000678EEF /* DelegatesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelegatesTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -216,6 +220,7 @@
 				DB2B00C322E12D7800B9931A /* Extensions.swift */,
 				DB2B00C422E12D7800B9931A /* SignalCommonCrypto.swift */,
 				DB2B00C522E12D7800B9931A /* ForstaError.swift */,
+				DBF5C5B42343E51C00678EEF /* Delegates.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -250,7 +255,7 @@
 				DB2B00A622E12D4600B9931A /* Atlas */,
 				DBDB772A22E124610027EEB0 /* LibForstaSwift.h */,
 				DBDB772B22E124610027EEB0 /* Info.plist */,
-				DB17A446230EF7F000AEEF73 /* Forsta.swift */,
+				DB17A446230EF7F000AEEF73 /* ForstaClient.swift */,
 			);
 			path = LibForstaSwift;
 			sourceTree = "<group>";
@@ -262,6 +267,7 @@
 				DB2B00CB22E12DB200B9931A /* KVStoreTests.swift */,
 				DB2B00CD22E12DB200B9931A /* SignalClientTests.swift */,
 				DBDB773722E124610027EEB0 /* Info.plist */,
+				DBF5C5B62343F1E000678EEF /* DelegatesTests.swift */,
 			);
 			path = LibForstaSwiftTests;
 			sourceTree = "<group>";
@@ -423,12 +429,13 @@
 				DB2B00B322E12D6100B9931A /* IncomingPushMessageSignal.pb.swift in Sources */,
 				DBF5B6EE23182CDD004765FA /* ForstaPayload.swift in Sources */,
 				DB2B00C122E12D7100B9931A /* KVStorageProtocol.swift in Sources */,
+				DBF5C5B52343E51C00678EEF /* Delegates.swift in Sources */,
 				DBE3D57A22F89EB50016B800 /* MessageReceiver.swift in Sources */,
 				DBE3D57822F89E880016B800 /* MessageSender.swift in Sources */,
 				DB2B00C722E12D7800B9931A /* Extensions.swift in Sources */,
 				DB2B00B622E12D6100B9931A /* SubProtocol.pb.swift in Sources */,
 				DB2B00B522E12D6100B9931A /* DeviceMessages.pb.swift in Sources */,
-				DB17A447230EF7F000AEEF73 /* Forsta.swift in Sources */,
+				DB17A447230EF7F000AEEF73 /* ForstaClient.swift in Sources */,
 				DBE3D57622F87B750016B800 /* Sendable.swift in Sources */,
 				DB2B00BC22E12D6A00B9931A /* SignalClient.swift in Sources */,
 			);
@@ -438,6 +445,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBF5C5B72343F1E000678EEF /* DelegatesTests.swift in Sources */,
 				DB2B00CF22E12DB200B9931A /* AtlasClientTests.swift in Sources */,
 				DB2B00CE22E12DB200B9931A /* KVStoreTests.swift in Sources */,
 				DB2B00D022E12DB200B9931A /* SignalClientTests.swift in Sources */,

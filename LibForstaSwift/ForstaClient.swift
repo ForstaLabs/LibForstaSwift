@@ -1,5 +1,5 @@
 //
-//  Forsta.swift
+//  ForstaClient.swift
 //  LibForstaSwift
 //
 //  Created by Greg Perkins on 8/22/19.
@@ -10,7 +10,7 @@ import Foundation
 import PromiseKit
 
 /// This is THE top-level helper class for using LibForstaSwift.
-public class Forsta {
+public class ForstaClient {
     /// The `DispatchQueue` that LibForstaSwift will do any asyncronous internal work on (Serial, QoS of Utility)
     static public let workQueue: DispatchQueue = .init(label: "LFS Subwork", qos: .utility)
     
@@ -34,7 +34,7 @@ public class Forsta {
     public init(_ kvstore: KVStorageProtocol) throws {
         self.atlas = AtlasClient(kvstore: kvstore)
         self.signal = try SignalClient(atlasClient: atlas)
-        self.wsr = WebSocketResource()
+        self.wsr = WebSocketResource(signalClient: self.signal)
         self.receiver = MessageReceiver(signalClient: signal, webSocketResource: wsr)
         self.sender = MessageSender(signalClient: signal)
     }

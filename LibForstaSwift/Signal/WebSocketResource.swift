@@ -97,7 +97,7 @@ public class OutgoingWSRequest: WSRequest {
         
         self.wsr.outgoingRequests[self.id] = self
         
-        return self.wsr.send(msg).then(on: Forsta.workQueue) { return promise }
+        return self.wsr.send(msg).then(on: ForstaClient.workQueue) { return promise }
     }
 }
 
@@ -109,6 +109,7 @@ func fallbackRequestHandler(request: IncomingWSRequest) {
 
 /// Manage a websocket, reporting dis/connection, routing incoming requests to handlers, and sending websocket requests on demand
 public class WebSocketResource: WebSocketDelegate {
+    let signalClient: SignalClient
     var lastConnect: Date?
     var socket: WebSocket?
     var url: String?
@@ -116,7 +117,8 @@ public class WebSocketResource: WebSocketDelegate {
     var requestHandler: WSRequestHandler
     
     /// Construct with a url `String` and an optional `WSRequestHandler` (falls back to our default handler that rejects all requests)
-    public init(requestHandler: WSRequestHandler? = nil) {
+    public init(signalClient: SignalClient, requestHandler: WSRequestHandler? = nil) {
+        self.signalClient = signalClient
         self.requestHandler = requestHandler != nil ? requestHandler! : fallbackRequestHandler
     }
 
@@ -125,7 +127,7 @@ public class WebSocketResource: WebSocketDelegate {
         self.url = url
         lastConnect = Date()
         socket = WebSocket(url: URL(string: self.url!)!)
-        socket?.callbackQueue = Forsta.workQueue
+        socket?.callbackQueue = ForstaClient.workQueue
         socket!.delegate = self
         socket!.connect()
     }
@@ -133,11 +135,13 @@ public class WebSocketResource: WebSocketDelegate {
     /// broadcast notification of connecting
     public func websocketDidConnect(socket: WebSocketClient) {
         NotificationCenter.broadcast(.signalConnected)
+        self.signalClient.delegates.notify { $0.connected() }
     }
     
     /// broadcast notification of a disconnect
     public func websocketDidDisconnect(socket: WebSocketClient, error: Error?) {
         NotificationCenter.broadcast(.signalDisconnected, error != nil ? ["error": error!] : nil)
+        self.signalClient.delegates.notify { $0.disconnected(error: error) }
         if lastConnect != nil {
             connect(url: self.url ?? "url somehow missing") // just immediately reconnect until we purposefully disconnect
         }

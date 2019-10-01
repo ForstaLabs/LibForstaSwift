@@ -198,7 +198,7 @@ public class MessageReceiver {
     /// Init with `SignalClient` and an optional `WebSocketResource` to use (it will make its own if not provided)
     public init(signalClient: SignalClient, webSocketResource: WebSocketResource? = nil) {
         self.signalClient = signalClient
-        self.wsr = webSocketResource ?? WebSocketResource()
+        self.wsr = webSocketResource ?? WebSocketResource(signalClient: signalClient)
         self.wsr.requestHandler = self.handleRequest
     }
     
@@ -208,6 +208,7 @@ public class MessageReceiver {
         // print("Handling WS request \(request.verb) \(request.path)...")
         if request.path == WSRequest.Path.queueEmpty {
             NotificationCenter.broadcast(.signalQueueEmpty)
+            self.signalClient.delegates.notify { $0.queueEmpty() }
             let _ = request.respond(status: 200, message: "OK")
             return
         } else if request.path != WSRequest.Path.message || request.verb != "PUT" {
@@ -229,6 +230,7 @@ public class MessageReceiver {
                                                             deviceId: envelope.sourceDevice),
                                               Date(millisecondsSince1970: envelope.timestamp))
                 NotificationCenter.broadcast(.signalDeliveryReceipt, ["deliveryReceipt": receipt])
+                self.signalClient.delegates.notify { $0.deliveryReceipt(receipt: receipt) }
             } else if envelope.hasContent {
                 try handleContentMessage(envelope)
             } else if envelope.hasLegacyMessage {
@@ -269,6 +271,7 @@ public class MessageReceiver {
             }
             happy = true
             NotificationCenter.broadcast(.signalSyncReadReceipts, ["syncReadReceipts": receipts])
+            self.signalClient.delegates.notify { $0.syncReadReceipts(receipts: receipts) }
         }
         
         if dm != nil {
@@ -291,6 +294,7 @@ public class MessageReceiver {
                                      destination: (sent?.hasDestination ?? false) ? sent!.destination : nil)
             happy = true
             NotificationCenter.broadcast(.signalInboundMessage, ["inboundMessage": msg])
+            self.signalClient.delegates.notify { $0.inboundMessage(message: msg) }
         }
         
         if !happy {

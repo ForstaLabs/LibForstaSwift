@@ -20,6 +20,8 @@ import SignalProtocol
 public class SignalClient {
     // -MARK: Attributes
     
+    public let delegates = Delegates<SignalClientDelegate>()
+    
     var atlasClient: AtlasClient
     var store: SignalStore
     
@@ -133,7 +135,7 @@ public class SignalClient {
             
             return self.atlasClient.provisionSignalAccount(data)
         }
-        .map(on: Forsta.workQueue) { result in
+        .map(on: ForstaClient.workQueue) { result in
             guard
                 let serverUrl = result["serverUrl"].string,
                 let userId = UUID(uuidString: result["userId"].stringValue),
@@ -152,13 +154,13 @@ public class SignalClient {
             }
             self.store.forstaIdentityKeyStore.setLocalRegistrationId(id: registrationId)
         }
-        .then(on: Forsta.workQueue) {
+        .then(on: ForstaClient.workQueue) {
             self.genKeystuffBundle()
         }
-        .then(on: Forsta.workQueue) { bundle in
+        .then(on: ForstaClient.workQueue) { bundle in
             self.request(.keys, method: .put, parameters: bundle)
         }
-        .map(on: Forsta.workQueue) { (code, json) in
+        .map(on: ForstaClient.workQueue) { (code, json) in
             if code == 204 { return }
             throw ForstaError(.requestFailure, "problem performing registerAccount: \(code), \(json)")
         }
@@ -228,7 +230,7 @@ public class SignalClient {
         let ourAddress = self.signalAddress
         
         return self.request(.devices, urlParameters: "/provisioning/code")
-            .then(on: Forsta.workQueue) { result -> Promise<(Int, JSON)> in
+            .then(on: ForstaClient.workQueue) { result -> Promise<(Int, JSON)> in
                 let (code, json) = result
                 if code != 200 {
                     throw ForstaError(.requestRejected, json)
@@ -253,7 +255,7 @@ public class SignalClient {
                 return self.request(.provisioning, urlParameters: "/\(uuidString)", method: .put,
                                     parameters: ["body": try envelope.serializedData().base64EncodedString()])
         }
-        .map(on: Forsta.workQueue) { result in
+        .map(on: ForstaClient.workQueue) { result in
             let (code, json) = result
             
             let handledByMe = code == 204
@@ -297,14 +299,14 @@ public class SignalClient {
     /// Download an (encrypted) attachment by Signal attachment ID
     func downloadEncryptedAttachment(id: UInt64) -> Promise<Data> {
         return self.request(.attachment, urlParameters: "/\(id)")
-            .map(on: Forsta.workQueue) { (code, json) in
+            .map(on: ForstaClient.workQueue) { (code, json) in
                 if code < 300 { return json["location"].stringValue }
                 throw ForstaError(.requestRejected, json)
         }
-        .then(on: Forsta.workQueue) { location in
+        .then(on: ForstaClient.workQueue) { location in
             self.request(location, headers: ["Content-Type": "application/octet-stream"])
         }
-        .map(on: Forsta.workQueue) { (code, data) in
+        .map(on: ForstaClient.workQueue) { (code, data) in
             if code < 300 { return data }
             throw ForstaError(.requestRejected, String(data: data, encoding: .utf8)!)
         }
@@ -315,11 +317,11 @@ public class SignalClient {
         var id: UInt64?
         
         return self.request(.attachment)
-            .map(on: Forsta.workQueue) { (code, json) -> JSON in
+            .map(on: ForstaClient.workQueue) { (code, json) -> JSON in
                 if code < 300 { return json }
                 throw ForstaError(.requestRejected, json)
         }
-        .then(on: Forsta.workQueue) { json -> Promise<(Int, String)> in
+        .then(on: ForstaClient.workQueue) { json -> Promise<(Int, String)> in
             guard
                 let theId = json["id"].uInt64,
                 let location = json["location"].string else {
@@ -329,7 +331,7 @@ public class SignalClient {
             
             return self.request(location, data: body, headers: ["Content-Type": "application/octet-stream"])
         }
-        .map(on: Forsta.workQueue) { (code, string) in
+        .map(on: ForstaClient.workQueue) { (code, string) in
             if code < 300 { return id! }
             throw ForstaError(.requestRejected, "\(code): \(string)")
         }
@@ -338,7 +340,7 @@ public class SignalClient {
     /// Download an attachment (uses an `AttachmentInfo` `.id` for retrieval and `.key` for decryption)
     public func downloadAttachment(_ attachmentInfo: AttachmentInfo) -> Promise<Data> {
         return self.downloadEncryptedAttachment(id: attachmentInfo.id)
-            .map(on: Forsta.workQueue) { data in try SignalCommonCrypto.decryptAttachment(data: data, keys: attachmentInfo.key) }
+            .map(on: ForstaClient.workQueue) { data in try SignalCommonCrypto.decryptAttachment(data: data, keys: attachmentInfo.key) }
     }
     
     /// Upload an attachment (returns an `AttachmentInfo` with `.id` for later retrieval and `.key` for decryption)
@@ -349,7 +351,7 @@ public class SignalClient {
             let encrypted = try SignalCommonCrypto.encryptAttachment(data: data, keys: keys, iv: iv)
             
             return self.uploadEncryptedAttachment(body: encrypted)
-                .map(on: Forsta.workQueue) { id in AttachmentInfo(name: name, size: data.count, type: type, mtime: mtime, id: id, key: keys) }
+                .map(on: ForstaClient.workQueue) { id in AttachmentInfo(name: name, size: data.count, type: type, mtime: mtime, id: id, key: keys) }
         } catch let error {
             return Promise<AttachmentInfo>.init(error: ForstaError("unable to prepare for upload", cause: error))
         }
@@ -366,7 +368,7 @@ public class SignalClient {
     func getKeysForAddr(addr: String, deviceId: UInt32? = nil) -> Promise<[SessionPreKeyBundle]> {
         let deviceStr = deviceId == nil ? "*" : String(deviceId!)
         return self.request(.keys, urlParameters: "/\(addr)/\(deviceStr)")
-            .map(on: Forsta.workQueue) { (statusCode, json) in
+            .map(on: ForstaClient.workQueue) { (statusCode, json) in
                 if statusCode == 200 {
                     guard
                         let devices = json["devices"].array,
@@ -432,7 +434,7 @@ public class SignalClient {
         return Promise { seal in
             let headers = authHeader()
             Alamofire.request("\(serverUrl!)\(call.rawValue)\(urlParameters)", method: method, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
-                .responseJSON(queue: Forsta.workQueue) { response in
+                .responseJSON(queue: ForstaClient.workQueue) { response in
                     let statusCode = response.response?.statusCode ?? 500
                     switch response.result {
                     case .success(let data):
@@ -561,7 +563,7 @@ public class SignalClient {
             self.signalClient.deviceLabel = deviceLabel
             self.provisioningCipher = ProvisioningCipher()
             
-            self.wsr = WebSocketResource(requestHandler: { request in
+            self.wsr = WebSocketResource(signalClient: self.signalClient, requestHandler: { request in
                 if request.body == nil { self.waitSeal.reject(ForstaError(.unknown, "provisioning ws request \(request.verb) \(request.path) has no body")) }
                 if request.path == "/v1/address" && request.verb == "PUT" {
                     do {
@@ -613,7 +615,7 @@ public class SignalClient {
             }
             
             return self.signalClient.atlasClient.getSignalAccountInfo()
-                .then(on: Forsta.workQueue) { accountInfo -> Promise<Signal_ProvisionEnvelope> in
+                .then(on: ForstaClient.workQueue) { accountInfo -> Promise<Signal_ProvisionEnvelope> in
                     guard accountInfo["devices"].arrayValue.count > 0 else {
                         throw ForstaError(ForstaError.ErrorType.configuration, "must use registerAccount for first device")
                     }
@@ -630,7 +632,7 @@ public class SignalClient {
                     print("(waiting on provisioning help to arrive)")
                     return self.waiter
             }
-            .then(on: Forsta.workQueue) { envelope -> Promise<(Int, JSON)> in
+            .then(on: ForstaClient.workQueue) { envelope -> Promise<(Int, JSON)> in
                 print("(provisioning help arrived)")
                 let plaintext = try self.provisioningCipher.decrypt(publicKey: envelope.publicKey, message: envelope.body)
                 let provisionMessage = try Signal_ProvisionMessage(serializedData: plaintext)
@@ -658,7 +660,7 @@ public class SignalClient {
                     method: .put,
                     parameters: parms)
             }
-            .map(on: Forsta.workQueue) { (code, json) in
+            .map(on: ForstaClient.workQueue) { (code, json) in
                 guard code == 200, let deviceId = json["deviceId"].uInt32 else {
                     throw ForstaError(.requestRejected, json)
                 }
@@ -676,13 +678,13 @@ public class SignalClient {
                 self.wsr?.disconnect()
                 self.wsr = nil
             }
-            .then(on: Forsta.workQueue) { x in
+            .then(on: ForstaClient.workQueue) { x in
                 self.signalClient.genKeystuffBundle()
             }
-            .then(on: Forsta.workQueue) { bundle in
+            .then(on: ForstaClient.workQueue) { bundle in
                 self.signalClient.request(.keys, method: .put, parameters: bundle)
             }
-            .map(on: Forsta.workQueue) { (code, json) in
+            .map(on: ForstaClient.workQueue) { (code, json) in
                 if code == 204 { return }
                 throw ForstaError(.requestFailure, "problem performing registerAccount: \(code), \(json)")
             }
@@ -697,4 +699,38 @@ public class SignalClient {
         case attachment = "/v1/attachments"
         case provisioning = "/v1/provisioning"
     }
+}
+
+/// Important events for a Signal client that you can register to receive
+public protocol SignalClientDelegate: class {
+    /// An identity key changed on an incoming message
+    func identityKeyChanged(address: SignalAddress)
+    /// Incoming delivery receipt
+    func deliveryReceipt(receipt: DeliveryReceipt)
+    /// Incoming message
+    func inboundMessage(message: InboundMessage)
+    /// Incoming read receipts
+    func syncReadReceipts(receipts: [SyncReadReceipt])
+    /// Incoming queue is now empty
+    func queueEmpty()
+    /// Websocket connection to the Signal Server established
+    func connected()
+    /// Websocket connection to the Signal Server ended
+    func disconnected(error: Error?)
+}
+extension SignalClientDelegate {
+    /// Default no-op implementation so you aren't forced to include one in your delegate class
+    public func identityKeyChanged(address: SignalAddress) { }
+    /// Default no-op implementation so you aren't forced to include one in your delegate class
+    public func deliveryReceipt(receipt: DeliveryReceipt) { }
+    /// Default no-op implementation so you aren't forced to include one in your delegate class
+    public func inboundMessage(message: InboundMessage) { }
+    /// Default no-op implementation so you aren't forced to include one in your delegate class
+    public func syncReadReceipts(receipts: [SyncReadReceipt]) { }
+    /// Default no-op implementation so you aren't forced to include one in your delegate class
+    public func queueEmpty() { }
+    /// Default no-op implementation so you aren't forced to include one in your delegate class
+    public func connected() { }
+    /// Default no-op implementation so you aren't forced to include one in your delegate class
+    public func disconnected(error: Error?) { }
 }
