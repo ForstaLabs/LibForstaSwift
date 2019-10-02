@@ -29,10 +29,11 @@ public class AtlasClient {
     static let defaultPublicOrg = "forsta"
     static let defaultServerUrl = "https://atlas-dev.forsta.io"
     
-    public let delegates = Delegates<AtlasClientDelegate>()
-    
     var kvstore: KVStorageProtocol
     
+    /// The registered delegates for this Atlas client
+    public let delegates = Delegates<AtlasClientDelegate>()
+
     private var _defaultOrg: KVBacked<String>
     /// The default public organization name (added to unqualified login tags)
     public var defaultOrg: String? {

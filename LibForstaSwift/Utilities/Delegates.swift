@@ -10,9 +10,22 @@ import Foundation
 
 /// A generic class for managing collections of delegates properly with weak references
 public class Delegates<T> {
+    // -MARK: Attributes
+    
     private var delegates = [Weak<T>]()
     
+    /// Count of live delegates
+    public var count: Int {
+        gc()
+        return self.delegates.count
+    }
+    
+    // -MARK: Constructors
+
+    /// Initialization
     public init() { }
+
+    // -MARK: Operations
     
     /// Add a new delegate
     public func add(_ delegate: T) {
@@ -29,13 +42,7 @@ public class Delegates<T> {
     public func removeAll() {
         self.delegates = []
     }
-    
-    /// Count of live delegates
-    public var count: Int {
-        gc()
-        return self.delegates.count
-    }
-    
+
     /// Iterate over the delegates with a closure to make calls, send messages, do work
     ///
     /// i.e., you can do `.notify({ $0.someDelegateCall(...) })`

@@ -20,6 +20,7 @@ import SignalProtocol
 public class SignalClient {
     // -MARK: Attributes
     
+    /// The registered delegates for this Atlas client
     public let delegates = Delegates<SignalClientDelegate>()
     
     var atlasClient: AtlasClient
