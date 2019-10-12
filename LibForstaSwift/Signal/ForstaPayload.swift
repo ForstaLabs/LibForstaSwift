@@ -118,8 +118,48 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         /// Provisioning UUID, string-encoded in a form we will use as-is (only relevant for `.control` messages of type `.provisionRequest`)
         public var uuid: String?
         
+        /// Devices for a sync request (only relevant for `.control` messages of type `.syncRequest`)
+        public var devices: [UInt32]?
+        /// Known contacts for a sync request (only relevant for `.control` messages of type `.syncRequest`)
+        public var knownContacts: [KnownContact]?
+        /// Known messages for a sync request (only relevant for `.control` messages of type `.syncRequest`)
+        public var knownMessages: [UUID]?
+        /// Known threads for a sync request (only relevant for `.control` messages of type `.syncRequest`)
+        public var knownThreads: [KnownThread]?
+        /// How long this is valid in milliseconds (only relevant for `.control` messages of type `.syncRequest`)
+        public var ttl: UInt64?
+        /// What type of sync request this is (only relevant for `.control` messages of type `.syncRequest`)
+        public var type: SyncRequestType?
+    }
+    
+    /// The schema for `.data.knownContacts`
+    public struct KnownContact: Codable {
+        /// ID of known user
+        public var id: UUID
+        /// Last updated timestamp for user
+        public var updated: Date
+        
+        /// Initialize from components
+        public init(id: UUID, updated: Date) {
+            self.id = id
+            self.updated = updated
+        }
     }
 
+    /// The schema for `.data.knownThreads`
+    public struct KnownThread: Codable {
+        /// ID of known thread
+        public var id: UUID
+        /// Last activity timestamp for known thread
+        public var lastActivity: Date
+        
+        /// Initialize from components
+        public init(id: UUID, lastActivity: Date) {
+            self.id = id
+            self.lastActivity = lastActivity
+        }
+    }
+    
     /// The schema for `.sender`
     public struct Address: Codable {
         /// User ID
@@ -220,12 +260,12 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
     /// The schema for `.distribution`
     public struct Distribution: Codable {
         /// The tag-math distribution expression for this message (required)
-        public var expression: String
+        public var expression: String?
         /// The user IDs that `.expression` resolves to (optional)
         public var users: [UUID]?
         
         /// Initialize from components
-        public init(expression: String, users: [UUID]? = nil) {
+        public init(expression: String? = nil, users: [UUID]? = nil) {
             self.expression = expression
             self.users = users
         }
@@ -655,5 +695,12 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         case callICECandidates
         /// Indicates that a call is ongoing with the recipient, from the sender's perspective
         case callHeartbeat
+    }
+    
+    public enum SyncRequestType: String, Codable {
+        /// syncing content history
+        case contentHistory
+        /// syncing device information
+        case deviceInfo
     }
 }
