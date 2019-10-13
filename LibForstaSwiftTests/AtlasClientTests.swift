@@ -536,8 +536,8 @@ export JWT_PROXY_AUDIENCE='atlas'
             .then {
                 atlas.getSignalAccountInfo()
             }
-            .done { result in
-                XCTAssert(result["devices"].arrayValue.count == 0)
+            .done { info in
+                XCTAssert(info.devices.count == 0)
             }.catch { error in
                 XCTFail("error authenticating and getting account info \(error)")
             }.finally {

@@ -563,12 +563,33 @@ public class AtlasClient {
     ///
     /// Retrieve information about the current Signal server account and its devices.
     ///
-    /// - returns: `Promise` resolving to an `JSON` array of device(s) info.
-    ///
-    public func getSignalAccountInfo() -> Promise<JSON> {
+    public func getSignalAccountInfo() -> Promise<SignalAccountInfo> {
         return request("/v1/provision/account")
             .map(on: ForstaClient.workQueue) { (statusCode, json) in
-                if statusCode == 200 { return json }
+                if statusCode == 200 {
+                    guard
+                        let userIdRaw = json["userId"].string,
+                        let userId = UUID(uuidString: userIdRaw),
+                        let serverUrl = json["serverUrl"].string,
+                        let devicesRaw = json["devices"].array else {
+                            throw ForstaError(.malformedResponse, "missing expected account info components")
+                    }
+                    let devices = try devicesRaw.map { device throws -> SignalDeviceInfo in
+                        guard
+                            let id = device["id"].uInt32,
+                            let label = device["name"].string,
+                            let lastSeenRaw = device["lastSeen"].uInt64,
+                            let createdRaw = device["created"].uInt64 else {
+                                throw ForstaError(.malformedResponse, "missing expected device info components")
+                        }
+                        return SignalDeviceInfo(id: id,
+                                                label: label,
+                                                lastSeen: Date(millisecondsSince1970: lastSeenRaw),
+                                                created: Date(millisecondsSince1970: createdRaw))
+                    }
+
+                    return SignalAccountInfo(userId: userId, serverUrl: serverUrl, devices: devices)
+                }
                 throw ForstaError(.requestRejected, json)
         }
     }
@@ -683,6 +704,26 @@ public class AtlasClient {
     /// The JSON blob detailing an authenticated user on Atlas
     public typealias AuthenticatedUser = JSON
     
+    /// Account info reported by Signal server
+    public struct SignalAccountInfo {
+        /// The user's ID
+        public let userId: UUID
+        /// The server URL to use for Signal requests
+        public let serverUrl: String
+        /// The current set of devices
+        public let devices: [SignalDeviceInfo]
+    }
+    /// Device info reported by Signal server
+    public struct SignalDeviceInfo {
+        /// The device id
+        public let id: UInt32
+        /// The device label ("name")
+        public let label: String
+        /// Datetime last seen
+        public let lastSeen: Date
+        /// Creation datetime
+        public let created: Date
+    }
 }
 
 /// Important events for an Atlas client that you can register to receive

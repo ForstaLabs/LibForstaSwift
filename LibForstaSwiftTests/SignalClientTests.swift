@@ -943,7 +943,7 @@ class SignalClientTests: XCTestCase {
             .then { info -> Promise<Void> in
                 let myId = forsta.signal.signalAddress?.deviceId
                 XCTAssert(myId != nil)
-                let x = info["devices"].arrayValue.first { $0["id"].int32 == myId! && $0["name"].stringValue == label }
+                let x = info.devices.first { $0.id == myId! && $0.label == label }
                 XCTAssert(x != nil)
                 return forsta.signal.deleteDevice(deviceId: UInt32(myId!))
             }
@@ -953,7 +953,7 @@ class SignalClientTests: XCTestCase {
             .map { info -> Void in
                 let myId = forsta.signal.signalAddress?.deviceId
                 XCTAssert(myId != nil)
-                let x = info["devices"].arrayValue.first { $0["id"].int32 == myId! && $0["name"].stringValue == label }
+                let x = info.devices.first { $0.id == myId! && $0.label == label }
                 XCTAssert(x == nil)
                 completed.fulfill()
             }

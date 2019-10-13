@@ -627,19 +627,13 @@ public class SignalClient {
             
             return self.signalClient.atlasClient.getSignalAccountInfo()
                 .then(on: ForstaClient.workQueue) { accountInfo -> Promise<Signal_ProvisionEnvelope> in
-                    guard accountInfo["devices"].arrayValue.count > 0 else {
+                    guard accountInfo.devices.count > 0 else {
                         throw ForstaError(ForstaError.ErrorType.configuration, "must use registerAccount for first device")
                     }
-                    self.signalClient.serverUrl = accountInfo["serverUrl"].string
-                    if self.signalClient.serverUrl == nil {
-                        throw ForstaError(.invalidPayload, "no serverUrl in account info")
-                    }
-                    
+                    self.signalClient.serverUrl = accountInfo.serverUrl
+
                     self.wsr?.connect(url: try self.signalClient.provisioningSocketUrl())
-                    userId = UUID(uuidString: accountInfo["userId"].stringValue)
-                    if userId == nil {
-                        throw ForstaError(.invalidPayload, "no userId in account info")
-                    }
+                    userId = accountInfo.userId
                     print("(waiting on provisioning help to arrive)")
                     return self.waiter
             }
