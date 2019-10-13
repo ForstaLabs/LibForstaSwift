@@ -923,6 +923,52 @@ class SignalClientTests: XCTestCase {
         }
     }
     
+    func testRegisterAndDeleteDevice() {
+        let completed = XCTestExpectation()
+        let label = "test new device create/delete"
+        do {
+            let forsta = try ForstaClient(MemoryKVStore())
+            firstly {
+                forsta.atlas.authenticateViaPassword(userTag: "greg1", password: "asdfasdf24")
+            }
+            .map { _ in
+                forsta.signal.registerDevice(deviceLabel: label)
+            }
+            .then { task in
+                task.complete
+            }
+            .then {
+                forsta.atlas.getSignalAccountInfo()
+            }
+            .then { info -> Promise<Void> in
+                let myId = forsta.signal.signalAddress?.deviceId
+                XCTAssert(myId != nil)
+                let x = info["devices"].arrayValue.first { $0["id"].int32 == myId! && $0["name"].stringValue == label }
+                XCTAssert(x != nil)
+                return forsta.signal.deleteDevice(deviceId: UInt32(myId!))
+            }
+            .then { _ in
+                forsta.atlas.getSignalAccountInfo()
+            }
+            .map { info -> Void in
+                let myId = forsta.signal.signalAddress?.deviceId
+                XCTAssert(myId != nil)
+                let x = info["devices"].arrayValue.first { $0["id"].int32 == myId! && $0["name"].stringValue == label }
+                XCTAssert(x == nil)
+                completed.fulfill()
+            }
+            .catch { error in
+                if let ferr = error as? ForstaError {
+                    XCTFail(ferr.description)
+                } else {
+                    XCTFail("surprising error")
+                }
+            }
+        } catch {
+            XCTFail("surprising error")
+        }
+        wait(for: [completed], timeout: 60.0)
+    }
     func testNewDeviceConversation() {
         let completed = XCTestExpectation()
         let conversation = Conversation()

@@ -230,7 +230,8 @@ public class SignalClient {
         let ourIdentity = self.store.identityKeyStore.identityKeyPair()
         let ourAddress = self.signalAddress
         
-        return self.request(.devices, urlParameters: "/provisioning/code")
+        return
+            self.request(.devices, urlParameters: "/provisioning/code")
             .then(on: ForstaClient.workQueue) { result -> Promise<(Int, JSON)> in
                 let (code, json) = result
                 if code != 200 {
@@ -270,7 +271,16 @@ public class SignalClient {
         }
     }
     
-    
+    ///  Delete a device associated with the current Signal server account.
+    public func deleteDevice(deviceId: UInt32) -> Promise<Void> {
+        return
+            self.request(.devices, urlParameters: "/\(deviceId)", method: .delete)
+            .map(on: ForstaClient.workQueue) { (statusCode, json) in
+                if statusCode == 204 { return }
+                throw ForstaError(.requestRejected, json)
+        }
+    }
+
     /// Request delivery of an encrypted message to a specific device
     func deliverToDevice(address: SignalAddress, messageBundle: [String: Any]) -> Promise<(Int, JSON)> {
         return self.request(

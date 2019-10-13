@@ -561,7 +561,7 @@ public class AtlasClient {
     }
     
     ///
-    /// Retrieve information about the current Signal server account.
+    /// Retrieve information about the current Signal server account and its devices.
     ///
     /// - returns: `Promise` resolving to an `JSON` array of device(s) info.
     ///
