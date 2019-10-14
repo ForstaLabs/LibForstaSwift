@@ -77,19 +77,21 @@ export JWT_PROXY_AUDIENCE='atlas'
             .then { _ in
                 atlas.createUser(["first_name": "Password", "tag_slug": "password", "password": "asdfasdf24"])
             }
-            .then { passUser in
-                atlas.getUserAuthToken(userId: UUID(uuidString: passUser["id"].stringValue)!)
+            .then { passUser -> Promise<(UUID, String)> in
+                print("passUser id is \(passUser["id"].stringValue)")
+                return atlas.createUserAuthToken(userId: UUID(uuidString: passUser["id"].stringValue)!)
             }
             .map { tokenInfo in
-                passwordUserAuthToken = tokenInfo["token"].stringValue
+                passwordUserAuthToken = tokenInfo.1
                 XCTAssert(passwordUserAuthToken.count > 20)
+                print("token id is \(tokenInfo.0)")
             }
             .then {
                 atlas.createUser(["first_name": "Twofactor", "tag_slug": "twofactor", "password": "asdfasdf24"])
             }
             .then { twofactor -> Promise<JSON> in
                 let otpString = totpGenerator?.currentPassword ?? "ugh"
-                return atlas.updateUser(twofactor["id"].stringValue, [
+                return atlas.updateUser(UUID(uuidString: twofactor["id"].stringValue)!, [
                     "password_proof": "asdfasdf24",
                     "new_totp_secret": totpSecret,
                     "totp_proof": otpString])
@@ -695,7 +697,7 @@ export JWT_PROXY_AUDIENCE='atlas'
         wait(for: [userCreation], timeout: 5.0)
         
         let userUpdate = XCTestExpectation(description: "user update")
-        atlas.updateUser(newUserId ?? "", ["last_name": "Bar"])
+        atlas.updateUser(UUID(uuidString: newUserId ?? "")!, ["last_name": "Bar"])
             .done { result in
                 XCTAssert(result["first_name"].stringValue == "Baz")
                 XCTAssert(result["last_name"].stringValue == "Bar")

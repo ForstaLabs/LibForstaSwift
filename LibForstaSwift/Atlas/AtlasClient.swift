@@ -262,13 +262,13 @@ public class AtlasClient {
     /// Administrator update of a new user in the same organization.
     ///
     /// - parameters:
-    ///     - id: the user's UUID
-    ///     - fields: dictionary of (only) the fields to update in the user
+    ///     - userId: the user's UUID
+    ///     - patchFields: dictionary of (only) the fields to update in the user
     ///
     /// - returns: A `Promise` that resolves to a `JSON` blob of the updated user
     ///
-    public func updateUser(_ id: String, _ fields: [String: Any]) -> Promise<JSON> {
-        return request("/v1/user/\(id)/", method: .patch, parameters: fields)
+    public func updateUser(_ userId: UUID, _ patchFields: [String: Any]) -> Promise<JSON> {
+        return request("/v1/user/\(userId.lcString)/", method: .patch, parameters: patchFields)
             .map(on: ForstaClient.workQueue) { (statusCode, json) in
                 if statusCode == 200 { return json }
                 throw ForstaError(.requestRejected, json)
@@ -276,22 +276,30 @@ public class AtlasClient {
     }
     
     ///
-    /// Request creation of a `UserAuthToken`
+    /// Request creation of a UserAuthToken
     ///
     /// - parameters:
-    ///     - id: optional user ID (set this if caller is an admin getting a token for another user)
+    ///     - userId: optional user ID to create the token for a user other than self (requires being an org admin)
     ///     - description: optional description for this token
     ///
-    /// - returns: A `Promise` that resolves to a `JSON` blob containing the `UserAuthToken`
+    /// - returns: A `Promise` that resolves to a tuple of the token's ID and the UserAuthToken
     ///
-    public func getUserAuthToken(userId: UUID? = nil, description: String? = nil) -> Promise<JSON> {
+    public func createUserAuthToken(userId: UUID? = nil, description: String? = nil) -> Promise<(UUID, String)> {
         var fields = [String:String]()
         if userId != nil { fields["userid"] = userId!.lcString }
         if description != nil { fields["description"] = description }
         
         return request("/v1/userauthtoken/", method: .post, parameters: fields)
             .map(on: ForstaClient.workQueue) { (statusCode, json) in
-                if statusCode == 200 { return json }
+                if statusCode == 200 {
+                    guard
+                        let idRaw = json["id"].string,
+                        let id = UUID(uuidString: idRaw),
+                        let token = json["token"].string else {
+                            throw ForstaError(.malformedResponse, "UserAuthToken creation missing expected component(s)")
+                    }
+                    return (id, token)
+                }
                 throw ForstaError(.requestRejected, json)
         }
     }
@@ -316,7 +324,7 @@ public class AtlasClient {
     ///     - invitationToken: Optional invitation token that was obtained from /v1/invitation
     ///     - fields: dictionary of the fields to define the new user and possibly org
     ///
-    /// - returns: A `Promise` that resolves to the new user's fully-qualified tag string and userId GUID: `(tag, guid)`
+    /// - returns: A `Promise` that resolves to a tuple of the new user's fully-qualified tag string and userId UUID: `(tag, uuid)`
     ///
     public func joinForsta(invitationToken: String? = nil,
                            _ fields: [String: Any]) -> Promise<(String, UUID)> {
@@ -753,7 +761,7 @@ public class AtlasClient {
         }
     }
 
-    /// Results of evaluating a tag expression -- see [the Atlas docs on this](https://github.com/ForstaLabs/atlas/tree/master/ccsm_api/core/tag_parser)
+    /// Results of evaluating a tag expression
     public struct TagExpressionResolution {
         /// The "pretty" version of this evaluated expression (simplified, human-readable with slug strings, qualified for the evaluating user's organization)
         public let pretty: String
