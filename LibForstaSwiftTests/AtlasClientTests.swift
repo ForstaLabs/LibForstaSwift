@@ -395,37 +395,6 @@ export JWT_PROXY_AUDIENCE='atlas'
         XCTAssert(atlas3.authenticatedUserJwt == nil)
     }
     
-    func testTagExpressionResolution() {
-        let atlas = AtlasClient(kvstore: MemoryKVStore())
-        atlas.serverUrl = testServerUrl
-        
-        let expectation = XCTestExpectation(description: "auth via password")
-        atlas.authenticateViaPassword(userTag: "@password:\(testOrgSlug)", password: "asdfasdf24")
-            .done { user in
-                XCTAssert(user["first_name"].stringValue == "Password")
-            }
-            .catch { error in
-                XCTFail("password authentication failed")
-            }
-            .finally {
-                expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 5.0)
-        
-        let expectation2 = XCTestExpectation(description: "resolve tag expression")
-        atlas.resolveTagExpression("@sms + @twofactor")
-            .done { result in
-                XCTAssert(result["userids"].arrayValue.count == 2)
-            }
-            .catch { error in
-                XCTFail("resolve tag expression failed \(error)")
-            }
-            .finally {
-                expectation2.fulfill()
-        }
-        wait(for: [expectation2], timeout: 5.0)
-    }
-    
     func testTagExpressionBatchResolution() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
         atlas.serverUrl = testServerUrl
@@ -444,12 +413,12 @@ export JWT_PROXY_AUDIENCE='atlas'
         wait(for: [expectation], timeout: 5.0)
         
         let expectation2 = XCTestExpectation(description: "resolve tag expression")
-        atlas.resolveTagExpressionBatch(["@sms + @twofactor", "@sms", "@sms + @password + @twofactor"])
+        atlas.resolveTagExpressions(["crap @sms + @twofactor more crap", "(@sms", "@sms + @password + @whoknows @twofactor)"])
             .done { result in
-                XCTAssert(result.arrayValue.count == 3)
-                XCTAssert(result[0]["userids"].arrayValue.count == 2)
-                XCTAssert(result[1]["userids"].arrayValue.count == 1)
-                XCTAssert(result[2]["userids"].arrayValue.count == 3)
+                XCTAssert(result.count == 3)
+                XCTAssert(result[0].users.count == 2)
+                XCTAssert(result[1].users.count == 1)
+                XCTAssert(result[2].users.count == 3)
             }
             .catch { error in
                 XCTFail("resolve tag expression failed \(error)")
@@ -479,10 +448,10 @@ export JWT_PROXY_AUDIENCE='atlas'
         
         let expectTags = XCTestExpectation(description: "resolve tag expression")
         var userIds: [UUID] = []
-        atlas.resolveTagExpression("@sms + @twofactor + @password")
+        atlas.resolveTagExpressions(["@sms + @twofactor + @password"])
             .done { result in
-                userIds = result["userids"].arrayValue.map { UUID(uuidString: $0.stringValue)! }
-                XCTAssert(userIds.count == 3, "should have three users")
+                userIds = result[0].users
+                XCTAssert(result[0].users.count == 3, "should have three users")
             }.catch { error in
                 XCTFail("resolve tag expression failed \(error)")
             }.finally {

@@ -402,38 +402,65 @@ public class AtlasClient {
     // -MARK: Tag and User Directory Services
     
     ///
-    /// Take a tag expression (i.e "@foo + @bar - (@joe + @sarah)") and resolve
-    /// it to its current user membership.
+    /// Takes an array of tag expressions (i.e "@foo + @bar - (@joe + @sarah)") and resolves
+    /// them to their current user memberships.
     ///
-    /// - parameter expression: a `String` tag expression
-    /// - returns: a `Promise` resolving to a `JSON` blob with the results of the tag math evaluation
+    /// - parameter expressions: an array of `String` tag expressions
+    /// - returns: a `Promise` resolving to a matching array of `TagExpressionResolution`s
     ///
-    public func resolveTagExpression(_ expression: String) -> Promise<JSON> {
-        return resolveTagExpressionBatch([expression])
-            .map(on: ForstaClient.workQueue) { result in
-                let res = result.arrayValue
-                if res.count > 0 {
-                    return res[0]
-                } else {
-                    throw ForstaError(.malformedResponse, "tagmath resolution with no result")
-                }
-        }
-    }
-    
-    ///
-    /// This is the batch version of `resolveTagExpression` with an array
-    /// of tag expressions. The results are in the same order as the input array
-    /// and invalid responses will be set to undefined.
-    ///
-    /// - parameter expressions: the `[String]` of tag expressions
-    /// - returns: array of resolutions of cool stuff
-    /// - returns: a `Promise` resolving to a `[JSON]` with the results of the tag math evaluations
-    ///
-    public func resolveTagExpressionBatch(_ expressions: [String]) -> Promise<JSON> {
+    public func resolveTagExpressions(_ expressions: [String]) -> Promise<[TagExpressionResolution]> {
         return request("/v1/tagmath/", method: .post, parameters: ["expressions": expressions])
             .map(on: ForstaClient.workQueue) { (statusCode, json) in
-                if statusCode == 200 { return json["results"] }
-                throw ForstaError(.requestRejected, json)
+                if statusCode != 200 { throw ForstaError(.requestRejected, json) }
+                return try json["results"].arrayValue.map { item in
+                    guard
+                        let pretty = item["pretty"].string,
+                        let universal = item["universal"].string,
+                        let usersRaw = item["userids"].array,
+                        let monitorsRaw = item["monitorids"].array,
+                        let includedTagsRaw = item["includedTagids"].array,
+                        let excludedTagsRaw = item["excludedTagids"].array,
+                        let warningsRaw = item["warnings"].array else {
+                            throw ForstaError(.malformedResponse, "tagmath resolution missing expected component(s)")
+                    }
+                    
+                    let users = usersRaw.map { id in UUID(uuidString: id.stringValue) }.filter { id in id != nil }.map { id in id! }
+                    let monitors = monitorsRaw.map { id in UUID(uuidString: id.stringValue) }.filter { id in id != nil }.map { id in id! }
+                    let includedTags = includedTagsRaw.map { id in UUID(uuidString: id.stringValue) }.filter { id in id != nil }.map { id in id! }
+                    let excludedTags = excludedTagsRaw.map { id in UUID(uuidString: id.stringValue) }.filter { id in id != nil }.map { id in id! }
+                    guard
+                        users.count == usersRaw.count,
+                        monitors.count == monitorsRaw.count,
+                        includedTags.count == includedTagsRaw.count,
+                        excludedTags.count == excludedTagsRaw.count else {
+                            throw ForstaError(.malformedResponse, "tagmath resolution malformed uuid(s)")
+                    }
+
+                    let warnings = try warningsRaw.map { warn -> TagExpressionResolution.Warning in
+                        guard let position = warn["position"].uInt,
+                            let sourceRaw = warn["source"].string,
+                            let source = TagExpressionResolution.Warning.Source(rawValue: sourceRaw),
+                            let kindRaw = warn["kind"].string,
+                            let kind = TagExpressionResolution.Warning.Kind(rawValue: kindRaw),
+                            let length = warn["length"].uInt,
+                            let cue = warn["cue"].string else {
+                                throw ForstaError(.malformedResponse, "tagmath resolution warning missing expected component(s)")
+                        }
+                        return TagExpressionResolution.Warning(source: source,
+                                                               kind: kind,
+                                                               cue: cue,
+                                                               position: position,
+                                                               length: length)
+                    }
+                    
+                    return TagExpressionResolution(pretty: pretty,
+                                                   universal: universal,
+                                                   users: users,
+                                                   monitors: monitors,
+                                                   includedTags: includedTags,
+                                                   excludedTags: excludedTags,
+                                                   warnings: warnings)
+                }
         }
     }
     
@@ -574,7 +601,7 @@ public class AtlasClient {
                         let devicesRaw = json["devices"].array else {
                             throw ForstaError(.malformedResponse, "missing expected account info components")
                     }
-                    let devices = try devicesRaw.map { device throws -> SignalDeviceInfo in
+                    let devices = try devicesRaw.map { device throws -> SignalAccountInfo.DeviceInfo in
                         guard
                             let id = device["id"].uInt32,
                             let label = device["name"].string,
@@ -582,10 +609,10 @@ public class AtlasClient {
                             let createdRaw = device["created"].uInt64 else {
                                 throw ForstaError(.malformedResponse, "missing expected device info components")
                         }
-                        return SignalDeviceInfo(id: id,
-                                                label: label,
-                                                lastSeen: Date(millisecondsSince1970: lastSeenRaw),
-                                                created: Date(millisecondsSince1970: createdRaw))
+                        return SignalAccountInfo.DeviceInfo(id: id,
+                                                            label: label,
+                                                            lastSeen: Date(millisecondsSince1970: lastSeenRaw),
+                                                            created: Date(millisecondsSince1970: createdRaw))
                     }
 
                     return SignalAccountInfo(userId: userId, serverUrl: serverUrl, devices: devices)
@@ -711,20 +738,78 @@ public class AtlasClient {
         /// The server URL to use for Signal requests
         public let serverUrl: String
         /// The current set of devices
-        public let devices: [SignalDeviceInfo]
+        public let devices: [DeviceInfo]
+        
+        /// Device info reported by Signal server
+        public struct DeviceInfo {
+            /// The device id
+            public let id: UInt32
+            /// The device label ("name")
+            public let label: String
+            /// Datetime last seen
+            public let lastSeen: Date
+            /// Creation datetime
+            public let created: Date
+        }
     }
-    /// Device info reported by Signal server
-    public struct SignalDeviceInfo {
-        /// The device id
-        public let id: UInt32
-        /// The device label ("name")
-        public let label: String
-        /// Datetime last seen
-        public let lastSeen: Date
-        /// Creation datetime
-        public let created: Date
+
+    /// Results of evaluating a tag expression -- see [the Atlas docs on this](https://github.com/ForstaLabs/atlas/tree/master/ccsm_api/core/tag_parser)
+    public struct TagExpressionResolution {
+        /// The "pretty" version of this evaluated expression (simplified, human-readable with slug strings, qualified for the evaluating user's organization)
+        public let pretty: String
+        /// The "universal" version of this evaluated expression (simplified, uses absolute tag IDs rather than slug strings)
+        public let universal: String
+        /// The users this expression resolves to
+        public let users: [UUID]
+        /// The monitors that were included in the resolution
+        public let monitors: [UUID]
+        /// The tags which were "positively" used in the expression (i.e., added)
+        public let includedTags: [UUID]
+        /// The tags which were "negatively" used in the expression (i.e., subtracted)
+        public let excludedTags: [UUID]
+        /// Warnings about lexing, parsing, or evaluation issues
+        public let warnings: [Warning]
+        
+        /// Warning about tag-math resolution
+        public struct Warning {
+            /// the general category of this warning
+            public let source: Source
+            /// general categories that the kinds of warnings fall into
+            public enum Source: String {
+                /// a lexical warning (like extra text that is being ignored)
+                case lex
+                /// a parsing warning (like noting an implicit union or unbalanced parens)
+                case parse
+                /// a parsing warning (like noting an unrecognized tag)
+                case eval
+            }
+            /// the kind of this warning
+            public let kind: Kind
+            /// various kinds of tag-math resolution warnings
+            public enum Kind: String {
+                /// superficial lexical adjustments (`.lex` source)
+                case trimmed
+                /// serious lexical adjustments that could be surprising (`.lex` source)
+                case ignored
+                /// random text understood as a union operator (`.parse` source)
+                case implicitUnion = "implicit union"
+                /// unexpected item(s) necessitating recovery-guesses (`.parse` source)
+                case unexpected
+                /// unbalanced parens necessitating recovery-guesses (`.parse` source)
+                case unbalanced
+                /// unknown tag (`.eval` source)
+                case unrecognized
+            }
+            /// a hint to show to a user (usually an offending snippet of the input)
+            public let cue: String
+            /// offset into the original input of the warning
+            public let position: UInt
+            /// length of the text in the original input causing the warning
+            public let length: UInt
+        }
     }
 }
+
 
 /// Important events for an Atlas client that you can register to receive
 public protocol AtlasClientDelegate: class {

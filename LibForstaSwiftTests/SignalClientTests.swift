@@ -941,19 +941,17 @@ class SignalClientTests: XCTestCase {
                 forsta.atlas.getSignalAccountInfo()
             }
             .then { info -> Promise<Void> in
-                let myId = forsta.signal.signalAddress?.deviceId
-                XCTAssert(myId != nil)
-                let x = info.devices.first { $0.id == myId! && $0.label == label }
+                let myId = forsta.signal.signalAddress!.deviceId
+                let x = info.devices.first { $0.id == myId && $0.label == label }
                 XCTAssert(x != nil)
-                return forsta.signal.deleteDevice(deviceId: UInt32(myId!))
+                return forsta.signal.deleteDevice(deviceId: UInt32(myId))
             }
             .then { _ in
                 forsta.atlas.getSignalAccountInfo()
             }
             .map { info -> Void in
-                let myId = forsta.signal.signalAddress?.deviceId
-                XCTAssert(myId != nil)
-                let x = info.devices.first { $0.id == myId! && $0.label == label }
+                let myId = forsta.signal.signalAddress!.deviceId
+                let x = info.devices.first { $0.id == myId && $0.label == label }
                 XCTAssert(x == nil)
                 completed.fulfill()
             }
