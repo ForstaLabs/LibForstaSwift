@@ -35,39 +35,85 @@ This allows your application to stop and restart, picking up where it left
 off in its relationships with Forsta servers and other messaging clients.
 
 
-Authenticating and Registering
+Example
 -------
-PREREQUISITE: To use LibForstaSwift you must first have a valid Forsta account.  
+PREREQUISITE: To use LibForstaSwift you must first have a valid Forsta account. 
 You can sign up for free at <https://app.forsta.io/join>. 
-```
+
+Here is a simplified example of a chat-bot that responds to any incoming message 
+with a line about how long that message was.
+
+```swift
 import LibForstaSwift
-...
 
-let forsta = Forsta(kvstore)
+class Example: SignalClientDelegate {
+    let forsta = try! ForstaClient(MyKVStore())
+    let (finished, finishedSeal) = Promise<Void>.pending()
 
-forsta.atlas.authenticateViaPassword(userTag: "@fred:acme", password: "password42")
-.then { _ in
-    forsta.signal.registerAccount(name: "swifty fred")
+    // This will authenticate with password credentials, register a new device,
+    // connect with the Signal server, and return a Promise that will resolve
+    // when the example conversation has completed.
+    func go() -> Promise<Void> {
+        return firstly {
+            forsta.atlas.authenticateViaPassword(userTag: "@me:my.org", password: "mypassword")
+        }
+        .map { _ in
+            self.forsta.signal.registerDevice(deviceLabel: "swift chat bot")
+        }
+        .then { task in
+            task.complete
+        }
+        .then { _ -> Promise<Void> in
+            self.forsta.signal.delegates.add(self)
+            try self.forsta.connect()
+            return self.finished
+        }
+    }
+
+    // This is a delegate method that is called with inbound messages.
+    // We'll just print the text and immediately respond to the sender.
+    func inboundMessage(message: InboundMessage) {
+        if message.payload.messageType! == .content {
+            let text = message.payload.bodyPlain ?? ""
+            print("received text: \(text)")
+
+            if text == "quit" {
+                self.forsta.disconnect()
+                finishedSeal.fulfill(())
+            }
+
+            // We'll cheat a little by treating the InboundMessage as our own
+            // Sendable, simply modifying it in place and sending it back.
+            // In a real application, you would use your own outgoing
+            // message class conforming to Sendable.
+            message.payload.sender = nil
+            message.payload.messageId = UUID()
+            message.timestamp = Date.timestamp
+            message.payload.bodyPlain = "That's \(text.count) character(s)."
+
+            print("Sending with timestamp \(message.timestamp.millisecondsSince1970): \(message.payload.bodyPlain ?? "???")")
+
+            firstly {
+                self.forsta.send(message, to: [.user(message.source.userId)])
+            }
+            .map { info in
+                print("transmission information:", info)
+            }
+            .catch { error in
+                print("send error: \(error)")
+                self.finishedSeal.reject(error)
+            }
+        }
+    }
+
+    // This is a delegate method that is called with delivery receipts
+    // handed up by the Signal server.
+    func deliveryReceipt(receipt: DeliveryReceipt) {
+        print(receipt)
+    }
 }
-.done {
-    print("Signal account registered -- ready to send and receive messages.")
-}
-.catch { error in
-    print("Trouble authenticating and registering:", error)
-}
+
 ```
-
-Message Receiving
--------
-
-*Example coming soon.*
-
-
-Message Sending
--------
-
-*Example coming soon.*
-
 
 Cryptography Notice
 --------

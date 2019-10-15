@@ -96,10 +96,10 @@ public class AttachmentInfo: CustomStringConvertible {
 }
 
 /// An inbound message (whether from another user or as a sync message from self)
-public class InboundMessage: CustomStringConvertible {
+public class InboundMessage: CustomStringConvertible, Sendable {
     // -MARK: Attributes
     
-    /// Device that send the message (note that this would be one of ours if it is a sync message)
+    /// Device that sent the message (note that this would be one of ours if it is a sync message)
     public var source: SignalAddress
     /// Timestamp of the sent message
     public var timestamp: Date
