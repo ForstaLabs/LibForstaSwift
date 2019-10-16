@@ -969,6 +969,7 @@ class SignalClientTests: XCTestCase {
     }
     
     func testNewDeviceConversation() {
+        watchEverything()
         let completed = XCTestExpectation()
         let conversation = Conversation()
         
@@ -999,6 +1000,23 @@ class SignalClientTests: XCTestCase {
         
         firstly {
             example.go()
+        }
+        .done {
+            completed.fulfill()
+        }
+        .catch { error in
+            print(error)
+        }
+        wait(for: [completed], timeout: 10*60.0)
+    }
+    
+    func testSyncStuff() {
+        watchEverything()
+        let completed=XCTestExpectation()
+        let syncStuff = SyncStuff()
+        
+        firstly {
+            syncStuff.go(userTag: "greg1", password: "asdfasdf24")
         }
         .done {
             completed.fulfill()
@@ -1174,5 +1192,67 @@ class Example: SignalClientDelegate {
     // (The timestamps are how Signal clients identify messages.)
     func deliveryReceipt(receipt: DeliveryReceipt) {
         print(receipt)
+    }
+}
+
+class SyncStuff: SignalClientDelegate {
+    let forsta = try! ForstaClient(MemoryKVStore())
+    let (finished, finishedSeal) = Promise<Void>.pending()
+    
+    func go(userTag: String, password: String) -> Promise<Void> {
+        return firstly {
+            forsta.atlas.authenticateViaPassword(userTag: userTag, password: password)
+        }
+        .map { _ in
+            self.forsta.signal.registerDevice(deviceLabel: "test new device conversation")
+        }
+        .then { task in
+            task.complete
+        }
+        .then {
+            self.instigateSync()
+        }
+        .then { _ -> Promise<Void> in
+            self.forsta.signal.delegates.add(self)
+            try self.forsta.connect()
+            return self.finished
+        }
+    }
+    
+    func instigateSync() -> Promise<Void> {
+        let msg = Message(messageType: .control, threadExpression: "")
+        msg.payload.controlType = .syncRequest
+        msg.payload.data!.type = .contentHistory
+        msg.payload.data!.knownMessages = []
+        msg.payload.data!.knownThreads = []
+        msg.payload.data!.knownContacts = [ForstaPayloadV1.KnownContact(id: self.forsta.signal.signalAddress!.userId, updated: Date.timestamp)]
+
+        return firstly {
+            self.forsta.atlas.getSignalAccountInfo()
+        }
+        .map { info in
+            msg.payload.data!.devices = info.devices.map { $0.id }
+        }
+        .then { _ in
+            self.forsta.send(msg, to: [])
+        }
+        .map { info in
+            print("transmission info \(info)")
+            return
+        }
+    }
+    
+    func inboundMessage(message: InboundMessage) {
+        print("inboundMessage called with message @\(message.timestamp.millisecondsSince1970)")
+        let text = message.payload.bodyPlain ?? ""
+
+        if text == "quit" || text == "end" {
+            self.forsta.disconnect()
+            finishedSeal.fulfill(())
+        }
+    }
+    
+    func deliveryReceipt(receipt: DeliveryReceipt) {
+        print("deliveryRecipt called with \(receipt)")
     }
 }

@@ -156,14 +156,20 @@ public class InboundMessage: CustomStringConvertible, Sendable {
         self.destination = destination
         
         if signalAttachments.count != self.payload.attachments?.count ?? 0 {
-            print("WARNING: envelope attachment count \(signalAttachments.count) doesn't match payload attachment count \(self.payload.attachments?.count ?? 0)")
+            let subAttachments = (self.payload.data?.messages ?? []).flatMap { $0.attachments }
+            if signalAttachments.count == subAttachments.count {
+                self.payload.attachments = subAttachments
+            } else {
+                print("WARNING: envelope attachment count \(signalAttachments.count) doesn't match payload attachment count \(self.payload.attachments?.count ?? 0)")
+            }
         }
+
         self.attachments = zip(signalAttachments, self.payload.attachments ?? []).map {
             let (signal, forsta) = $0
-            return AttachmentInfo(name: forsta.name,
-                                  size: forsta.size,
+            return AttachmentInfo(name: forsta.name ?? "",
+                                  size: forsta.size ?? 0,
                                   type: signal.contentType,
-                                  mtime: forsta.mtime,
+                                  mtime: forsta.mtime ?? Date.timestamp,
                                   id: signal.id,
                                   key: signal.key)
         }

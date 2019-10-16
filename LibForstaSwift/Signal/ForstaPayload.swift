@@ -130,6 +130,107 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         public var ttl: UInt64?
         /// What type of sync request this is (only relevant for `.control` messages of type `.syncRequest`)
         public var type: SyncRequestType?
+        
+        public var messages: [SyncMessage]?
+    }
+    
+    /// The schema for `.data.messages` (only relevant for `.control` messges of type `.syncResponse`)
+    public struct SyncMessage: Codable {
+        public var attachments: [Attachment]
+        public var expiration: Date?
+        public var expirationUpdate: Date?
+        public var flags: UInt64?
+        public var id: UUID
+        public var incoming: Bool?
+        public var keyChange: Bool?
+        public var members: [UUID]
+        public var mentions: [UUID]?
+        public var messageRef: UUID?
+        public var monitors: [UUID]?
+        public var pendingMembers: [UUID]?
+        public var plain: String?
+        public var read: Date?
+        public var received: Date
+        public var replies: [UUID]?
+        public var safe_html: String?
+        public var sender: UUID
+        public var senderDevice: UInt32
+        public var source: UUID?
+        public var sourceDevice: UInt32?
+        public var sent: Date
+        public var threadId: UUID
+        public var type: MessageType
+        public var userAgent: String?
+        public var actions: [String]? // what is this?
+        public var actionOptions: [String]? // what is this?
+        public var action: String? // what is this?
+        public var serverAge: Date?
+        public var timestamp: Date
+        
+        /// Initialize from components
+        public init(
+            attachments: [Attachment],
+            expiration: Date? = nil,
+            expirationUpdate: Date? = nil,
+            flags: UInt64? = nil,
+            id: UUID,
+            incoming: Bool? = nil,
+            keyChange: Bool? = nil,
+            members: [UUID],
+            mentions: [UUID]? = nil,
+            messageRef: UUID? = nil,
+            monitors: [UUID]? = nil,
+            pendingMembers: [UUID]? = nil,
+            plain: String? = nil,
+            read: Date? = nil,
+            received: Date,
+            replies: [UUID]? = nil,
+            safe_html: String? = nil,
+            sender: UUID,
+            senderDevice: UInt32,
+            source: UUID? = nil,
+            sourceDevice: UInt32? = nil,
+            sent: Date,
+            threadId: UUID,
+            type: MessageType,
+            userAgent: String? = nil,
+            actions: [String]? = nil,
+            actionOptions: [String]? = nil,
+            action: String? = nil,
+            serverAge: Date? = nil,
+            timestamp: Date)
+        {
+            self.attachments = attachments
+            self.expiration = expiration
+            self.expirationUpdate = expirationUpdate
+            self.flags = flags
+            self.id = id
+            self.incoming = incoming
+            self.keyChange = keyChange
+            self.members = members
+            self.mentions = mentions
+            self.messageRef = messageRef
+            self.monitors = monitors
+            self.pendingMembers = pendingMembers
+            self.plain = plain
+            self.read = read
+            self.received = received
+            self.replies = replies
+            self.safe_html = safe_html
+            self.sender = sender
+            self.senderDevice = senderDevice
+            self.source = source
+            self.sourceDevice = sourceDevice
+            self.sent = sent
+            self.threadId = threadId
+            self.type = type
+            self.userAgent = userAgent
+            self.actions = actions
+            self.actionOptions = actionOptions
+            self.action = action
+            self.serverAge = serverAge
+            self.timestamp = timestamp
+        }
     }
     
     /// The schema for `.data.knownContacts`
@@ -238,22 +339,25 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
     }
     
     /// The schema for `.data` `.attachments`
-    struct Attachment: Codable {
+    public struct Attachment: Codable {
         /// The file name
-        public var name: String
+        public var name: String?
         /// The file size in bytes
-        public var size: Int
+        public var size: Int?
         /// The file mime-type
         public var type: String
         /// The file modification-time
-        public var mtime: Date
+        public var mtime: Date?
+        /// An optional index (used to clarify relationship to Signal envelope attachment information in `.syncResponse`s)
+        public var index: UInt?
         
-        /// Initialize from components
+        /// Initialize from `AttachmentInfo`
         init(from info: AttachmentInfo) {
             self.name = info.name
             self.size = info.size
             self.type = info.type
             self.mtime = info.mtime
+            self.index = nil
         }
     }
 
