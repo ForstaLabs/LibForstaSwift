@@ -309,15 +309,15 @@ public class SignalClient {
     
     /// Download an (encrypted) attachment by Signal attachment ID
     func downloadEncryptedAttachment(id: UInt64) -> Promise<Data> {
-        return self.request(.attachment, urlParameters: "/\(id)")
+        return self.request(.attachment, urlParameters: "/\(id)", queue: ForstaClient.bgQueue)
             .map(on: ForstaClient.workQueue) { (code, json) in
                 if code < 300 { return json["location"].stringValue }
                 throw ForstaError(.requestRejected, json)
         }
-        .then(on: ForstaClient.workQueue) { location in
+        .then(on: ForstaClient.bgQueue) { location in
             self.request(location, headers: ["Content-Type": "application/octet-stream"])
         }
-        .map(on: ForstaClient.workQueue) { (code, data) in
+        .map(on: ForstaClient.bgQueue) { (code, data) in
             if code < 300 { return data }
             throw ForstaError(.requestRejected, String(data: data, encoding: .utf8)!)
         }
@@ -328,11 +328,11 @@ public class SignalClient {
         var id: UInt64?
         
         return self.request(.attachment)
-            .map(on: ForstaClient.workQueue) { (code, json) -> JSON in
+            .map(on: ForstaClient.bgQueue) { (code, json) -> JSON in
                 if code < 300 { return json }
                 throw ForstaError(.requestRejected, json)
         }
-        .then(on: ForstaClient.workQueue) { json -> Promise<(Int, String)> in
+        .then(on: ForstaClient.bgQueue) { json -> Promise<(Int, String)> in
             guard
                 let theId = json["id"].uInt64,
                 let location = json["location"].string else {
@@ -342,7 +342,7 @@ public class SignalClient {
             
             return self.request(location, data: body, headers: ["Content-Type": "application/octet-stream"])
         }
-        .map(on: ForstaClient.workQueue) { (code, string) in
+        .map(on: ForstaClient.bgQueue) { (code, string) in
             if code < 300 { return id! }
             throw ForstaError(.requestRejected, "\(code): \(string)")
         }
@@ -437,57 +437,73 @@ public class SignalClient {
     }
     
     /// Internal: Basic Signal Server http request
-    private func request(_ call: ServerCall, urlParameters: String = "", method: HTTPMethod = .get, parameters: Parameters? = nil) -> Promise<(Int, JSON)> {
+    private func request(_ call: ServerCall,
+                         urlParameters: String = "",
+                         method: HTTPMethod = .get,
+                         parameters: Parameters? = nil,
+                         queue: DispatchQueue = ForstaClient.workQueue) -> Promise<(Int, JSON)> {
         guard serverUrl != nil else {
             return Promise(error: ForstaError(.configuration, "No signal server url available."))
         }
         
         return Promise { seal in
-            let headers = authHeader()
-            Alamofire.request("\(serverUrl!)\(call.rawValue)\(urlParameters)", method: method, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
-                .responseJSON(queue: ForstaClient.workQueue) { response in
-                    let statusCode = response.response?.statusCode ?? 500
-                    switch response.result {
-                    case .success(let data):
-                        let json = JSON(data)
-                        seal.fulfill((statusCode, json))
-                    case .failure(let error):
-                        return seal.reject(ForstaError(.requestFailure, cause: error))
-                    }
+            queue.async {
+                let headers = self.authHeader()
+                Alamofire.request("\(self.serverUrl!)\(call.rawValue)\(urlParameters)", method: method, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+                    .responseJSON(queue: ForstaClient.workQueue) { response in
+                        let statusCode = response.response?.statusCode ?? 500
+                        switch response.result {
+                        case .success(let data):
+                            let json = JSON(data)
+                            seal.fulfill((statusCode, json))
+                        case .failure(let error):
+                            return seal.reject(ForstaError(.requestFailure, cause: error))
+                        }
+                }
             }
         }
     }
     
     /// Internal: Basic http request to send raw data
-    private func request(_ url: String, data: Data, headers: [String: String]? = nil) -> Promise<(Int, String)> {
+    private func request(_ url: String,
+                         data: Data,
+                         headers: [String: String]? = nil,
+                         queue: DispatchQueue = ForstaClient.workQueue) -> Promise<(Int, String)> {
         return Promise { seal in
-            Alamofire.upload(data, to: url, method: .put, headers: headers)
-                // .uploadProgress { progress in print("uploading:", progress) }
-                .responseString { response in
-                    let statusCode = response.response?.statusCode ?? 500
-                    switch response.result {
-                    case .success(let str):
-                        seal.fulfill((statusCode, str))
-                    case .failure(let error):
-                        return seal.reject(ForstaError(.requestFailure, cause: error))
-                    }
+            queue.async {
+                Alamofire.upload(data, to: url, method: .put, headers: headers)
+                    // .uploadProgress { progress in print("uploading:", progress) }
+                    .responseString { response in
+                        let statusCode = response.response?.statusCode ?? 500
+                        switch response.result {
+                        case .success(let str):
+                            seal.fulfill((statusCode, str))
+                        case .failure(let error):
+                            return seal.reject(ForstaError(.requestFailure, cause: error))
+                        }
+                }
             }
         }
     }
     
     /// Internal: Basic http request to fetch raw data
-    private func request(_ url: String, headers: [String: String]? = nil, parameters: [String: Any]? = nil) -> Promise<(Int, Data)> {
+    private func request(_ url: String,
+                         headers: [String: String]? = nil,
+                         parameters: [String: Any]? = nil,
+                         queue: DispatchQueue = ForstaClient.workQueue) -> Promise<(Int, Data)> {
         return Promise { seal in
-            Alamofire.request(url, method: .get, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
-                // .downloadProgress { progress in print("downloading:", progress) }
-                .responseData { response in
-                    let statusCode = response.response?.statusCode ?? 500
-                    switch response.result {
-                    case .success(let data):
-                        seal.fulfill((statusCode, data))
-                    case .failure(let error):
-                        return seal.reject(ForstaError(.requestFailure, cause: error))
-                    }
+            queue.async {
+                Alamofire.request(url, method: .get, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+                    // .downloadProgress { progress in print("downloading:", progress) }
+                    .responseData { response in
+                        let statusCode = response.response?.statusCode ?? 500
+                        switch response.result {
+                        case .success(let data):
+                            seal.fulfill((statusCode, data))
+                        case .failure(let error):
+                            return seal.reject(ForstaError(.requestFailure, cause: error))
+                        }
+                }
             }
         }
     }

@@ -42,7 +42,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
     public var version: Int?
 
     /// The message's globally-unique ID (required)
-    public var messageId: UUID?
+    public var messageId: UUID? = UUID()
 
     /// A reference to another message, by ID (useful for message replies, or survey responses)
     public var messageRef: UUID?

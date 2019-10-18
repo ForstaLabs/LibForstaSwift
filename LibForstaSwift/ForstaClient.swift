@@ -13,7 +13,9 @@ import PromiseKit
 public class ForstaClient {
     /// The `DispatchQueue` that LibForstaSwift will do any asyncronous internal work on (Serial, QoS of Utility)
     static public let workQueue: DispatchQueue = .init(label: "LFS Subwork", qos: .utility)
-    
+    /// The `DispatchQueue` that LibForstaSwift will do any background, concurrent asyncronous internal work on (Concurrent, QoS of Background)
+    static public let bgQueue: DispatchQueue = .init(label: "LFS Background Subwork", qos: .background, attributes: [.concurrent])
+
     // -MARK: Attributes
     
     /// An Atlas client for Forsta Atlas server operations.
