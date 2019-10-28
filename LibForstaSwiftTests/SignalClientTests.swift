@@ -693,6 +693,29 @@ class SignalClientTests: XCTestCase {
 
         XCTAssert(expected == result)
     }
+    
+    func testSigning() throws {
+
+        let keyPair = try Signal.generateIdentityKeyPair()
+        
+        var message = "Foo the bar, Baz!".toData()
+        
+        let signature = try SignalCommonCrypto.generateSignature(privateKeyData: keyPair.privateKey, message: message)
+        XCTAssert(signature.count == 64)
+        
+        let verify1 = try SignalCommonCrypto.verifySignature(signature: signature, publicKeyData: keyPair.publicKey, message: message)
+        XCTAssert(verify1)
+        
+        var badPub = keyPair.publicKey.dropFirst()
+        badPub[10] = 42
+        
+        let verify2 = try Utility.curve25519Verify(signature: signature, publicKey: badPub, message: message)
+        XCTAssert(!verify2)
+        
+        message[3] = 88 // X
+        let verify3 = try SignalCommonCrypto.verifySignature(signature: signature, publicKeyData: keyPair.publicKey, message: message)
+        XCTAssert(!verify3)
+    }
 
 
     func testProvisionResponse() {

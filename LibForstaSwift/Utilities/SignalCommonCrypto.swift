@@ -386,6 +386,24 @@ extension SignalCommonCrypto {
         return KeyPair(publicKey: Data([5]) + pubKeyData, privateKey: privateKeyData)
     }
     
+    /// Generate a Curve25519 signature.
+    static public func generateSignature(privateKeyData: Data, message: Data) throws -> Data {
+        let random = try SignalCommonCrypto.random(bytes: 64)
+        guard let signature = try Utility.curve25519Sign(privateKey: privateKeyData, message: message, random: random) else {
+            throw ForstaError(ForstaError.ErrorType.encryptionError, "Failed to generate curve25519 signature.")
+        }
+        
+        return signature
+    }
+    
+    /// Validate a Curve25519 signature.
+    static public func verifySignature(signature: Data, publicKeyData: Data, message: Data) throws -> Bool {
+        guard publicKeyData.count == 33 else {
+            throw ForstaError(.invalidLength, "Public key is wrong length (expected 33 bytes).")
+        }
+        return try Utility.curve25519Verify(signature: signature, publicKey: publicKeyData.dropFirst(1), message: message)
+    }
+    
     /// Decrypt attachment data
     static public func decryptAttachment(data: Data, keys: Data) throws -> Data {
         if (keys.count != 64) {
