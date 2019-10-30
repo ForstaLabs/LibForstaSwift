@@ -191,6 +191,9 @@ public final class ForstaError: CustomStringConvertible, Error {
         /// The authentication failed
         case invalidMac = "Invalid mac"
         
+        /// Invalid hash
+        case invalidHash = "Invalid hash"
+
         /// The message structure is invalid
         case invalidMessage = "Invalid message"
         

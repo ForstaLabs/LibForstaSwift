@@ -352,6 +352,13 @@ public class SignalClient {
     public func downloadAttachment(_ attachmentInfo: AttachmentInfo) -> Promise<Data> {
         return self.downloadEncryptedAttachment(id: attachmentInfo.id)
             .map(on: ForstaClient.workQueue) { data in try SignalCommonCrypto.decryptAttachment(data: data, keys: attachmentInfo.key) }
+            .map(on: ForstaClient.workQueue) { data in
+                let hash = try SignalCommonCrypto.sha512(for: data)
+                if attachmentInfo.hash != nil && hash != attachmentInfo.hash {
+                    throw ForstaError(.invalidHash)
+                }
+                return data
+        }
     }
     
     /// Upload an attachment (returns an `AttachmentInfo` with `.id` for later retrieval and `.key` for decryption)
@@ -360,9 +367,10 @@ public class SignalClient {
             let keys = try SignalCommonCrypto.random(bytes: 64)
             let iv = try SignalCommonCrypto.random(bytes: 16)
             let encrypted = try SignalCommonCrypto.encryptAttachment(data: data, keys: keys, iv: iv)
+            let hash = try SignalCommonCrypto.sha512(for: data)
             
             return self.uploadEncryptedAttachment(body: encrypted)
-                .map(on: ForstaClient.workQueue) { id in AttachmentInfo(name: name, size: data.count, type: type, mtime: mtime, id: id, key: keys) }
+                .map(on: ForstaClient.workQueue) { id in AttachmentInfo(name: name, size: data.count, type: type, mtime: mtime, hash: hash, id: id, key: keys) }
         } catch let error {
             return Promise<AttachmentInfo>.init(error: ForstaError("unable to prepare for upload", cause: error))
         }

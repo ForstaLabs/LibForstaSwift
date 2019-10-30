@@ -126,6 +126,23 @@ class ForstaIdentityKeyStore: IdentityKeyStore {
         return savedIdentity == identity
     }
     
+    func publicIdentityKey(for address: SignalAddress) -> Data? {
+        return kvstore.get(ns: ns, key: address)
+    }
+    
+    func publicIdentityKey(for userId: UUID) -> Data? {
+        let ids = knownDeviceIds(for: userId)
+        if ids.count == 0 { return nil }
+        return publicIdentityKey(for: SignalAddress(userId: userId, deviceId: ids[0]))
+    }
+    
+    func knownDeviceIds(for userId: UUID) -> [Int32] {
+        let name = userId.lcString
+        return kvstore.keys(ns: ns)
+            .map { SignalAddress(description: $0) }
+            .filter { $0?.name == name }
+            .map { $0!.deviceId }
+    }
 
     // supplements to protocol
     

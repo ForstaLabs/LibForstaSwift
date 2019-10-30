@@ -69,6 +69,21 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
     /// The user agent sending this message (optional)
     public var userAgent: String?
     
+    /// The identity-key-based signature for the essential parts of this message
+    /// (useful for trusting forwarded/shared/replayed messages).
+    ///
+    /// The signed text is the concatenation of:
+    ///    - timestamp
+    ///    - distribution expression (i.e., a universal expression string yielded by Atlas)
+    ///    - messageId (lowercase UUID string)
+    ///    - threadId (lowercase UUID string)
+    ///    - messageRef (lowercase UUID string or empty)
+    ///    - body plain text (or empty)
+    ///    - body html text (or empty)
+    ///    - attachment hashes (base64 sha512 hash strings in order, or empty)
+    ///
+    public var signature: Data?
+    
     // -MARK: Substructure Schema
     
     /// The schema for the `.data` attribute in a message exchange payload
@@ -348,6 +363,8 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         public var type: String
         /// The file modification-time
         public var mtime: Date?
+        /// The file content hash for verifying integrity (SHA512)
+        public var hash: Data?
         /// An optional index (used to clarify relationship to Signal envelope attachment information in `.syncResponse`s)
         public var index: UInt?
         
@@ -357,6 +374,7 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
             self.size = info.size
             self.type = info.type
             self.mtime = info.mtime
+            self.hash = info.hash
             self.index = nil
         }
     }

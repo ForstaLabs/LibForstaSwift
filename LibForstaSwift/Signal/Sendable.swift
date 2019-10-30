@@ -43,36 +43,46 @@ public protocol Sendable {
 
 extension Sendable {
     /// INTERNAL: the Signal_Content protobuf encoding for this `Sendable`
-    var contentProto: Signal_Content {
-        get {
-            var payloadCopy = payload
-            payloadCopy.attachments = attachments.map {
-                return ForstaPayloadV1.Attachment(from: $0)
-            }
-
-            var dm = Signal_DataMessage()
-            dm.body = payloadCopy.json() ?? "<json encoding error>"
-            if self.expiration != nil { dm.expireTimer = UInt32(self.expiration!.milliseconds) }
-            var flags: UInt32 = 0
-            if self.endSessionFlag { flags |= UInt32(Signal_DataMessage.Flags.endSession.rawValue) }
-            if self.expirationTimerUpdateFlag { flags |= UInt32(Signal_DataMessage.Flags.expirationTimerUpdate.rawValue) }
-            if flags != 0 { dm.flags = flags }
-
-            dm.attachments = attachments.map { info -> Signal_AttachmentPointer in
-                var pointer = Signal_AttachmentPointer()
-                pointer.id = info.id
-                pointer.contentType = info.type
-                pointer.key = info.key
-                return pointer
-            }
-
-            var content = Signal_Content()
-            content.dataMessage = dm
-
-            return content;
+    func contentProto(privateKey: Data) throws -> Signal_Content {
+        var payloadCopy = payload
+        payloadCopy.attachments = attachments.map {
+            return ForstaPayloadV1.Attachment(from: $0)
         }
+        let signatureMessage = """
+        \(timestamp.millisecondsSince1970)\
+        \(payload.threadExpression ?? "")\
+        \(payload.messageId?.lcString ?? "")\
+        \(payload.threadId?.lcString ?? "")\
+        \(payload.messageRef?.lcString ?? "")\
+        \(payload.bodyPlain ?? "")\
+        \(payload.bodyHtml ?? "")\
+        \(attachments.map { $0.hash?.base64EncodedString() ?? "" }.joined())
+        """
+        
+        payloadCopy.signature = try SignalCommonCrypto.generateSignature(privateKeyData: privateKey, message: signatureMessage.toData())
+        
+        var dm = Signal_DataMessage()
+        dm.body = payloadCopy.json() ?? "<json encoding error>"
+        if self.expiration != nil { dm.expireTimer = UInt32(self.expiration!.milliseconds) }
+        var flags: UInt32 = 0
+        if self.endSessionFlag { flags |= UInt32(Signal_DataMessage.Flags.endSession.rawValue) }
+        if self.expirationTimerUpdateFlag { flags |= UInt32(Signal_DataMessage.Flags.expirationTimerUpdate.rawValue) }
+        if flags != 0 { dm.flags = flags }
+        
+        dm.attachments = attachments.map { info -> Signal_AttachmentPointer in
+            var pointer = Signal_AttachmentPointer()
+            pointer.id = info.id
+            pointer.contentType = info.type
+            pointer.key = info.key
+            return pointer
+        }
+        
+        var content = Signal_Content()
+        content.dataMessage = dm
+        
+        return content;
     }
-    
+
     /// Pretty-printed version of this `Sendable`
     public var description: String {
         return """

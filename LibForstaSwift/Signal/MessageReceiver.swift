@@ -69,6 +69,8 @@ public class AttachmentInfo: CustomStringConvertible {
     public let size: Int
     /// The file modification time
     public let mtime: Date
+    /// The content integrity hash
+    public let hash: Data?
 
     /// The file content mime type
     public let type: String
@@ -76,13 +78,15 @@ public class AttachmentInfo: CustomStringConvertible {
     public let id: UInt64
     /// The key used to encrypt the file contents before upload
     public let key: Data
+
     
 
-    init(name: String, size: Int, type: String, mtime: Date, id: UInt64, key: Data) {
+    init(name: String, size: Int, type: String, mtime: Date, hash: Data?, id: UInt64, key: Data) {
         self.name = name
         self.size = size
         self.type = type
         self.mtime = mtime
+        self.hash = hash
         self.id = id
         self.key = key
     }
@@ -170,6 +174,7 @@ public class InboundMessage: CustomStringConvertible, Sendable {
                                   size: forsta.size ?? 0,
                                   type: signal.contentType,
                                   mtime: forsta.mtime ?? Date.timestamp,
+                                  hash: forsta.hash,
                                   id: signal.id,
                                   key: signal.key)
         }
@@ -188,6 +193,30 @@ public class InboundMessage: CustomStringConvertible, Sendable {
         \(attachments.count > 0 ? "\n>>> Attachments \(attachments.map { $0.description })" : "")
         \(payload.description.indentWith(">>> "))
         """
+    }
+    
+    public func verifySignature(store: SignalStore) throws -> Bool {
+        let message = """
+        \(timestamp.millisecondsSince1970)\
+        \(payload.threadExpression ?? "")\
+        \(payload.messageId?.lcString ?? "")\
+        \(payload.threadId?.lcString ?? "")\
+        \(payload.messageRef?.lcString ?? "")\
+        \(payload.bodyPlain ?? "")\
+        \(payload.bodyHtml ?? "")\
+        \(attachments.map { $0.hash?.base64EncodedString() ?? "" }.joined())
+        """
+        var signer = source.userId
+        if payload.sender != nil {
+            signer = payload.sender!.userId
+        }
+        guard
+            let signature = payload.signature,
+            let pubKey = store.forstaIdentityKeyStore.publicIdentityKey(for: signer) else {
+                return false
+        }
+        
+        return try SignalCommonCrypto.verifySignature(signature: signature, publicKeyData: pubKey, message: message.toData())
     }
 }
 

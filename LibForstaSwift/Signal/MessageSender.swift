@@ -45,7 +45,10 @@ public class MessageSender {
         return firstly { () -> Promise<[TransmissionInfo]> in
             try sendable.payload.sanityCheck()
             var results: [Promise<TransmissionInfo>] = []
-            let contentProto = sendable.contentProto
+            guard let keyPair = self.signalClient.store.forstaIdentityKeyStore.identityKeyPair() else {
+                throw ForstaError(.configuration, "identity key pair not available")
+            }
+            let contentProto = try sendable.contentProto(privateKey: keyPair.privateKey)
             
             var paddedClearData = try contentProto.serializedData()
             pad(&paddedClearData)
