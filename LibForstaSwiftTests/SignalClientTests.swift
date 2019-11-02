@@ -1347,9 +1347,11 @@ class SignatureValidator: SignalClientDelegate {
             }
             return when(fulfilled: uploads)
         }
-        .then { attachments in
-            self.forsta1.send(Message(threadExpression: distribution,
-                                      bodyPlain: "A message with \(attachments.count) attachments.", attachments: attachments))
+        .then { attachments -> Promise<[MessageSender.TransmissionInfo]> in
+            let msg = Message(threadExpression: distribution,
+                              bodyPlain: "A message with \(attachments.count) attachments.", attachments: attachments)
+            msg.payload.data?.body?.append(ForstaPayloadV1.Body(type: "text/foober", value: "my foober!"))
+            return self.forsta1.send(msg)
         }
         .then { info -> Promise<Void> in
             print(info)

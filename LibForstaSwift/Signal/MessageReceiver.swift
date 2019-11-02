@@ -202,9 +202,8 @@ public class InboundMessage: CustomStringConvertible, Sendable {
         \(payload.messageId?.lcString ?? "")\
         \(payload.threadId?.lcString ?? "")\
         \(payload.messageRef?.lcString ?? "")\
-        \(payload.bodyPlain ?? "")\
-        \(payload.bodyHtml ?? "")\
-        \(attachments.map { $0.hash?.base64EncodedString() ?? "" }.joined())
+        \(payload.data?.body?.map({ $0.value }).joined() ?? "")\
+        \(attachments.map({ $0.hash?.base64EncodedString() ?? "" }).joined())
         """
         var signer = source.userId
         if payload.sender != nil {

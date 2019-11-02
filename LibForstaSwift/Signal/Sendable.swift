@@ -54,9 +54,8 @@ extension Sendable {
         \(payload.messageId?.lcString ?? "")\
         \(payload.threadId?.lcString ?? "")\
         \(payload.messageRef?.lcString ?? "")\
-        \(payload.bodyPlain ?? "")\
-        \(payload.bodyHtml ?? "")\
-        \(attachments.map { $0.hash?.base64EncodedString() ?? "" }.joined())
+        \(payload.data?.body?.map({ $0.value }).joined() ?? "")\
+        \(attachments.map({ $0.hash?.base64EncodedString() ?? "" }).joined())
         """
         
         payloadCopy.signature = try SignalCommonCrypto.generateSignature(privateKeyData: privateKey, message: signatureMessage.toData())

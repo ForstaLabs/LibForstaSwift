@@ -73,14 +73,13 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
     /// (useful for trusting forwarded/shared/replayed messages).
     ///
     /// The signed text is the concatenation of:
-    ///    - timestamp
+    ///    - timestamp message ID from the envelope
     ///    - distribution expression (i.e., a universal expression string yielded by Atlas)
     ///    - messageId (lowercase UUID string)
     ///    - threadId (lowercase UUID string)
     ///    - messageRef (lowercase UUID string or empty)
-    ///    - body plain text (or empty)
-    ///    - body html text (or empty)
-    ///    - attachment hashes (base64 sha512 hash strings in order, or empty)
+    ///    - the values of any body item(s), in order
+    ///    - the hashes (sha512 in base64) of any attachements, in order
     ///
     public var signature: Data?
     
