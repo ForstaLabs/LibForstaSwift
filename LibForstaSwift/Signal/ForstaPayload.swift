@@ -748,10 +748,6 @@ public struct ForstaPayloadV1: CustomStringConvertible, Codable {
         case control
         /// A content message (i.e., plain text and optional html)
         case content
-        /// A poll message (defines prescribed responses)
-        case poll
-        /// A poll response message (provides prescribed responses to a poll message)
-        case pollResponse
     }
 
     /// Forsta thread types
