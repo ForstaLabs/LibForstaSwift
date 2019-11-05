@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: Refresh Docs
-    runs-on: macOS-latest
+    runs-on: macOS-10.14
     
     steps:
     - name: get the code

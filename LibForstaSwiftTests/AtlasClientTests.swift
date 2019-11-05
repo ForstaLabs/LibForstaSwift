@@ -151,6 +151,7 @@ export JWT_PROXY_AUDIENCE='atlas'
         XCTAssert(o1 == "bar")
     }
     
+    
     func testRequestAuthentication() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
         atlas.serverUrl = testServerUrl
