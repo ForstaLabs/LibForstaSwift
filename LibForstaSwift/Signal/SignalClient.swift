@@ -433,6 +433,20 @@ public class SignalClient {
         }
     }
     
+    // Register for push notifications
+    public func registerForPushNotifications(pushToken: String, voipToken: String = "") -> Promise<Void> {
+        let fields:[String: Any] = [
+            "apnRegistrationId" : pushToken,
+            "voipRegistrationId" : voipToken
+        ]
+        return request(.accounts,
+                       urlParameters: "apn",
+                       method: .put,
+                       parameters: fields,
+                       queue: ForstaClient.workQueue)
+            .map { (_, _) in /* just signal success */ }
+    }
+    
     /// Internal: Generate authorization header for Signal Server requests
     private func authHeader() -> [String: String] {
         if signalServerUsername != nil && signalServerPassword != nil {
