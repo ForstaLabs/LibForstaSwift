@@ -237,7 +237,7 @@ public class AtlasClient {
         }
     }
     
-    // -MARK: Invitation, User, and Org CRUD
+    // -MARK: Invitation, Conversation, User, and Org CRUD
     
     ///
     /// Administrator creation of a new user in the same organization.
@@ -406,7 +406,203 @@ public class AtlasClient {
         }
     }
     
+    public class ConversationInfo {
+        public var threadId: UUID
+        public var distribution: String
+        public var creatorId: UUID
+        public var orgId: UUID
+        public var userIds: [UUID]
+        public var expires: Date
+        public var token: String
+        public var created: Date
+        
+        public init(
+            threadId: UUID,
+            distribution: String,
+            creatorId: UUID,
+            orgId: UUID,
+            userIds: [UUID],
+            expires: Date,
+            token: String,
+            created: Date) {
+            self.token = token
+            self.threadId = threadId
+            self.distribution = distribution
+            self.creatorId = creatorId
+            self.orgId = orgId
+            self.userIds = userIds
+            self.expires = expires
+            self.created = created
+        }
+    }
     
+    ///
+    /// Generate a Conversation.
+    ///
+    /// - parameters:
+    ///     - captcha: reCaptcha's output, required if not currently signed in
+    ///     - threadId: optional thread id (defaults to a random uuid4)
+    ///     - distribution: optional starting distribution (defaults to empty, or self if signed in)
+    ///     - expires: optional expiration datetime (defaults to 1 day from now)
+    ///
+    /// - returns: a `Promise` that resolves to a `ConversationInfo`
+    ///
+    public func createConversation(captcha: String? = nil,
+                                   threadId: UUID? = nil,
+                                   distribution: String? = nil,
+                                   expires: Date? = nil) -> Promise<ConversationInfo> {
+        let fmt = ISO8601DateFormatter()
+        fmt.formatOptions = [.withInternetDateTime, .withDashSeparatorInDate, .withColonSeparatorInTime,
+                             .withColonSeparatorInTimeZone, .withFractionalSeconds]
+        var fields = [String: Any]()
+        if captcha != nil { fields["captcha"] = captcha }
+        if threadId != nil { fields["thread_id"] = threadId!.lcString }
+        if distribution != nil { fields["distribution"] = distribution }
+        if expires != nil { fields["expires"] = fmt.string(from: expires!) }
+        
+        return request("/v1/conversation/", method: .post, parameters: fields)
+            .map(on: ForstaClient.workQueue) { (statusCode, json) in
+                if statusCode != 200 { throw ForstaError(.requestRejected, json) }
+                guard
+                    let rawThreadId = json["thread_id"].string,
+                    let threadId = UUID(uuidString: rawThreadId),
+                    let distribution = json["distribution"].string,
+                    let rawCreatorId = json["creator_id"].string,
+                    let creatorId = UUID(uuidString: rawCreatorId),
+                    let rawOrgId = json["org_id"].string,
+                    let orgId = UUID(uuidString: rawOrgId),
+                    let rawUserIds = json["user_ids"].array,
+                    let rawExpires = json["expires"].string,
+                    let expiresDate = fmt.date(from: rawExpires),
+                    let token = json["token"].string,
+                    let rawCreated = json["created"].string,
+                    let createdDate = fmt.date(from: rawCreated) else {
+                        throw ForstaError(.malformedResponse, "conversation creation missing expected component(s)")
+                }
+                let userIds = rawUserIds.map { UUID(uuidString: $0.stringValue) }.filter { $0 != nil }.map { $0! }
+                let info = ConversationInfo(threadId: threadId,
+                                            distribution: distribution,
+                                            creatorId: creatorId,
+                                            orgId: orgId,
+                                            userIds: userIds,
+                                            expires: expiresDate,
+                                            token: token,
+                                            created: createdDate)
+                return info
+        }
+    }
+    
+    ///
+    /// Get information about a Conversation (if the requesting user is its creator)
+    ///
+    /// - parameters:
+    ///     - conversationToken: An existing Conversation's token
+    ///
+    /// - returns: a `Promise` that resolves to a `ConversationInfo`
+    ///
+    public func getConversationInfo(_ conversationToken: String) -> Promise<ConversationInfo> {
+        return request("/v1/conversation/\(conversationToken)", method: .get)
+            .map(on: ForstaClient.workQueue) { (statusCode, json) in
+                if statusCode != 200 { throw ForstaError(.requestRejected, json) }
+                
+                let fmt = ISO8601DateFormatter()
+                fmt.formatOptions = [.withInternetDateTime, .withDashSeparatorInDate, .withColonSeparatorInTime,
+                                     .withColonSeparatorInTimeZone, .withFractionalSeconds]
+                guard
+                    let rawThreadId = json["thread_id"].string,
+                    let threadId = UUID(uuidString: rawThreadId),
+                    let distribution = json["distribution"].string,
+                    let rawCreatorId = json["creator_id"].string,
+                    let creatorId = UUID(uuidString: rawCreatorId),
+                    let rawOrgId = json["org_id"].string,
+                    let orgId = UUID(uuidString: rawOrgId),
+                    let rawUserIds = json["user_ids"].array,
+                    let rawExpires = json["expires"].string,
+                    let expiresDate = fmt.date(from: rawExpires),
+                    let rawCreated = json["created"].string,
+                    let createdDate = fmt.date(from: rawCreated) else {
+                        throw ForstaError(.malformedResponse, "conversation creation missing expected component(s)")
+                }
+                let userIds = rawUserIds.map { UUID(uuidString: $0.stringValue) }.filter { $0 != nil }.map { $0! }
+                let info = ConversationInfo(threadId: threadId,
+                                            distribution: distribution,
+                                            creatorId: creatorId,
+                                            orgId: orgId,
+                                            userIds: userIds,
+                                            expires: expiresDate,
+                                            token: conversationToken,
+                                            created: createdDate)
+                return info
+        }
+    }
+    
+    ///
+    /// Join a Conversation.
+    /// If not authenticated with Atlas, this will cause an ephemeral user to be created
+    /// and this AtlasClient will begin maintaining a JWT for it.
+    ///
+    /// - parameters:
+    ///     - conversationToken: An existing Conversation's token
+    ///     - firstName: optional first name (used if an ephemeral user is created, defaults to Anonymous)
+    ///     - lastName: optional last name (used if an ephemeral user is created)
+    ///     - email: optional email (used if an ephemeral user is created)
+    ///     - phone: optional phone (used if an ephemeral user is created)
+    ///
+    /// - returns: a `Promise` that resolves to a `ConversationInfo`
+    ///
+    public func joinConversation(_ conversationToken: String,
+                                 firstName: String? = nil,
+                                 lastName: String? = nil,
+                                 email: String? = nil,
+                                 phone: String? = nil) -> Promise<ConversationInfo> {
+        var fields = [String: Any]()
+        if firstName != nil { fields["first_name"] = firstName }
+        if lastName != nil { fields["last_name"] = lastName }
+        if email != nil { fields["email"] = email }
+        if phone != nil { fields["phone"] = phone }
+
+        return request("/v1/conversation/\(conversationToken)", method: .post, parameters: fields)
+            .map(on: ForstaClient.workQueue) { (statusCode, json) in
+                if statusCode != 200 { throw ForstaError(.requestRejected, json) }
+                
+                let fmt = ISO8601DateFormatter()
+                fmt.formatOptions = [.withInternetDateTime, .withDashSeparatorInDate, .withColonSeparatorInTime,
+                                     .withColonSeparatorInTimeZone, .withFractionalSeconds]
+                guard
+                    let rawThreadId = json["thread_id"].string,
+                    let threadId = UUID(uuidString: rawThreadId),
+                    let distribution = json["distribution"].string,
+                    let rawCreatorId = json["creator_id"].string,
+                    let creatorId = UUID(uuidString: rawCreatorId),
+                    let rawOrgId = json["org_id"].string,
+                    let orgId = UUID(uuidString: rawOrgId),
+                    let rawUserIds = json["user_ids"].array,
+                    let rawExpires = json["expires"].string,
+                    let expiresDate = fmt.date(from: rawExpires),
+                    let rawCreated = json["created"].string,
+                    let createdDate = fmt.date(from: rawCreated) else {
+                        throw ForstaError(.malformedResponse, "conversation join missing expected component(s)")
+                }
+                let userIds = rawUserIds.map { UUID(uuidString: $0.stringValue) }.filter { $0 != nil }.map { $0! }
+                let info = ConversationInfo(threadId: threadId,
+                                            distribution: distribution,
+                                            creatorId: creatorId,
+                                            orgId: orgId,
+                                            userIds: userIds,
+                                            expires: expiresDate,
+                                            token: conversationToken,
+                                            created: createdDate)
+                if !self.isAuthenticated {
+                    guard let jwt = json["jwt"].string else {
+                        throw ForstaError(.malformedResponse, "conversation join missing expected jwt")
+                    }
+                    self.authenticatedUserJwt = jwt
+                }
+                return info
+        }
+    }
+    
+
     // -MARK: Tag and User Directory Services
     
     ///

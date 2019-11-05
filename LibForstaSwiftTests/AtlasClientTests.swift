@@ -124,15 +124,15 @@ export JWT_PROXY_AUDIENCE='atlas'
     func testTagParts() {
         let atlas = AtlasClient(kvstore: MemoryKVStore())
         atlas.serverUrl = testServerUrl
-        atlas.defaultOrg = "yobaby"
+        atlas.defaultOrg = "yodude"
         
         var (n1, o1) = atlas.tagParts("foo")
         XCTAssert(n1 == "foo")
-        XCTAssert(o1 == "yobaby")
+        XCTAssert(o1 == "yodude")
         
         (n1, o1) = atlas.tagParts("@Foo")
         XCTAssert(n1 == "foo")
-        XCTAssert(o1 == "yobaby")
+        XCTAssert(o1 == "yodude")
         
         (n1, o1) = atlas.tagParts("foo:bar")
         XCTAssert(n1 == "foo")
@@ -144,7 +144,7 @@ export JWT_PROXY_AUDIENCE='atlas'
         
         (n1, o1) = atlas.tagParts("")
         XCTAssert(n1 == "")
-        XCTAssert(o1 == "yobaby")
+        XCTAssert(o1 == "yodude")
         
         (n1, o1) = atlas.tagParts(" :bar ")
         XCTAssert(n1 == "")
@@ -745,6 +745,60 @@ export JWT_PROXY_AUDIENCE='atlas'
                 expectation.fulfill()
         }
         wait(for: [expectation], timeout: 5.0)
+    }
+    
+    func testConversations() {
+        let atlas = AtlasClient(kvstore: MemoryKVStore())
+        let atlas2 = AtlasClient(kvstore: MemoryKVStore())
+        atlas.serverUrl = testServerUrl
+        atlas2.serverUrl = testServerUrl
+        
+        let myExpires = Date.timestamp + TimeInterval(60.0)
+        var info: AtlasClient.ConversationInfo? = nil
+        
+        let expectation = XCTestExpectation(description: "auth via password")
+        atlas.authenticateViaPassword(userTag: "@password:\(testOrgSlug)", password: "asdfasdf24")
+            .map { user in
+                XCTAssert(user["first_name"].stringValue == "Password")
+        }
+        .then {
+            atlas.createConversation(expires: myExpires)
+        }
+        .map { i in
+            XCTAssert(i.expires == myExpires)
+            XCTAssert(i.created != myExpires)
+            info = i
+        }
+        .then {
+            atlas.getConversationInfo(info!.token)
+        }
+        .map { i in
+            XCTAssert(i.expires == myExpires)
+            XCTAssert(i.created != myExpires)
+        }
+        .then {
+            atlas.joinConversation(info!.token, firstName: "Yo", lastName: "Dude")
+        }
+        .map { i in
+            XCTAssert(i.userIds.count == 1)
+            XCTAssert(i.userIds[0] == atlas.authenticatedUserId)
+        }
+        .then {
+            atlas2.joinConversation(info!.token, firstName: "Yo2", lastName: "Dude2")
+        }
+        .done { i in
+            XCTAssert(i.userIds.count == 2)
+            XCTAssert(i.userIds[1] == atlas2.authenticatedUserId)
+        }
+        .catch { error in
+            if let ferr = error as? ForstaError {
+                print(ferr)
+            }
+            XCTFail("surprising error")
+        }.finally {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 55.0)
     }
     
     func testSMSAuthentication() {
