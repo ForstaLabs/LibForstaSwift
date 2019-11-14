@@ -440,7 +440,7 @@ public class SignalClient {
             "voipRegistrationId" : voipToken
         ]
         return request(.accounts,
-                       urlParameters: "apn",
+                       urlParameters: "/apn",
                        method: .put,
                        parameters: fields,
                        queue: ForstaClient.workQueue)

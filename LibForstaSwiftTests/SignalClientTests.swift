@@ -1018,6 +1018,32 @@ class SignalClientTests: XCTestCase {
         wait(for: [completed], timeout: 10*60.0)
     }
     
+    func testNewDeviceDelayedConnectionConversation() {
+        watchEverything()
+        let completed = XCTestExpectation()
+        let conversation = Conversation()
+        
+        firstly {
+            conversation.register(tag: "greg1", password: "asdfasdf24", delayConnection: 20.0)
+        }
+        .then {
+            conversation.finished
+        }
+        .done { _ in
+            print("conversation over")
+            completed.fulfill()
+        }
+        .catch { error in
+            if let e = error as? ForstaError {
+                print(e)
+            } else {
+                print(error)
+            }
+            XCTFail("What we've got here is a failure to communicate.")
+        }
+        wait(for: [completed], timeout: 10*60.0)
+    }
+    
     func testExample() {
         let completed=XCTestExpectation()
         let example = Example()
@@ -1076,8 +1102,9 @@ class SignalClientTests: XCTestCase {
 class Conversation: SignalClientDelegate {
     let forsta = try! ForstaClient(MemoryKVStore())
     let (finished, finishedSeal) = Promise<Void>.pending()
-
-    func register(tag: String, password: String) -> Promise<Void> {
+    let delayConnection = TimeInterval(0.0)
+    
+    func register(tag: String, password: String, delayConnection: TimeInterval = 0.0) -> Promise<Void> {
         return firstly {
             forsta.atlas.authenticateViaPassword(userTag: tag, password: password)
         }
@@ -1089,6 +1116,11 @@ class Conversation: SignalClientDelegate {
         }
         .map { _ in
             self.forsta.signal.delegates.add(self)
+        }
+        .then { _ in
+            after(seconds: delayConnection)
+        }
+        .map { _ in
             try self.forsta.connect()
         }
     }
