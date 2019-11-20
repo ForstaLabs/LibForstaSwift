@@ -27,6 +27,15 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "DBDB772622E124610027EEB0"
+            BuildableName = "LibForstaSwift.framework"
+            BlueprintName = "LibForstaSwift"
+            ReferencedContainer = "container:LibForstaSwift.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -44,23 +53,9 @@
                <Test
                   Identifier = "AtlasClientTests/testGetDevices()">
                </Test>
-               <Test
-                  Identifier = "AtlasClientTests/testSMSAuthentication()">
-               </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DBDB772622E124610027EEB0"
-            BuildableName = "LibForstaSwift.framework"
-            BlueprintName = "LibForstaSwift"
-            ReferencedContainer = "container:LibForstaSwift.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -81,8 +76,6 @@
             ReferencedContainer = "container:LibForstaSwift.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

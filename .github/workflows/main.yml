@@ -5,22 +5,15 @@ on:
       - master
 
 jobs:
-  build:
+  refresh_docs:
     name: Refresh Docs
-    runs-on: macOS-10.14
-    
+    runs-on: macOS-latest
     steps:
-    - name: get the code
-      uses: actions/checkout@master
-    - name: install the jazzy gem
-      run: gem install jazzy
-    - name: install dependencies and build docs
-      run: make docs
-    - name: push to gh-pages
-      if: success()
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-        PUBLISH_BRANCH: gh-pages
-        PUBLISH_DIR: ./docs
-      run: ./.github/bin/gh-pages-push.sh
+      - name: Get Code
+        uses: actions/checkout@v1
+      - name: Publish Docs
+        uses: steven0351/publish-jazzy-docs@v1.1.0
+        with:
+          personal_access_token: ${{ secrets.GH_PAT }}
+          config: .jazzy.yaml
 

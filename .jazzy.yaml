@@ -1,0 +1,13 @@
+module: LibForstaSwift
+author: "Forsta, Inc"
+author_url: https://forsta.io
+github_url: https://github.com/ForstaLabs/LibForstaSwift
+root_url: https://forstalabs.github.io/LibForstaSwift/LATEST/index.html
+
+theme: fullwidth
+clean: true
+hide_documentation_coverage: true
+skip_undocumented: false
+
+github_file_prefix: https://github.com/ForstaLabs/LibForstaSwift/blob/master
+xcodebuild_arguments: [-scheme, LibForstaSwift]

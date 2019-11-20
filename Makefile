@@ -7,7 +7,7 @@ DEPENDENCIES := .dependencies-built
 
 .PHONY: build test retest clean dependencies ci pristine docs
 
-default: clean $(DEPENDENCIES) build
+default: clean $(DEPENDENCIES)
 
 ci: $(DEPENDENCIES) test
 	$(XCODE_BUILD) build
@@ -29,18 +29,7 @@ pristine: clean
 	rm -rf Carthage
 	rm -f $(DEPENDENCIES)
 
-docs: $(DEPENDENCIES)
+docs:
 	@ echo building api docs
-	@ jazzy \
-                --clean \
-                --hide-documentation-coverage \
-                --author "Forsta, Inc" \
-                --author_url https://forsta.io \
-                --github_url https://github.com/ForstaLabs/LibForstaSwift \
-                --github-file-prefix https://github.com/ForstaLabs/LibForstaSwift/blob/master \
-                --xcodebuild-arguments -scheme,LibForstaSwift \
-                --module LibForstaSwift \
-                --root-url https://forstalabs.github.io/LibForstaSwift/LATEST/index.html \
-                --output docs \
-                --theme fullwidth
+	@ jazzy 
 
