@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>SignalCommonCrypto Structure Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Struct/SignalCommonCrypto" class="dashAnchor"></a>
+
+    <a title="SignalCommonCrypto Structure Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          LibForstaSwift Docs
+        </a>
+        
+      </p>
+    
+      <p class="header-col--secondary">
+        <form role="search" action="../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/ForstaLabs/LibForstaSwift">
+            <img class="header-icon" src="../img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="dash-feed://https%3A%2F%2Fforstalabs%2Egithub%2Eio%2FLibForstaSwift%2FLATEST%2Fdocsets%2FLibForstaSwift%2Exml">
+            <img class="header-icon" src="../img/dash.png"/>
+            Install in Dash
+          </a>
+        </p>
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">LibForstaSwift Reference</a>
+      <img class="carat" src="../img/carat.png" />
+      SignalCommonCrypto Structure Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/AtlasClient.html">AtlasClient</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/AtlasClient/ConversationInfo.html">– ConversationInfo</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/AtlasClient/AuthenticationMethod.html">– AuthenticationMethod</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/AtlasClient/SignalAccountInfo.html">– SignalAccountInfo</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/AtlasClient/TagExpressionResolution.html">– TagExpressionResolution</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/AttachmentInfo.html">AttachmentInfo</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/Delegates.html">Delegates</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/DeliveryReceipt.html">DeliveryReceipt</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/ForstaClient.html">ForstaClient</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/ForstaError.html">ForstaError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/ForstaError/ErrorType.html">– ErrorType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/InboundMessage.html">InboundMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/IncomingWSRequest.html">IncomingWSRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/KVBacked.html">KVBacked</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/MessageReceiver.html">MessageReceiver</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/MessageSender.html">MessageSender</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/MessageSender/TransmissionInfo.html">– TransmissionInfo</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/OutgoingWSRequest.html">OutgoingWSRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/SignalClient.html">SignalClient</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/SignalClient/AutoprovisionTask.html">– AutoprovisionTask</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/SyncReadReceipt.html">SyncReadReceipt</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/WSRequest.html">WSRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/WSRequest.html#/s:14LibForstaSwift9WSRequestC4PathC">– Path</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/WebSocketResource.html">WebSocketResource</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/MessageRecipient.html">MessageRecipient</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/SignalEncryptionScheme.html">SignalEncryptionScheme</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/Data.html">Data</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/Date.html">Date</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/JSON.html">JSON</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/Notification.html">Notification</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/Notification/Name.html">– Name</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/Request.html">Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/SignalAddress.html">SignalAddress</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/String.html">String</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/TimeInterval.html">TimeInterval</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/UUID.html">UUID</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/AtlasClientDelegate.html">AtlasClientDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/KVStorageProtocol.html">KVStorageProtocol</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Sendable.html">Sendable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/SignalClientDelegate.html">SignalClientDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/ToFromData.html">ToFromData</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1.html">ForstaPayloadV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/DataElement.html">– DataElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/SyncMessage.html">– SyncMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/KnownContact.html">– KnownContact</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/KnownThread.html">– KnownThread</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/Address.html">– Address</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/Body.html">– Body</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/ThreadUpdate.html">– ThreadUpdate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/IceCandidate.html">– IceCandidate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/SDP.html">– SDP</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/Attachment.html">– Attachment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/Distribution.html">– Distribution</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/StreamType.html">– StreamType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/MessageType.html">– MessageType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/ThreadType.html">– ThreadType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/ControlType.html">– ControlType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/SyncRequestType.html">– SyncRequestType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SignalCommonCrypto.html">SignalCommonCrypto</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:14LibForstaSwift16WSRequestHandlera">WSRequestHandler</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:14LibForstaSwift17WSResponseHandlera">WSResponseHandler</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content">
+            <h1>SignalCommonCrypto</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">SignalCommonCrypto</span></code></pre>
+
+                </div>
+              </div>
+            <p><code>SignalCommonCrypto</code> struct adopted from the
+<a href="https://github.com/christophhagen/LibSignalProtocolSwift">LibSignalProtocolSwift</a>
+project (lightly modified)</p>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift18SignalCommonCryptoV6random5bytes10Foundation4DataVSi_tKFZ"></a>
+                    <a name="//apple_ref/swift/Method/random(bytes:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift18SignalCommonCryptoV6random5bytes10Foundation4DataVSi_tKFZ">random(bytes:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Create a number of random bytes</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>SignalError.noRandomBytes</code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">random</span><span class="p">(</span><span class="nv">bytes</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>bytes</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The number of random bytes to create</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>An array of <code>bytes</code> length with random numbers</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/SignalCommonCrypto.swift#L23-L31">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift18SignalCommonCryptoV10hmacSHA2563for4with10Foundation4DataVAI_AItFZ"></a>
+                    <a name="//apple_ref/swift/Method/hmacSHA256(for:with:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift18SignalCommonCryptoV10hmacSHA2563for4with10Foundation4DataVAI_AItFZ">hmacSHA256(for:with:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Create a HMAC authentication for a given message</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">hmacSHA256</span><span class="p">(</span><span class="k">for</span> <span class="nv">message</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="n">with</span> <span class="nv">salt</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>message</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The input message to create the HMAC for</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>salt</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The salt for the HMAC</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The HMAC</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/SignalCommonCrypto.swift#L39-L59">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift18SignalCommonCryptoV6sha5123for10Foundation4DataVAH_tKFZ"></a>
+                    <a name="//apple_ref/swift/Method/sha512(for:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift18SignalCommonCryptoV6sha5123for10Foundation4DataVAH_tKFZ">sha512(for:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Create a SHA512 digest for a given message</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>SignalError.digestError</code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">sha512</span><span class="p">(</span><span class="k">for</span> <span class="nv">message</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>message</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The input message to create the digest for</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The digest</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/SignalCommonCrypto.swift#L67-L92">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift18SignalCommonCryptoV7encrypt7message4with3key2iv10Foundation4DataVAK_AA0D16EncryptionSchemeOA2KtKFZ"></a>
+                    <a name="//apple_ref/swift/Method/encrypt(message:with:key:iv:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift18SignalCommonCryptoV7encrypt7message4with3key2iv10Foundation4DataVAK_AA0D16EncryptionSchemeOA2KtKFZ">encrypt(message:with:key:iv:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Encrypt a message with AES</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>SignalError.encryptionError</code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">encrypt</span><span class="p">(</span><span class="nv">message</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="n">with</span> <span class="nv">cipher</span><span class="p">:</span> <span class="kt"><a href="../Enums/SignalEncryptionScheme.html">SignalEncryptionScheme</a></span> <span class="o">=</span> <span class="o">.</span><span class="kt">AES_CBCwithPKCS5</span><span class="p">,</span> <span class="nv">key</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">iv</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>message</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The input message to encrypt</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>cipher</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>THe encryption scheme to use</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>key</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The key for encryption (<code>kCCKeySizeAES256</code> bytes)</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>iv</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The initialization vector (<code>kCCBlockSizeAES128</code> bytes)</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The encrypted message</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/SignalCommonCrypto.swift#L103-L119">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift18SignalCommonCryptoV7decrypt7message4with3key2iv10Foundation4DataVAK_AA0D16EncryptionSchemeOA2KtKFZ"></a>
+                    <a name="//apple_ref/swift/Method/decrypt(message:with:key:iv:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift18SignalCommonCryptoV7decrypt7message4with3key2iv10Foundation4DataVAK_AA0D16EncryptionSchemeOA2KtKFZ">decrypt(message:with:key:iv:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Decrypt a message with AES</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    <code>SignalError.decryptionError</code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">decrypt</span><span class="p">(</span><span class="nv">message</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="n">with</span> <span class="nv">cipher</span><span class="p">:</span> <span class="kt"><a href="../Enums/SignalEncryptionScheme.html">SignalEncryptionScheme</a></span> <span class="o">=</span> <span class="o">.</span><span class="kt">AES_CBCwithPKCS5</span><span class="p">,</span> <span class="nv">key</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">iv</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>message</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The input message to decrypt</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>cipher</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>THe encryption scheme to use</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>key</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The key for decryption (<code>kCCKeySizeAES256</code> bytes)</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>iv</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The initialization vector (<code>kCCBlockSizeAES128</code> bytes)</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The decrypted message</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/SignalCommonCrypto.swift#L130-L146">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift18SignalCommonCryptoV9verifyMAC4data3key08expectedH0y10Foundation4DataV_A2JtKFZ"></a>
+                    <a name="//apple_ref/swift/Method/verifyMAC(data:key:expectedMAC:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift18SignalCommonCryptoV9verifyMAC4data3key08expectedH0y10Foundation4DataV_A2JtKFZ">verifyMAC(data:key:expectedMAC:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Verify a message MAC</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">verifyMAC</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">key</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">expectedMAC</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/SignalCommonCrypto.swift#L336-L341">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift18SignalCommonCryptoV13deriveSecrets5input4salt4info6chunksSay10Foundation4DataVGAK_A2KSitKFZ"></a>
+                    <a name="//apple_ref/swift/Method/deriveSecrets(input:salt:info:chunks:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift18SignalCommonCryptoV13deriveSecrets5input4salt4info6chunksSay10Foundation4DataVGAK_A2KSitKFZ">deriveSecrets(input:salt:info:chunks:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>RFC 5869 key derivation</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">deriveSecrets</span><span class="p">(</span><span class="nv">input</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">salt</span><span class="p">:</span> <span class="kt">Data</span> <span class="o">=</span> <span class="kt">Data</span><span class="p">(</span><span class="nv">count</span><span class="p">:</span> <span class="mi">32</span><span class="p">),</span> <span class="nv">info</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">chunks</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">Data</span><span class="p">]</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/SignalCommonCrypto.swift#L344-L365">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift18SignalCommonCryptoV18calculateAgreement13publicKeyData07privatejK010Foundation0K0VAI_AItKFZ"></a>
+                    <a name="//apple_ref/swift/Method/calculateAgreement(publicKeyData:privateKeyData:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift18SignalCommonCryptoV18calculateAgreement13publicKeyData07privatejK010Foundation0K0VAI_AItKFZ">calculateAgreement(publicKeyData:privateKeyData:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Calculate an ECDH agreement.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">calculateAgreement</span><span class="p">(</span><span class="nv">publicKeyData</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">privateKeyData</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>publicKeyData</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The curve25519 (typically remote party&rsquo;s) 32-byte public key data</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>privateKeyData</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The curve25519 (typically your) 32-byte private key data</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>a 32-bit shared secret on success, throwing on failure</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/SignalCommonCrypto.swift#L372-L374">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift18SignalCommonCryptoV026generateKeyPairFromPrivateH0yXe10Foundation4DataV_tKcACmFZ"></a>
+                    <a name="//apple_ref/swift/Method/generateKeyPairFromPrivateKey(privateKeyData:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift18SignalCommonCryptoV026generateKeyPairFromPrivateH0yXe10Foundation4DataV_tKcACmFZ">generateKeyPairFromPrivateKey(privateKeyData:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Generates a Curve25519 keypair.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">generateKeyPairFromPrivateKey</span><span class="p">(</span><span class="nv">privateKeyData</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">KeyPair</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>privateKeyData</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The curve25519 (typically your) 32-byte private key data</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>the full <code>KeyPair</code></p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/SignalCommonCrypto.swift#L380-L387">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift18SignalCommonCryptoV17generateSignature14privateKeyData7message10Foundation0K0VAI_AItKFZ"></a>
+                    <a name="//apple_ref/swift/Method/generateSignature(privateKeyData:message:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift18SignalCommonCryptoV17generateSignature14privateKeyData7message10Foundation0K0VAI_AItKFZ">generateSignature(privateKeyData:message:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Generate a Curve25519 signature.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">generateSignature</span><span class="p">(</span><span class="nv">privateKeyData</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">message</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/SignalCommonCrypto.swift#L390-L397">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift18SignalCommonCryptoV15verifySignature9signature13publicKeyData7messageSb10Foundation0L0V_A2JtKFZ"></a>
+                    <a name="//apple_ref/swift/Method/verifySignature(signature:publicKeyData:message:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift18SignalCommonCryptoV15verifySignature9signature13publicKeyData7messageSb10Foundation0L0V_A2JtKFZ">verifySignature(signature:publicKeyData:message:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Validate a Curve25519 signature.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">verifySignature</span><span class="p">(</span><span class="nv">signature</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">publicKeyData</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">message</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/SignalCommonCrypto.swift#L400-L405">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift18SignalCommonCryptoV17decryptAttachment4data4keys10Foundation4DataVAI_AItKFZ"></a>
+                    <a name="//apple_ref/swift/Method/decryptAttachment(data:keys:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift18SignalCommonCryptoV17decryptAttachment4data4keys10Foundation4DataVAI_AItKFZ">decryptAttachment(data:keys:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Decrypt attachment data</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">decryptAttachment</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">keys</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/SignalCommonCrypto.swift#L408-L426">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift18SignalCommonCryptoV17encryptAttachment4data4keys2iv10Foundation4DataVAJ_A2JtKFZ"></a>
+                    <a name="//apple_ref/swift/Method/encryptAttachment(data:keys:iv:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift18SignalCommonCryptoV17encryptAttachment4data4keys2iv10Foundation4DataVAJ_A2JtKFZ">encryptAttachment(data:keys:iv:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Encrypt attachment data</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">encryptAttachment</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">keys</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">iv</span><span class="p">:</span> <span class="kt">Data</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Utilities/SignalCommonCrypto.swift#L429-L445">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2019 <a class="link" href="https://forsta.io" target="_blank" rel="external">Forsta, Inc</a>. All rights reserved. (Last updated: 2019-11-20)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.12.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
+  </body>
+</div>
+</html>

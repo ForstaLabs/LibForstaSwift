@@ -1,0 +1,2273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>AtlasClient Class Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Class/AtlasClient" class="dashAnchor"></a>
+
+    <a title="AtlasClient Class Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          LibForstaSwift Docs
+        </a>
+        
+      </p>
+    
+      <p class="header-col--secondary">
+        <form role="search" action="../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/ForstaLabs/LibForstaSwift">
+            <img class="header-icon" src="../img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="dash-feed://https%3A%2F%2Fforstalabs%2Egithub%2Eio%2FLibForstaSwift%2FLATEST%2Fdocsets%2FLibForstaSwift%2Exml">
+            <img class="header-icon" src="../img/dash.png"/>
+            Install in Dash
+          </a>
+        </p>
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">LibForstaSwift Reference</a>
+      <img class="carat" src="../img/carat.png" />
+      AtlasClient Class Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/AtlasClient.html">AtlasClient</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/AtlasClient/ConversationInfo.html">– ConversationInfo</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/AtlasClient/AuthenticationMethod.html">– AuthenticationMethod</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/AtlasClient/SignalAccountInfo.html">– SignalAccountInfo</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/AtlasClient/TagExpressionResolution.html">– TagExpressionResolution</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/AttachmentInfo.html">AttachmentInfo</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/Delegates.html">Delegates</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/DeliveryReceipt.html">DeliveryReceipt</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/ForstaClient.html">ForstaClient</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/ForstaError.html">ForstaError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/ForstaError/ErrorType.html">– ErrorType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/InboundMessage.html">InboundMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/IncomingWSRequest.html">IncomingWSRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/KVBacked.html">KVBacked</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/MessageReceiver.html">MessageReceiver</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/MessageSender.html">MessageSender</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/MessageSender/TransmissionInfo.html">– TransmissionInfo</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/OutgoingWSRequest.html">OutgoingWSRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/SignalClient.html">SignalClient</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/SignalClient/AutoprovisionTask.html">– AutoprovisionTask</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/SyncReadReceipt.html">SyncReadReceipt</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/WSRequest.html">WSRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/WSRequest.html#/s:14LibForstaSwift9WSRequestC4PathC">– Path</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/WebSocketResource.html">WebSocketResource</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/MessageRecipient.html">MessageRecipient</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/SignalEncryptionScheme.html">SignalEncryptionScheme</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/Data.html">Data</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/Date.html">Date</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/JSON.html">JSON</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/Notification.html">Notification</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/Notification/Name.html">– Name</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/Request.html">Request</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/SignalAddress.html">SignalAddress</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/String.html">String</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/TimeInterval.html">TimeInterval</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/UUID.html">UUID</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/AtlasClientDelegate.html">AtlasClientDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/KVStorageProtocol.html">KVStorageProtocol</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Sendable.html">Sendable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/SignalClientDelegate.html">SignalClientDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/ToFromData.html">ToFromData</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1.html">ForstaPayloadV1</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/DataElement.html">– DataElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/SyncMessage.html">– SyncMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/KnownContact.html">– KnownContact</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/KnownThread.html">– KnownThread</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/Address.html">– Address</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/Body.html">– Body</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/ThreadUpdate.html">– ThreadUpdate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/IceCandidate.html">– IceCandidate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/SDP.html">– SDP</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/Attachment.html">– Attachment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/Distribution.html">– Distribution</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/StreamType.html">– StreamType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/MessageType.html">– MessageType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/ThreadType.html">– ThreadType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/ControlType.html">– ControlType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ForstaPayloadV1/SyncRequestType.html">– SyncRequestType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SignalCommonCrypto.html">SignalCommonCrypto</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:14LibForstaSwift16WSRequestHandlera">WSRequestHandler</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:14LibForstaSwift17WSResponseHandlera">WSResponseHandler</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content">
+            <h1>AtlasClient</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">AtlasClient</span></code></pre>
+
+                </div>
+              </div>
+            <p>Central class for interacting for the Forsta Atlas server.</p>
+
+<p>You&rsquo;ll use this for Atlas authentication, user creation and manipulation,
+tag creation and manipulation, and tag-math evaluation to resolve message
+distributions.</p>
+
+<p>It requires an object conforming to <code><a href="../Protocols/KVStorageProtocol.html">KVStorageProtocol</a></code> so it can maintain
+login sessions across invocations, etc.</p>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Attributes"></a>
+                <a name="//apple_ref/swift/Section/Attributes" class="dashAnchor"></a>
+                <a href="#/Attributes">
+                  <h3 class="section-name">Attributes</h3>
+                </a>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC9delegatesAA9DelegatesCyAA0dE8Delegate_pGvp"></a>
+                    <a name="//apple_ref/swift/Property/delegates" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC9delegatesAA9DelegatesCyAA0dE8Delegate_pGvp">delegates</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The registered delegates for this Atlas client</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">delegates</span><span class="p">:</span> <span class="kt"><a href="../Classes/Delegates.html">Delegates</a></span><span class="o">&lt;</span><span class="kt"><a href="../Protocols/AtlasClientDelegate.html">AtlasClientDelegate</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L35">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC10defaultOrgSSSgvp"></a>
+                    <a name="//apple_ref/swift/Property/defaultOrg" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC10defaultOrgSSSgvp">defaultOrg</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The default public organization name (added to unqualified login tags)</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">defaultOrg</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L39-L42">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC9serverUrlSSSgvp"></a>
+                    <a name="//apple_ref/swift/Property/serverUrl" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC9serverUrlSSSgvp">serverUrl</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The URL of the Atlas server we are using</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">serverUrl</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L46-L49">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC19authenticatedUserId10Foundation4UUIDVSgvp"></a>
+                    <a name="//apple_ref/swift/Property/authenticatedUserId" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC19authenticatedUserId10Foundation4UUIDVSgvp">authenticatedUserId</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The current authenticated user UUID</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">authenticatedUserId</span><span class="p">:</span> <span class="kt">UUID</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L52">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC15isAuthenticatedSbvp"></a>
+                    <a name="//apple_ref/swift/Property/isAuthenticated" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC15isAuthenticatedSbvp">isAuthenticated</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>predicate for whether this Atlas client is currently authenticated</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">isAuthenticated</span><span class="p">:</span> <span class="kt">Bool</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L55-L57">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC20authenticatedUserJwtSSSgvp"></a>
+                    <a name="//apple_ref/swift/Property/authenticatedUserJwt" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC20authenticatedUserJwtSSSgvp">authenticatedUserJwt</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The current authenticated user JWT (will be automatically set and maintained)</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">authenticatedUserJwt</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L61-L67">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Constructors"></a>
+                <a name="//apple_ref/swift/Section/Constructors" class="dashAnchor"></a>
+                <a href="#/Constructors">
+                  <h3 class="section-name">Constructors</h3>
+                </a>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC7kvstoreAcA17KVStorageProtocol_p_tcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(kvstore:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC7kvstoreAcA17KVStorageProtocol_p_tcfc">init(kvstore:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initialize this Atlas client.
+This will resume maintaining an auth session, if possible.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">kvstore</span><span class="p">:</span> <span class="kt"><a href="../Protocols/KVStorageProtocol.html">KVStorageProtocol</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>kvstore</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>a persistent key-value store</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L77-L85">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Authentication%20and%20JWT%20Maintenance"></a>
+                <a name="//apple_ref/swift/Section/Authentication and JWT Maintenance" class="dashAnchor"></a>
+                <a href="#/Authentication%20and%20JWT%20Maintenance">
+                  <h3 class="section-name">Authentication and JWT Maintenance</h3>
+                </a>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC21requestAuthenticationyXeSScACF"></a>
+                    <a name="//apple_ref/swift/Method/requestAuthentication(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC21requestAuthenticationyXeSScACF">requestAuthentication(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Request a user&rsquo;s authentication method for the Atlas server.
+(This will trigger the transmission of an SMS code if applicable.)</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">requestAuthentication</span><span class="p">(</span><span class="n">_</span> <span class="nv">userTag</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/AtlasClient/AuthenticationMethod.html">AuthenticationMethod</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>userTag</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Tag for the user to authenticate as.
+                 It takes the form [@]user[:org].</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code>Promise</code> that resolves to an <code><a href="../Classes/AtlasClient/AuthenticationMethod.html">AuthenticationMethod</a></code>
+       indicating how to complete authentiation.</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L98-L116">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC19authenticateViaCodeyXeSS_SStcACF"></a>
+                    <a name="//apple_ref/swift/Method/authenticateViaCode(userTag:code:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC19authenticateViaCodeyXeSS_SStcACF">authenticateViaCode(userTag:code:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Authentication via SMS code</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">authenticateViaCode</span><span class="p">(</span><span class="nv">userTag</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">code</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/AtlasClient.html#/s:14LibForstaSwift11AtlasClientC17AuthenticatedUsera">AuthenticatedUser</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>userTag</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Tag for the user. It takes the form [@]user[:org].</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>code</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>SMS code that was sent to the user when <code>requestAuthentication</code> was called.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code>Promise</code> that resolves to  an <code><a href="../Classes/AtlasClient.html#/s:14LibForstaSwift11AtlasClientC17AuthenticatedUsera">AuthenticatedUser</a></code> <code>JSON</code> blob for the user</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L126-L133">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC23authenticateViaPasswordyXeSS_SStcACF"></a>
+                    <a name="//apple_ref/swift/Method/authenticateViaPassword(userTag:password:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC23authenticateViaPasswordyXeSS_SStcACF">authenticateViaPassword(userTag:password:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Authentication via password</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">authenticateViaPassword</span><span class="p">(</span><span class="nv">userTag</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/AtlasClient.html#/s:14LibForstaSwift11AtlasClientC17AuthenticatedUsera">AuthenticatedUser</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>userTag</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Tag for the user. It takes the form [@]user[:org].</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>password</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The user&rsquo;s password.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code>Promise</code> that resolves to an <code><a href="../Classes/AtlasClient.html#/s:14LibForstaSwift11AtlasClientC17AuthenticatedUsera">AuthenticatedUser</a></code> <code>JSON</code> blob for the user</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L143-L150">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC26authenticateViaPasswordOtpyXeSS_S2StcACF"></a>
+                    <a name="//apple_ref/swift/Method/authenticateViaPasswordOtp(userTag:password:otp:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC26authenticateViaPasswordOtpyXeSS_S2StcACF">authenticateViaPasswordOtp(userTag:password:otp:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Authentication via password + authenticator code</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">authenticateViaPasswordOtp</span><span class="p">(</span><span class="nv">userTag</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">otp</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/AtlasClient.html#/s:14LibForstaSwift11AtlasClientC17AuthenticatedUsera">AuthenticatedUser</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>userTag</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Tag for the user. It takes the form [@]user[:org].</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>password</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The user&rsquo;s password.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code>Promise</code> that resolves to an <code><a href="../Classes/AtlasClient.html#/s:14LibForstaSwift11AtlasClientC17AuthenticatedUsera">AuthenticatedUser</a></code> <code>JSON</code> blob for the user</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L161-L169">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC28authenticateViaUserAuthTokenyXeSS_tcACF"></a>
+                    <a name="//apple_ref/swift/Method/authenticateViaUserAuthToken(token:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC28authenticateViaUserAuthTokenyXeSS_tcACF">authenticateViaUserAuthToken(token:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Authentication via a <code>UserAuthToken</code></p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">authenticateViaUserAuthToken</span><span class="p">(</span><span class="nv">token</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/AtlasClient.html#/s:14LibForstaSwift11AtlasClientC17AuthenticatedUsera">AuthenticatedUser</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>token</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A <code>UserAuthToken</code> for the authenticating user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code>Promise</code> that resolves to an <code><a href="../Classes/AtlasClient.html#/s:14LibForstaSwift11AtlasClientC17AuthenticatedUsera">AuthenticatedUser</a></code> <code>JSON</code> blob for the user</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L177-L182">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC23authenticateViaJwtProxyyXeSS_tcACF"></a>
+                    <a name="//apple_ref/swift/Method/authenticateViaJwtProxy(jwt:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC23authenticateViaJwtProxyyXeSS_tcACF">authenticateViaJwtProxy(jwt:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Authentication via UserAuthToken</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">authenticateViaJwtProxy</span><span class="p">(</span><span class="nv">jwt</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/AtlasClient.html#/s:14LibForstaSwift11AtlasClientC17AuthenticatedUsera">AuthenticatedUser</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>jwt</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A JWT proxy for the authenticating user.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code>Promise</code> that resolves to an <code><a href="../Classes/AtlasClient.html#/s:14LibForstaSwift11AtlasClientC17AuthenticatedUsera">AuthenticatedUser</a></code> <code>JSON</code> blob for the user</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L190-L195">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Invitation,%20Conversation,%20User,%20and%20Org%20CRUD"></a>
+                <a name="//apple_ref/swift/Section/Invitation, Conversation, User, and Org CRUD" class="dashAnchor"></a>
+                <a href="#/Invitation,%20Conversation,%20User,%20and%20Org%20CRUD">
+                  <h3 class="section-name">Invitation, Conversation, User, and Org CRUD</h3>
+                </a>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC10createUseryXeSDySSypGcACF"></a>
+                    <a name="//apple_ref/swift/Method/createUser(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC10createUseryXeSDySSypGcACF">createUser(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Administrator creation of a new user in the same organization.</p>
+
+<p>REQUIRED FIELDS: first_name, tag_slug</p>
+
+<p>ALERT: if tag_slug is already taken in the caller&rsquo;s org, the result will be a clunky 500 error</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">createUser</span><span class="p">(</span><span class="n">_</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt">JSON</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>fields</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>dictionary of optional and required fields for the new user</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code>Promise</code> that resolves to a <code>JSON</code> blob of the new user</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L253-L259">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC10updateUseryXe10Foundation4UUIDV_SDySSypGtcACF"></a>
+                    <a name="//apple_ref/swift/Method/updateUser(_:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC10updateUseryXe10Foundation4UUIDV_SDySSypGtcACF">updateUser(_:_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Administrator update of a new user in the same organization.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">updateUser</span><span class="p">(</span><span class="n">_</span> <span class="nv">userId</span><span class="p">:</span> <span class="kt">UUID</span><span class="p">,</span> <span class="n">_</span> <span class="nv">patchFields</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt">JSON</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>userId</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the user&rsquo;s UUID</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>patchFields</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>dictionary of (only) the fields to update in the user</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code>Promise</code> that resolves to a <code>JSON</code> blob of the updated user</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L270-L276">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC19createUserAuthTokenyXe10Foundation4UUIDVSg_SSSgtcACF"></a>
+                    <a name="//apple_ref/swift/Method/createUserAuthToken(userId:description:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC19createUserAuthTokenyXe10Foundation4UUIDVSg_SSSgtcACF">createUserAuthToken(userId:description:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Request creation of a UserAuthToken</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">createUserAuthToken</span><span class="p">(</span><span class="nv">userId</span><span class="p">:</span> <span class="kt">UUID</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">description</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="p">(</span><span class="kt">UUID</span><span class="p">,</span> <span class="kt">String</span><span class="p">)</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>userId</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>optional user ID to create the token for a user other than self (requires being an org admin)</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>description</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>optional description for this token</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code>Promise</code> that resolves to a tuple of the token&rsquo;s ID and the UserAuthToken</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L287-L305">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC04joinB0yXeSSSg_SDySSypGtcACF"></a>
+                    <a name="//apple_ref/swift/Method/joinForsta(invitationToken:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC04joinB0yXeSSSg_SDySSypGtcACF">joinForsta(invitationToken:_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Unauthenticated creation of an account (and an org for it, optionally).
+On success, this also sets the JWT for this <code>AtlasClient</code>.</p>
+
+<p>Required fields:</p>
+
+<ul>
+<li><q>captcha</q>: reCaptcha&rsquo;s output</li>
+<li><q>phone</q>: The new user&rsquo;s phone number</li>
+<li><q>email</q>: The new user&rsquo;s email address</li>
+<li><q>fullname</q>: The new user&rsquo;s full name</li>
+<li><q>tag_slug</q>: The new user&rsquo;s usertag slug text</li>
+<li><q>password</q>: The new user&rsquo;s password text</li>
+</ul>
+
+<p>Optional fields (only define these if you are creating a new org):</p>
+
+<ul>
+<li><q>org_name</q>: Full name of the new org</li>
+<li><p><q>org_slug</q>: Slug text for the new org</p></li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">joinForsta</span><span class="p">(</span><span class="nv">invitationToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+                       <span class="n">_</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">:</span> <span class="kt">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="p">(</span><span class="kt">String</span><span class="p">,</span> <span class="kt">UUID</span><span class="p">)</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>invitationToken</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Optional invitation token that was obtained from /v1/invitation</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>fields</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>dictionary of the fields to define the new user and possibly org</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code>Promise</code> that resolves to a tuple of the new user&rsquo;s fully-qualified tag string and userId UUID: <code>(tag, uuid)</code></p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L329-L345">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC14sendInvitationyXeSDySSypGcACF"></a>
+                    <a name="//apple_ref/swift/Method/sendInvitation(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC14sendInvitationyXeSDySSypGcACF">sendInvitation(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Generate an invitation from Atlas. Repeated invitations for the same person
+(currently identified via phone number) will return the same pending user ID.</p>
+
+<p>Possible fields:</p>
+
+<ul>
+<li><q>phone</q>: The new user&rsquo;s phone number (required)</li>
+<li><q>email</q>: The new user&rsquo;s email address (optional)</li>
+<li><q>first_name</q>: The new user&rsquo;s first name (optional)</li>
+<li><q>last_name</q>: The new user&rsquo;s last name (optional)</li>
+<li><p><q>message</q>: Supplementary message for invitation (optional)</p></li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">sendInvitation</span><span class="p">(</span><span class="n">_</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt">UUID</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>fields</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>dictionary of the fields giving informatino about the invited user</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>a <code>Promise</code> that resolves to the <code>UUID</code> of
+       the pending user who was sent an invitation</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L363-L373">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC16revokeInvitationyXe10Foundation4UUIDVcACF"></a>
+                    <a name="//apple_ref/swift/Method/revokeInvitation(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC16revokeInvitationyXe10Foundation4UUIDVcACF">revokeInvitation(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Revoke a pending invitation.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">revokeInvitation</span><span class="p">(</span><span class="n">_</span> <span class="nv">pendingUserId</span><span class="p">:</span> <span class="kt">UUID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt">Void</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>pendingUserId</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the user ID of the pending invited user</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>a Promise that resolves upon completion of the task</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L382-L388">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC17getInvitationInfoyXeSScACF"></a>
+                    <a name="//apple_ref/swift/Method/getInvitationInfo(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC17getInvitationInfoyXeSScACF">getInvitationInfo(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get information about an invitation via its token. (This is intended to help
+clients present pre-filled forms for joining based on what Atlas has been
+given about them, perhaps accumulated across several invitation requests
+to Atlas.)</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getInvitationInfo</span><span class="p">(</span><span class="n">_</span> <span class="nv">invitationToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt">JSON</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>invitationToken</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>the token for the invitation</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>a Promise that resolves to <code>JSON</code> containing accumulated field
+       values for prefilling a form leading to a <code>joinForsta()</code></p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L401-L407">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC16ConversationInfoC"></a>
+                    <a name="//apple_ref/swift/Class/ConversationInfo" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC16ConversationInfoC">ConversationInfo</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                        <a href="../Classes/AtlasClient/ConversationInfo.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">ConversationInfo</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L409-L437">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC18createConversationyXeSSSg_10Foundation4UUIDVSgAeF4DateVSgtcACF"></a>
+                    <a name="//apple_ref/swift/Method/createConversation(captcha:threadId:distribution:expires:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC18createConversationyXeSSSg_10Foundation4UUIDVSgAeF4DateVSgtcACF">createConversation(captcha:threadId:distribution:expires:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Generate a Conversation.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">createConversation</span><span class="p">(</span><span class="nv">captcha</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+                               <span class="nv">threadId</span><span class="p">:</span> <span class="kt">UUID</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+                               <span class="nv">distribution</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+                               <span class="nv">expires</span><span class="p">:</span> <span class="kt">Date</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/AtlasClient/ConversationInfo.html">ConversationInfo</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>captcha</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>reCaptcha&rsquo;s output, required if not currently signed in</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>threadId</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>optional thread id (defaults to a random uuid4)</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>distribution</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>optional starting distribution (defaults to empty, or self if signed in)</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>expires</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>optional expiration datetime (defaults to 1 day from now)</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>a <code>Promise</code> that resolves to a <code><a href="../Classes/AtlasClient/ConversationInfo.html">ConversationInfo</a></code></p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L450-L493">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC19getConversationInfoyXeSScACF"></a>
+                    <a name="//apple_ref/swift/Method/getConversationInfo(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC19getConversationInfoyXeSScACF">getConversationInfo(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get information about a Conversation (if the requesting user is its creator)</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getConversationInfo</span><span class="p">(</span><span class="n">_</span> <span class="nv">conversationToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/AtlasClient/ConversationInfo.html">ConversationInfo</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>conversationToken</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>An existing Conversation&rsquo;s token</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>a <code>Promise</code> that resolves to a <code><a href="../Classes/AtlasClient/ConversationInfo.html">ConversationInfo</a></code></p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L503-L537">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC16joinConversationyXeSS_SSSgA3EtcACF"></a>
+                    <a name="//apple_ref/swift/Method/joinConversation(_:firstName:lastName:email:phone:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC16joinConversationyXeSS_SSSgA3EtcACF">joinConversation(_:firstName:lastName:email:phone:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Join a Conversation.
+If not authenticated with Atlas, this will cause an ephemeral user to be created
+and this AtlasClient will begin maintaining a JWT for it.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">joinConversation</span><span class="p">(</span><span class="n">_</span> <span class="nv">conversationToken</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span>
+                             <span class="nv">firstName</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+                             <span class="nv">lastName</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+                             <span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span>
+                             <span class="nv">phone</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/AtlasClient/ConversationInfo.html">ConversationInfo</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>conversationToken</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>An existing Conversation&rsquo;s token</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>firstName</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>optional first name (used if an ephemeral user is created, defaults to Anonymous)</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>lastName</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>optional last name (used if an ephemeral user is created)</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>email</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>optional email (used if an ephemeral user is created)</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>phone</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>optional phone (used if an ephemeral user is created)</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>a <code>Promise</code> that resolves to a <code><a href="../Classes/AtlasClient/ConversationInfo.html">ConversationInfo</a></code></p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L553-L603">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Tag%20and%20User%20Directory%20Services"></a>
+                <a name="//apple_ref/swift/Section/Tag and User Directory Services" class="dashAnchor"></a>
+                <a href="#/Tag%20and%20User%20Directory%20Services">
+                  <h3 class="section-name">Tag and User Directory Services</h3>
+                </a>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC21resolveTagExpressionsyXeSaySSGcACF"></a>
+                    <a name="//apple_ref/swift/Method/resolveTagExpressions(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC21resolveTagExpressionsyXeSaySSGcACF">resolveTagExpressions(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Takes an array of tag expressions (i.e <q>@foo + @bar - (@joe + @sarah)</q>) and resolves
+them to their current user memberships.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">resolveTagExpressions</span><span class="p">(</span><span class="n">_</span> <span class="nv">expressions</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="p">[</span><span class="kt"><a href="../Classes/AtlasClient/TagExpressionResolution.html">TagExpressionResolution</a></span><span class="p">]</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>expressions</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>an array of <code>String</code> tag expressions</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>a <code>Promise</code> resolving to a matching array of <code><a href="../Classes/AtlasClient/TagExpressionResolution.html">TagExpressionResolution</a></code>s</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L615-L669">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC8getUsersyXeSay10Foundation4UUIDVG_SbtcACF"></a>
+                    <a name="//apple_ref/swift/Method/getUsers(userIds:onlyPublicDirectory:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC8getUsersyXeSay10Foundation4UUIDVG_SbtcACF">getUsers(userIds:onlyPublicDirectory:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get user objects based on a list of user IDs.
+First try to get it from the (more verbose) <code>/user</code> endpoint
+for users in the same org, then fall back to the (more lightweight)
+<code>/directory/user</code> public directory for those in other orgs.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getUsers</span><span class="p">(</span><span class="nv">userIds</span><span class="p">:</span> <span class="p">[</span><span class="kt">UUID</span><span class="p">],</span> <span class="nv">onlyPublicDirectory</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">JSON</span><span class="p">]</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>userIds</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Array of user ID <code>UUID</code>s to look up.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>onlyPublicDirectory</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Optional boolean to only use the
+Forsta public directory. E.g. only return lightweight user objects.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code>Promise</code> resolving to a <code>JSON</code> array of the users&rsquo; information</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L684-L713">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC8getUsersyXeSSSg_tcACF"></a>
+                    <a name="//apple_ref/swift/Method/getUsers(q:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC8getUsersyXeSSSg_tcACF">getUsers(q:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get all user objects in this org based on an optional search/filter query string.
+Retrieves from the <code>/v1/user</code> endpoint. This will retrieve
+<em>all</em> pages of results.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getUsers</span><span class="p">(</span><span class="nv">q</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">JSON</span><span class="p">]</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>q</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Optional query search/filter string.
+           No query string means retreive <strong>all</strong> users.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code>Promise</code> resolving to a <code>JSON</code> array of
+       retrieved users&rsquo; information</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L743-L746">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC7getTagsyXeycACF"></a>
+                    <a name="//apple_ref/swift/Method/getTags()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC7getTagsyXeycACF">getTags()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Get all tag objects for this org.
+Retrieves from the <code>/v1/tag</code> endpoint. This will retrieve
+<em>all</em> pages of results.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getTags</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">JSON</span><span class="p">]</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A <code>Promise</code> resolving to a <code>JSON</code> array of
+       retrieved tags&rsquo; information</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L756-L758">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Atlas%20Calls%20for%20Signal%20Server%20Assistance"></a>
+                <a name="//apple_ref/swift/Section/Atlas Calls for Signal Server Assistance" class="dashAnchor"></a>
+                <a href="#/Atlas%20Calls%20for%20Signal%20Server%20Assistance">
+                  <h3 class="section-name">Atlas Calls for Signal Server Assistance</h3>
+                </a>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC21provisionSignalDeviceyXeSS_SStcACF"></a>
+                    <a name="//apple_ref/swift/Method/provisionSignalDevice(uuidString:pubKeyString:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC21provisionSignalDeviceyXeSS_SStcACF">provisionSignalDevice(uuidString:pubKeyString:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Request provisioning assistance from any existing devices.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">provisionSignalDevice</span><span class="p">(</span><span class="nv">uuidString</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">pubKeyString</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt">JSON</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>uuidString</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>provisioning UUID string provided by Signal server</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>pubKeyString</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>base64-encoded public key to use in encrypting provisioning secrets for me</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p><code>Promise</code> resolving to results bundled in a <code>JSON</code></p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L770-L779">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC22provisionSignalAccountyXeSDySSypGcACF"></a>
+                    <a name="//apple_ref/swift/Method/provisionSignalAccount(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC22provisionSignalAccountyXeSDySSypGcACF">provisionSignalAccount(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Provision/refresh a new Signal Server account.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">provisionSignalAccount</span><span class="p">(</span><span class="n">_</span> <span class="nv">fields</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt">JSON</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p><code>Promise</code> resolving to results bundled in a <code>JSON</code>.</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L786-L792">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC20getSignalAccountInfoyXeycACF"></a>
+                    <a name="//apple_ref/swift/Method/getSignalAccountInfo()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC20getSignalAccountInfoyXeycACF">getSignalAccountInfo()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Retrieve information about the current Signal server account and its devices.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getSignalAccountInfo</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="kt"><a href="../Classes/AtlasClient/SignalAccountInfo.html">SignalAccountInfo</a></span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L797-L826">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC21getRtcTurnServersInfoyXeycACF"></a>
+                    <a name="//apple_ref/swift/Method/getRtcTurnServersInfo()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC21getRtcTurnServersInfoyXeycACF">getRtcTurnServersInfo()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Retrieve information about our WebRTC TURN servers.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">getRtcTurnServersInfo</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Promise</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">JSON</span><span class="p">]</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p><code>Promise</code> resolving to an array of <code>JSON</code> with TURN server info.</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L833-L839">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Utilities"></a>
+                <a name="//apple_ref/swift/Section/Utilities" class="dashAnchor"></a>
+                <a href="#/Utilities">
+                  <h3 class="section-name">Utilities</h3>
+                </a>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC8tagPartsySS_SStSSF"></a>
+                    <a name="//apple_ref/swift/Method/tagParts(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC8tagPartsySS_SStSSF">tagParts(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Breaks a tag into (normalized) user and org slug parts.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">tagParts</span><span class="p">(</span><span class="n">_</span> <span class="nv">tag</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="kt">String</span><span class="p">,</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>tag</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>a string shaped like [@]user[:org]</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>a tuple of (user, org) slug <code>String</code>s &ndash;
+       trimmed, lowercased, @-stripped (also, a
+       missing org will default to <code>self.defaultOrg</code>)</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L851-L860">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Related%20Subtypes"></a>
+                <a name="//apple_ref/swift/Section/Related Subtypes" class="dashAnchor"></a>
+                <a href="#/Related%20Subtypes">
+                  <h3 class="section-name">Related Subtypes</h3>
+                </a>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC20AuthenticationMethodO"></a>
+                    <a name="//apple_ref/swift/Enum/AuthenticationMethod" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC20AuthenticationMethodO">AuthenticationMethod</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A user&rsquo;s current method of interactive authentication</p>
+
+                        <a href="../Classes/AtlasClient/AuthenticationMethod.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">AuthenticationMethod</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L924-L933">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC17AuthenticatedUsera"></a>
+                    <a name="//apple_ref/swift/Alias/AuthenticatedUser" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC17AuthenticatedUsera">AuthenticatedUser</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The JSON blob detailing an authenticated user on Atlas</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">typealias</span> <span class="kt">AuthenticatedUser</span> <span class="o">=</span> <span class="kt">JSON</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L936">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC17SignalAccountInfoV"></a>
+                    <a name="//apple_ref/swift/Struct/SignalAccountInfo" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC17SignalAccountInfoV">SignalAccountInfo</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Account info reported by Signal server</p>
+
+                        <a href="../Classes/AtlasClient/SignalAccountInfo.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">SignalAccountInfo</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L939-L958">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:14LibForstaSwift11AtlasClientC23TagExpressionResolutionV"></a>
+                    <a name="//apple_ref/swift/Struct/TagExpressionResolution" class="dashAnchor"></a>
+                    <a class="token" href="#/s:14LibForstaSwift11AtlasClientC23TagExpressionResolutionV">TagExpressionResolution</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Results of evaluating a tag expression</p>
+
+                        <a href="../Classes/AtlasClient/TagExpressionResolution.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">TagExpressionResolution</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/ForstaLabs/LibForstaSwift/blob/master/LibForstaSwift/Atlas/AtlasClient.swift#L961-L1014">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2019 <a class="link" href="https://forsta.io" target="_blank" rel="external">Forsta, Inc</a>. All rights reserved. (Last updated: 2019-11-20)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.12.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
+  </body>
+</div>
+</html>

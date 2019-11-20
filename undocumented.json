@@ -1,0 +1,355 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Atlas/AtlasClient.swift",
+      "line": 409,
+      "symbol": "AtlasClient.ConversationInfo",
+      "symbol_kind": "source.lang.swift.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Atlas/AtlasClient.swift",
+      "line": 410,
+      "symbol": "AtlasClient.ConversationInfo.threadId",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Atlas/AtlasClient.swift",
+      "line": 411,
+      "symbol": "AtlasClient.ConversationInfo.distribution",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Atlas/AtlasClient.swift",
+      "line": 412,
+      "symbol": "AtlasClient.ConversationInfo.creatorId",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Atlas/AtlasClient.swift",
+      "line": 413,
+      "symbol": "AtlasClient.ConversationInfo.orgId",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Atlas/AtlasClient.swift",
+      "line": 414,
+      "symbol": "AtlasClient.ConversationInfo.userIds",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Atlas/AtlasClient.swift",
+      "line": 415,
+      "symbol": "AtlasClient.ConversationInfo.expires",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Atlas/AtlasClient.swift",
+      "line": 416,
+      "symbol": "AtlasClient.ConversationInfo.token",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Atlas/AtlasClient.swift",
+      "line": 417,
+      "symbol": "AtlasClient.ConversationInfo.created",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Atlas/AtlasClient.swift",
+      "line": 419,
+      "symbol": "AtlasClient.ConversationInfo.init(threadId:distribution:creatorId:orgId:userIds:expires:token:created:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 148,
+      "symbol": "ForstaPayloadV1.DataElement.messages",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 153,
+      "symbol": "ForstaPayloadV1.SyncMessage.attachments",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 154,
+      "symbol": "ForstaPayloadV1.SyncMessage.expiration",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 155,
+      "symbol": "ForstaPayloadV1.SyncMessage.expirationUpdate",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 156,
+      "symbol": "ForstaPayloadV1.SyncMessage.flags",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 157,
+      "symbol": "ForstaPayloadV1.SyncMessage.id",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 158,
+      "symbol": "ForstaPayloadV1.SyncMessage.incoming",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 159,
+      "symbol": "ForstaPayloadV1.SyncMessage.keyChange",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 160,
+      "symbol": "ForstaPayloadV1.SyncMessage.members",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 161,
+      "symbol": "ForstaPayloadV1.SyncMessage.mentions",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 162,
+      "symbol": "ForstaPayloadV1.SyncMessage.messageRef",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 163,
+      "symbol": "ForstaPayloadV1.SyncMessage.monitors",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 164,
+      "symbol": "ForstaPayloadV1.SyncMessage.pendingMembers",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 165,
+      "symbol": "ForstaPayloadV1.SyncMessage.plain",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 166,
+      "symbol": "ForstaPayloadV1.SyncMessage.read",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 167,
+      "symbol": "ForstaPayloadV1.SyncMessage.received",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 168,
+      "symbol": "ForstaPayloadV1.SyncMessage.replies",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 169,
+      "symbol": "ForstaPayloadV1.SyncMessage.safe_html",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 170,
+      "symbol": "ForstaPayloadV1.SyncMessage.sender",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 171,
+      "symbol": "ForstaPayloadV1.SyncMessage.senderDevice",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 172,
+      "symbol": "ForstaPayloadV1.SyncMessage.source",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 173,
+      "symbol": "ForstaPayloadV1.SyncMessage.sourceDevice",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 174,
+      "symbol": "ForstaPayloadV1.SyncMessage.sent",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 175,
+      "symbol": "ForstaPayloadV1.SyncMessage.threadId",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 176,
+      "symbol": "ForstaPayloadV1.SyncMessage.type",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 177,
+      "symbol": "ForstaPayloadV1.SyncMessage.userAgent",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 178,
+      "symbol": "ForstaPayloadV1.SyncMessage.actions",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 179,
+      "symbol": "ForstaPayloadV1.SyncMessage.actionOptions",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 180,
+      "symbol": "ForstaPayloadV1.SyncMessage.action",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 181,
+      "symbol": "ForstaPayloadV1.SyncMessage.serverAge",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 182,
+      "symbol": "ForstaPayloadV1.SyncMessage.timestamp",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 322,
+      "symbol": "ForstaPayloadV1.IceCandidate.candidate",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 323,
+      "symbol": "ForstaPayloadV1.IceCandidate.sdpMid",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 324,
+      "symbol": "ForstaPayloadV1.IceCandidate.sdpMLineIndex",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 325,
+      "symbol": "ForstaPayloadV1.IceCandidate.serverUrl",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 340,
+      "symbol": "ForstaPayloadV1.SDP.SdpType.answer",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 341,
+      "symbol": "ForstaPayloadV1.SDP.SdpType.offer",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/ForstaPayload.swift",
+      "line": 817,
+      "symbol": "ForstaPayloadV1.SyncRequestType",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/MessageReceiver.swift",
+      "line": 198,
+      "symbol": "InboundMessage.verifySignature(store:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift/LibForstaSwift/Signal/SignalClient.swift",
+      "line": 437,
+      "symbol": "SignalClient.registerForPushNotifications(pushToken:voipToken:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/runner/runners/2.160.2/work/LibForstaSwift/LibForstaSwift"
+}
